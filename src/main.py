@@ -1,12 +1,13 @@
 from logger import Logger
+from config import Config
 from unzip import Unzip
 from prep import Prepare
 from cloc import ClocPreCleanup
 from logger import INFO
 from argparse import ArgumentParser
-
-
 from os.path import isfile,isdir
+
+from xlwt import Workbook
 
 from sourceValidation import SourceValidation 
 
@@ -32,17 +33,21 @@ if __name__ == '__main__':
     parser.add_argument('-r','--restart', required=False, help='Cleanup all work and start over')
     args = parser.parse_args()
 
+    config=Config()
+    config.project=args.projectName    
+    config.base=args.baseFolder
+    config.restart=args.restart    
+
+    workbook = Workbook()
     process = [
-    #    Prepare(args,log_level),
-    #    Unzip(args,log_level),
-       ClocPreCleanup(args,log_level)
+        Prepare(log_level),
+        Unzip(log_level),
+       ClocPreCleanup(workbook,log_level)
     ]
 
     step = 1
     for p in process:
         log.info(f'Step {step}.')
         if issubclass(type(p), SourceValidation):
-            if p.run():
-                pass
-        p.run(["app1","app2"])
+            status = p.run(config)
         step = step + 1

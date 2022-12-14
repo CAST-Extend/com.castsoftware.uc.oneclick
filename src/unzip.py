@@ -2,22 +2,22 @@ from os import walk,remove
 from shutil import unpack_archive
 
 from sourceValidation import SourceValidation 
-
+from config import Config
 
 class Unzip(SourceValidation):
 
-   def __init__(cls, args, log_level:int):
-      super().__init__(args,cls.__class__.__name__,log_level)
+   def __init__(cls, log_level:int):
+      super().__init__(cls.__class__.__name__,log_level)
 
 
-   def run(cls):
+   def run(cls,config:Config):
       cls._log.info('Running unzip step')
-      work_folder = f'{cls._args.baseFolder}\\work\\{cls._args.projectName}'        
+      work_folder = f'{config.base}\\work\\{config.project}'        
 
       #scan delivery folder for application folders
-      apps=[]
-      for (dirpath,dirnames,filenames) in walk(work_folder):
-         apps.extend(dirnames)
+      apps= config.application
+      # for (dirpath,dirnames,filenames) in walk(work_folder):
+      #    apps.extend(dirnames)
 
       found = True
       while found:

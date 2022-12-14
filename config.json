@@ -1,0 +1,21 @@
+{
+    "rest":{
+        "AIP":{
+            "Active":true,
+			"URL":"http://sha-dd-node03:8087/rest/",
+            "user":"cast",
+            "password":"cast"
+        },
+        "Highlight":{
+            "Active":true,
+            "URL":"https://rpa.casthighlight.com/WS2/",
+            "user":"n.kaplan+Irth4iq@castsoftware.com",
+            "password":"vadKpBFAZ8KIKb2f2y",
+            "instance":"20881"
+        }
+	},
+	"Database":{
+		"user":"username",
+		"password":"pw"
+	}
+}
