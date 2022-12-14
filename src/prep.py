@@ -1,20 +1,21 @@
 from logger import Logger
-from os import mkdir,walk
+from os import mkdir,walk,listdir
 from os.path import exists
 from shutil import copytree,rmtree
 
 from sourceValidation import SourceValidation 
+from config import Config
 
 class Prepare(SourceValidation):
 
-    def __init__(cls, args, log_level:int):
-        super().__init__(args,cls.__class__.__name__,log_level)
+    def __init__(cls, log_level:int):
+        super().__init__(cls.__class__.__name__,log_level)
         pass
 
-    def run(cls):
+    def run(cls,config:Config):
         cls._log.info('Running environment preparation step')
-        deliver_folder = f'{cls._args.baseFolder}\\deliver\\{cls._args.projectName}'        
-        work_folder = f'{cls._args.baseFolder}\\work\\{cls._args.projectName}'        
+        deliver_folder = f'{config.base}\\deliver\\{config.project}'        
+        work_folder = f'{config.base}\\work\\{config.project}'        
 
         """is the minimal enviroment configured
             base
@@ -33,8 +34,10 @@ class Prepare(SourceValidation):
 
         #scan delivery folder for application folders
         dir=[]
-        for (dirpath,dirnames,filenames) in walk(deliver_folder):
+        for (dirpath,dirnames,filenames) in walk(deliver_folder,topdown=False):
             dir.extend(dirnames)
+        config.application=dirnames
+
 
         """create the application folders under 'work'
             base
@@ -61,7 +64,7 @@ class Prepare(SourceValidation):
             dst_aip_name = f'{dst_name}\\AIP'
             dst_hl_name = f'{dst_name}\\HL'
 
-            if cls._args.restart:
+            if config.restart:
                 if exists (dst_name):
                     cls._log.info(f'-reset flag set, {dst_name} destination before copy')
                     rmtree(dst_name)
@@ -75,7 +78,7 @@ class Prepare(SourceValidation):
 
         cls._log.info('Environment preparation step complete')
 
-        pass
+        return True
 
 
 
