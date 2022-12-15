@@ -110,9 +110,7 @@ class ClocPreCleanup(SourceValidation):
     #     pass
 
     def save_workbook(cls):
-        if exists(cls._workbook_name):
-            remove(cls._workbook_name)
-        cls._workbook.save(cls._workbook_name)
+        pass
 
 
 class ClocPostCleanup(SourceValidation):
@@ -122,9 +120,9 @@ class ClocPostCleanup(SourceValidation):
 
     @property
     def phase(cls):
-        return 'PostCleanup_'
+        return 'After'
 
     def save_workbook(cls):
         if exists(cls._workbook_name):
             remove(cls._workbook_name)
-        save(cls._workbook_name)
+        cls._workbook.save(cls._workbook_name)
