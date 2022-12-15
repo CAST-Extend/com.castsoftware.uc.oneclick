@@ -5,7 +5,7 @@ from logging import DEBUG, INFO, WARN, ERROR, info, warn, error
 from logger import Logger
 from json import load
 from argparse import ArgumentParser
-from json import JSONDecodeError
+from json import JSONDecodeError,dump
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -21,16 +21,18 @@ class Config():
                 self._config = load(config_file)
                 config_file.close()
 
+            self._config_file = config
+
             if 'rest' not in self._config:
                 raise ValueError(f"Required field 'rest' is missing from config.json")
 
-            for v in ['AIP','Highlight']:
+            for v in ['AIP','highlight']:
                 if v not in self._config['rest']:
                     raise ValueError(f"Required field '{v}' is missing from config.json")
 
             self._rest_settings(self._config['rest']['AIP'])
-            self._rest_settings(self._config['rest']['Highlight'])
-            if 'instance' not in self._config['rest']['Highlight']:
+            self._rest_settings(self._config['rest']['highlight'])
+            if 'instance' not in self._config['rest']['highlight']:
                 raise ValueError(f"Required field 'instance' is missing from config.json")
 
             if 'setting' not in self._config:
@@ -54,19 +56,65 @@ class Config():
             if v not in dict:
                 raise ValueError(f"Required field '{v}' is missing from config.json")
 
+    def _save(self):
+        with open(self._config_file, "w") as f:
+            dump(self._config, f,indent=4)
+            f.close()
+
+    @property
+    def highlight(self):
+        return self.rest['highlight']
+    @property
+    def hl_active(self):
+        return self.highlight['Active']
+
+    @property
+    def hl_url(self):
+        return self.highlight['URL'] 
+    @hl_url.setter
+    def hl_url(self,value):
+        self.highlight['URL']=value
+        self._save()
+
+    @property
+    def hl_user(self):
+        return self.highlight['user']  
+    @hl_user.setter
+    def hl_user(self,value):
+        self.highlight['user']=value
+        self._save()
+
+    @property
+    def hl_password(self):
+        return self.highlight['password']   
+    @hl_password.setter
+    def hl_password(self,value):
+        self.highlight['password']=value
+        self._save()
+
+    @property
+    def hl_instance(self):
+        return self.highlight['instance']   
+    @hl_instance.setter
+    def hl_instance(self,value):
+        self.highlight['instance']=value
+        self._save()
+
     @property
     def project(self):
         return self._config['project']
     @project.setter
     def project(self,value):
         self._config['project']=value
+        self._save()
 
     @property
     def application(self):
         return self._config['application']
+    @application.setter
     def application(self,value):
         self._config['application']=value
-
+        self._save()
 
     @property
     def base(self):
@@ -74,16 +122,18 @@ class Config():
     @base.setter
     def base(self,value):
         self._config['base']=value
+        self._save()
 
     @property
-    def restart(self):
+    def reset(self):
         return self._config['setting']['restart']
-    @restart.setter
-    def restart(self,value):
+    @reset.setter
+    def reset(self,value):
         if value is None:
             self._config['setting']['restart']=False
         else:
             self._config['setting']['restart']=value
+        self._save()
 
 
     @property
@@ -106,22 +156,4 @@ class Config():
     def aip_password(self):
         return self.rest['AIP']['password']
 
-    @property
-    def hl_active(self):
-        return self.rest['Highlight']['Active']
 
-    @property
-    def hl_url(self):
-        return self.rest['Highlight']['URL']
-
-    @property
-    def hl_user(self):
-        return self.rest['Highlight']['user']
-
-    @property
-    def hl_password(self):
-        return self.rest['Highlight']['password']
-
-    @property
-    def hl_instance(self):
-        return self.rest['Highlight']['instance']

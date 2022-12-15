@@ -1,0 +1,32 @@
+from analysis import Analysis
+from subprocess import Popen,PIPE
+from config import Config
+
+
+class Highlight(Analysis):
+
+    def __init__(cls, log_level:int):
+        super().__init__(cls.__class__.__name__,log_level)
+        pass
+
+
+    def jarWrapper(cls,args):
+        process = Popen(['java', '-jar']+list(args), stdout=PIPE, stderr=PIPE)
+        ret = []
+        while process.poll() is None:
+            line = process.stdout.readline()
+            print(line)
+            if line != '' and line.endswith(b'\n'):
+                ret.append(line[:-1])
+        stdout, stderr = process.communicate()
+        ret += str(stdout).split('\n')
+        if stderr != b'':
+            ret += str(stderr).split('\n')
+        return ret
+
+    def run(cls, config):
+        
+
+        #Arguments to pass in HighlightAutomation 
+        args = [f'{hlJarPath}', '--sourceDir', f'{sourceDir}', '--workingDir' , f'{workingDir}', '--analyzerDir', f'{analyzerDir}', '--companyId', f'{companyId}', '--applicationId', f'{applicationId}', '--snapshotLabel', f'{snapshotLabel}', '--basicAuth', f'{basicAuth}', '--serverUrl', f'{serverUrl}'] # Any number of args to be passed to the jar file
+

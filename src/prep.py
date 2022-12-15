@@ -38,7 +38,6 @@ class Prepare(SourceValidation):
             dir.extend(dirnames)
         config.application=dirnames
 
-
         """create the application folders under 'work'
             base
             |-work
@@ -64,7 +63,7 @@ class Prepare(SourceValidation):
             dst_aip_name = f'{dst_name}\\AIP'
             dst_hl_name = f'{dst_name}\\HL'
 
-            if config.restart:
+            if config.reset:
                 if exists (dst_name):
                     cls._log.info(f'-reset flag set, {dst_name} destination before copy')
                     rmtree(dst_name)
