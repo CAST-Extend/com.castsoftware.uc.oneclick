@@ -25,59 +25,59 @@ class sourceDiscovery():
         #print(p.returncode)
         return p.returncode,dirname
 
-    def runCodeCleanup(self,dirLoc,dirname,output_path):
-        print('#3. Source Code cleanup is in progress')
-        #filepathHL=dirname+'\\scripts\\cleanup-hl.bat'  
-        #filepathHAIP=dirname+'\\scripts\\cleanup-aip.bat' 
-        dateTimeObj=datetime.now()
-        file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
-        #print('bba - '+dirLoc)
-        #print('bba - '+str(os.listdir(dirLoc).count))
-        exclusionFileList= dirname+'\\scripts\\deleteFileList.txt'
-        exclusionFolderList= dirname+'\\scripts\\deleteFolderList.txt'
-        clean_up_log_file= output_path +f"\\deletedFiles_{file_suffix}.txt"
-        clean_up_log_folder= output_path +f"\\deletedFolders_{file_suffix}.txt"
+    # def runCodeCleanup(self,dirLoc,dirname,output_path):
+    #     print('#3. Source Code cleanup is in progress')
+    #     #filepathHL=dirname+'\\scripts\\cleanup-hl.bat'  
+    #     #filepathHAIP=dirname+'\\scripts\\cleanup-aip.bat' 
+    #     dateTimeObj=datetime.now()
+    #     file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
+    #     #print('bba - '+dirLoc)
+    #     #print('bba - '+str(os.listdir(dirLoc).count))
+    #     exclusionFileList= dirname+'\\scripts\\deleteFileList.txt'
+    #     exclusionFolderList= dirname+'\\scripts\\deleteFolderList.txt'
+    #     clean_up_log_file= output_path +f"\\deletedFiles_{file_suffix}.txt"
+    #     clean_up_log_folder= output_path +f"\\deletedFolders_{file_suffix}.txt"
     
-        #items = os.listdir(dirLoc)
-        #deleting unwanted files and writing those logs to deleteFileList.txt file.
-        with open (clean_up_log_file, 'a+') as file1: 
-            s=''
-            with open(exclusionFileList) as f:
-                files_list = f.read().splitlines()
-                #print(files_list)
-            count=1
-            for subdir, dirs, files in os.walk(dirLoc):
-                for file in files:
-                    fileN=os.path.join(subdir, file) 
-                    for fileName in files_list:
-                        #print(fileName)
-                        if fileN.endswith(fileName):
-                            os.remove(fileN)
-                            #print('Removed file -> '+fileN)     
-                            s=str(count)+") Removed file -> "+fileN
-                            count+=1
-                            file1.write(s)
-                            file1.write('\n') 
+    #     #items = os.listdir(dirLoc)
+    #     #deleting unwanted files and writing those logs to deleteFileList.txt file.
+    #     with open (clean_up_log_file, 'a+') as file1: 
+    #         s=''
+    #         with open(exclusionFileList) as f:
+    #             files_list = f.read().splitlines()
+    #             #print(files_list)
+    #         count=1
+    #         for subdir, dirs, files in os.walk(dirLoc):
+    #             for file in files:
+    #                 fileN=os.path.join(subdir, file) 
+    #                 for fileName in files_list:
+    #                     #print(fileName)
+    #                     if fileN.endswith(fileName):
+    #                         os.remove(fileN)
+    #                         #print('Removed file -> '+fileN)     
+    #                         s=str(count)+") Removed file -> "+fileN
+    #                         count+=1
+    #                         file1.write(s)
+    #                         file1.write('\n') 
 
-        #deleting unwanted folders and writing those logs to deleteFolderList.txt file.
-        with open (clean_up_log_folder, 'a+') as file2: 
-            s=''
-            with open(exclusionFolderList) as f:
-                folder_list = f.read().splitlines()
-                #print(folder_list)
-            count=1
-            for subdir, dirs, files in os.walk(dirLoc):
-                    for dir in dirs:
-                        if dir in folder_list:
-                            folder=os.path.join(subdir, dir)
-                            shutil.rmtree(folder)
-                            #print('Removed folder -> '+folder)       
-                            s=str(count)+") Removed folder -> "+folder
-                            count+=1
-                            file2.write(s)
-                            file2.write('\n') 
-        print('Cleanup completed successfully')
-        print('Completed step number 3 out of 5.\n')         
+    #     #deleting unwanted folders and writing those logs to deleteFolderList.txt file.
+    #     with open (clean_up_log_folder, 'a+') as file2: 
+    #         s=''
+    #         with open(exclusionFolderList) as f:
+    #             folder_list = f.read().splitlines()
+    #             #print(folder_list)
+    #         count=1
+    #         for subdir, dirs, files in os.walk(dirLoc):
+    #                 for dir in dirs:
+    #                     if dir in folder_list:
+    #                         folder=os.path.join(subdir, dir)
+    #                         shutil.rmtree(folder)
+    #                         #print('Removed folder -> '+folder)       
+    #                         s=str(count)+") Removed folder -> "+folder
+    #                         count+=1
+    #                         file2.write(s)
+    #                         file2.write('\n') 
+    #     print('Cleanup completed successfully')
+    #     print('Completed step number 3 out of 5.\n')         
 
     def runCloc(self,dirLoc,file_Suffix,flag,workbook,output_path):
         dateTimeObj=datetime.now()
