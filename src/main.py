@@ -3,6 +3,7 @@ from config import Config
 from unzip import Unzip
 from prep import Prepare
 from cloc import ClocPreCleanup
+from cleanup import Cleanup
 from logger import INFO
 from argparse import ArgumentParser
 from os.path import isfile,isdir
@@ -60,8 +61,10 @@ if __name__ == '__main__':
     workbook = Workbook()
     process = [
         Prepare(log_level),
-        Unzip(log_level)
-        #ClocPreCleanup(workbook,log_level)
+        Unzip(log_level),
+        # ClocPreCleanup(workbook,log_level)
+        Cleanup(log_level)
+        
     ]
 
     step = 1
