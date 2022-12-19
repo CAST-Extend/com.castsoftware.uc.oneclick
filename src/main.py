@@ -1,11 +1,15 @@
 from logger import Logger
-from config import Config
-from unzip import Unzip
-from prep import Prepare
-from cloc import ClocPreCleanup
 from logger import INFO
+from config import Config
 from argparse import ArgumentParser
 from os.path import isfile,isdir
+
+from discovery.unzip import Unzip
+from discovery.prep import Prepare
+from discovery.cloc import ClocPreCleanup
+
+from analysis.analysis import Analysis
+from analysis.highlight import Highlight
 
 #from discovery import Unzip,Prepare
 
@@ -16,8 +20,6 @@ from sourceValidation import SourceValidation
 __author__ = "Nevin Kaplan"
 __email__ = "n.kaplan@castsoftware.com"
 __copyright__ = "Copyright 2022, CAST Software"
-
-
 
 if __name__ == '__main__':
 
@@ -60,7 +62,8 @@ if __name__ == '__main__':
     workbook = Workbook()
     process = [
         Prepare(log_level),
-        Unzip(log_level)
+        #Unzip(log_level),
+        Highlight(config,log_level)
         #ClocPreCleanup(workbook,log_level)
     ]
 
@@ -68,5 +71,7 @@ if __name__ == '__main__':
     for p in process:
         log.info(f'Step {step}.')
         if issubclass(type(p), SourceValidation):
+            status = p.run(config)
+        elif issubclass(type(p), Analysis):
             status = p.run(config)
         step = step + 1

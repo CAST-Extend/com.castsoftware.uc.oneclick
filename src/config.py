@@ -99,6 +99,13 @@ class Config():
     def hl_instance(self,value):
         self.highlight['instance']=value
         self._save()
+    
+    @property
+    def hl_jar_loc(self):
+        return self.highlight['jar-loc']   
+    @property
+    def perlInstallDir(self):
+        return self.highlight['perlInstallDir']   
 
     @property
     def project(self):

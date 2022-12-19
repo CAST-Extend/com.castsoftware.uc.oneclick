@@ -1,0 +1,9 @@
+/.env
+/.venv
+/.vscode
+/test
+/src/__pycache__/*
+get-pip.py
+settings.json
+src/analysis/__pycache__/*
+src/discovery/__pycache__/*

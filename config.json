@@ -1,21 +1,28 @@
 {
-    "rest":{
-        "AIP":{
-            "Active":true,
-			"URL":"http://sha-dd-node03:8087/rest/",
-            "user":"cast",
-            "password":"cast"
+    "rest": {
+        "AIP": {
+            "Active": true,
+            "URL": "http://sha-dd-node03:8087/rest/",
+            "user": "cast",
+            "password": "cast"
         },
-        "Highlight":{
-            "Active":true,
-            "URL":"https://rpa.casthighlight.com/WS2/",
-            "user":"n.kaplan+Irth4iq@castsoftware.com",
-            "password":"vadKpBFAZ8KIKb2f2y",
-            "instance":"20881"
+        "highlight": {
+            "Active": true,
+            "URL": "https://rpa.casthighlight.com/WS2/",
+            "user": "n.kaplan+mshsandbox@castsoftware.com",
+            "password": "iaraKkUVGO7Ovfr1WOur",
+            "instance": "7793",
+            "jar-loc": "D:\\Highlight-Automation-Command",
+            "perlInstallDir": "D:\\Program Files\\CAST\\HighlightAgent\\strawberry\\perl"
         }
-	},
-	"Database":{
-		"user":"username",
-		"password":"pw"
-	}
+    },
+    "setting": {
+        "restart": false
+    },
+    "application": [
+        "July",
+        "SeedOps"
+    ],
+    "project": "IT_Ally",
+    "base": "t:"
 }
