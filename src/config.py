@@ -14,7 +14,9 @@ __email__ = "n.kaplan@castsoftware.com"
 class Config():
     log = None
     log_translate = {} 
-    def __init__(self, config='config.json'):
+    def __init__(self, config='config.json',log_level: int=INFO):
+        self.log = Logger(self.__class__.__name__,log_level)
+
         #do all required fields contain data
         try:
             with open(config, 'rb') as config_file:

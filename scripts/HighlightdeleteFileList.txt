@@ -1,0 +1,8 @@
+.gitignore
+.class
+.exe
+.zip
+.doc
+.gif
+.png
+.xlsx

@@ -2,8 +2,8 @@ from logger import Logger
 from config import Config
 from unzip import Unzip
 from prep import Prepare
-from cloc import ClocPreCleanup
-from cleanup import Cleanup
+from cloc import ClocPreCleanup#,ClocPostCleanup
+from cleanup import cleanUpAIP,cleanUpHL
 from logger import INFO
 from argparse import ArgumentParser
 from os.path import isfile,isdir
@@ -62,14 +62,17 @@ if __name__ == '__main__':
     process = [
         Prepare(log_level),
         Unzip(log_level),
-        # ClocPreCleanup(workbook,log_level)
-        Cleanup(log_level)
+        ClocPreCleanup(log_level),
+        cleanUpAIP(log_level),
+        cleanUpHL(log_level)
+#        ClocPostCleanup(workbook,log_level),
+
         
     ]
 
     step = 1
     for p in process:
-        log.info(f'Step {step}.')
+        log.info(f'Step {step} - {p.__class__.__name__}')
         if issubclass(type(p), SourceValidation):
             status = p.run(config)
         step = step + 1
