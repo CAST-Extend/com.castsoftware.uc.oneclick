@@ -113,7 +113,7 @@ class ClocPreCleanup(SourceValidation):
         pass
 
 
-class ClocPostCleanup(SourceValidation):
+class ClocPostCleanup(ClocPreCleanup):
     def __init__(cls, log_level:int):
         super().__init__(cls.__class__.__name__,log_level)
         pass
