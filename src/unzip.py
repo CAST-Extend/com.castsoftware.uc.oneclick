@@ -11,7 +11,7 @@ class Unzip(SourceValidation):
 
 
    def run(cls,config:Config):
-      cls._log.info('Running unzip step')
+      cls._log.debug('Running unzip step')
       work_folder = f'{config.base}\\work\\{config.project}'        
 
       #scan delivery folder for application folders

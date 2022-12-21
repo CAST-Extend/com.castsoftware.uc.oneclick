@@ -1,160 +1,39 @@
-Technology,Applicable
-ABAP,YES
-ActionScript,NO
-Ada,NO
-ADSO/IDSM,NO
-AMPLE,NO
-Ant,NO
-Apex Trigger,NO
-Arduino Sketch,NO
-ASP,YES
-ASP.Net,YES
-Assembly,NO
-AutoHotkey,NO
-awk,NO
-Bourne Again Shell,NO
-Bourne Shell,NO
-C,YES
-C Shell,NO
-C#,YES
-C++,YES
-C/C++ Header,YES
-CCS,NO
-Clojure,NO
-ClojureScript,NO
-CMake,NO
-COBOL,YES
-CoffeeScript,NO
-ColdFusion,YES
-ColdFusion CFScript,NO
-CSS,YES
-CUDA,NO
-Cython,NO
-D/dtrace,NO
-DAL,NO
-Dart,NO
-diff,NO
-DITA,NO
-DOS Batch,NO
-DTD,NO
-ECPP,NO
-Elixir,NO
-ERB,NO
-Erlang,NO
-Expect,NO
-F#,NO
-Focus,NO
-Fortran 77,YES
-Fortran 90,YES
-Fortran 95,YES
-Go,NO
-Grails,NO
-Groovy,NO
-Haml,NO
-Handlebars,NO
-Harbour,NO
-Haskell,NO
-HLSL,NO
-HTML,YES
-IDL,NO
-IDL/Qt Project/Prolog,NO
-InstallShield,NO
-Java,YES
-Javascript,YES
-JavaServer Faces,YES
-JCL,YES
-JSON,NO
-JSP,YES
-Kermit,NO
-Korn Shell,YES
-Kotlin,NO
-LESS,NO
-lex,NO
-Lisp,NO
-Lisp/Julia,NO
-Lisp/OpenCL,NO
-LiveLink OScript,NO
-Lua,NO
-m4,NO
-make,NO
-MATLAB,NO
-Maven,YES
-Modula3,NO
-MSBuild script,YES
-MUMPS,NO
-Mustache,NO
-MXML,YES
-NAnt script,NO
-NASTRAN DMAP,NO
-Objective C,YES
-Objective C++,YES
-OCaml,NO
-Oracle Forms,YES
-Oracle Reports,YES
-Pascal,NO
-Pascal/Puppet,NO
-Patran Command Language,NO
-Perl,YES
-Perl/Prolog,YES
-PHP,YES
-PHP/Pascal,YES
-Pig Latin,NO
-PL/I,YES
-PowerShell,NO
-Prolog,NO
-Protocol Buffers,NO
-PureScript,NO
-Python,YES
-QML,NO
-R,NO
-Racket,NO
-Razor,YES
-Rexx,NO
-RobotFramework,NO
-Ruby,YES
-Ruby HTML,YES
-Rust,NO
-SAS,NO
-SASS,NO
-Scala,NO
-sed,NO
-SKILL,NO
-SKILL++,NO
-Smarty,NO
-Softbridge Basic,NO
-SQL,YES
-SQL Data,NO
-SQL Stored Procedure,NO
-Standard ML,NO
-Swift,NO
-Tcl/Tk,NO
-Teamcenter met,NO
-Teamcenter mth,NO
-Titanium Style Sheet,NO
-TypeScript,YES
-Unity-Prefab,NO
-Vala,NO
-Vala Header,NO
-Velocity Template Language,NO
-Verilog-SystemVerilog,NO
-VHDL,NO
-vim script,NO
-Visual Basic,YES
-Visual Fox Pro,NO
-Visualforce Component,NO
-Visualforce Page,NO
-Windows Message File,NO
-Windows Module Definition,NO
-Windows Resource File,NO
-WiX include,NO
-WiX source,NO
-WiX string localization,NO
-XAML,YES
-xBase,NO
-xBase Header,NO
-XML,NO
-XQuery,NO
-XSD,NO
-XSLT,NO
-yacc,NO
-YAML,YES
+ABAP
+ASP
+ASP.Net
+C
+C#
+C++
+C/C++ Header
+COBOL
+ColdFusion
+CSS
+Fortran 77
+Fortran 90
+Fortran 95
+HTML
+Java
+Javascript
+JavaServer Faces
+JCL
+JSP
+Korn Shell
+MSBuild script
+Objective C
+Objective C++
+Oracle Forms
+Oracle Reports
+Perl
+Perl/Prolog
+PHP
+PHP/Pascal
+Python
+Razor
+Ruby
+Ruby HTML
+SQL
+TypeScript
+Visual Basic
+XAML
+YAML
+SUM:
