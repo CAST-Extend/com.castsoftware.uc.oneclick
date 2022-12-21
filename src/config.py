@@ -138,20 +138,15 @@ class Config():
         self._config['base']=value
         self._save()
 
-
-    @property
-    def settings(self):
-        return self._config['setting']
-
     @property
     def reset(self):
-        return self.settings['restart']
+        return self._config['setting']['restart']
     @reset.setter
     def reset(self,value):
         if value is None:
-            self.settings['restart']=False
+            self._config['setting']['restart']=False
         else:
-            self.settings['restart']=value
+            self._config['setting']['restart']=value
         self._save()
 
     @property
@@ -178,4 +173,10 @@ class Config():
     def aip_password(self):
         return self.rest['AIP']['password']
 
+    @property
+    def aip_key(self):
+        return self.rest['AIP']['api_key']
 
+    @property
+    def aip_cli(self):
+        return self.rest['AIP']['aip_cli']

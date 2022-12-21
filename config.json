@@ -6,6 +6,11 @@
             "user":"cast",
             "password":"cast"
         },
+        "AIPConsole":{
+            "Active":true,
+			"URL":"http://sha-dd-node03:8081/",
+            "API_Key":"xxxxxxxxxxxxxxx"
+        },
         "Highlight":{
             "Active":true,
             "URL":"https://rpa.casthighlight.com/WS2/",
