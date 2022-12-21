@@ -20,7 +20,8 @@ class aipAnalysis(SourceValidation):
                     '-jar',config.aip_cli,
                     'new',
                     '-n',f'{appl}',
-                    '--apikey=',config.apiKey,
+                    '-s',config.aip_url,
+                    '--apikey=',config.aip_key,
                     '--verbose=' , 'false',
                     '--no-version-history=' , 'false'
                     ]
@@ -38,6 +39,7 @@ class aipAnalysis(SourceValidation):
                     '--apikey=',config.aip_key,
                     '-n',f'{appl}',
                     '-f', f'{aip_work_folder}\\AIP',
+                    '-s',config.aip_url,
                     '--verbose' , 'false'
                     ]
             status,output = run_process(args)        
