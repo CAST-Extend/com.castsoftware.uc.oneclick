@@ -2,7 +2,7 @@ from datetime import datetime
 from os import mkdir,getcwd,walk,remove
 from os.path import exists,join
 from shutil import rmtree
-from sourceValidation import SourceValidation 
+from sourceValidation import SourceValidation
 from config import Config
 from logger import INFO
 
