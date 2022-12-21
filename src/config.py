@@ -180,3 +180,7 @@ class Config():
     @property
     def aip_cli(self):
         return self.rest['AIP']['aip_cli']
+
+    @property
+    def node_name(self):
+        return self.rest['AIP']['node_name']    

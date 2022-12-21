@@ -14,16 +14,15 @@ class aipAnalysis(SourceValidation):
         for appl in config.application:
             #add a new appication in AIP Console
             cls._log.info(f'Creating new application {config.project}\{appl}')
-            aip_work_folder = f'{config.base}\\work\\{config.project}\\{appl}'
             
             args = [f'{config.java_home}\\bin\\java.exe',
                     '-jar',config.aip_cli,
                     'new',
                     '-n',f'{appl}',
                     '-s',config.aip_url,
-                    '--apikey=',config.aip_key,
-                    '--verbose=' , 'false',
-                    '--no-version-history=' , 'false'
+                    '--apikey',config.aip_key,
+                    '--verbose' , 'false',
+                    '--node-name',config.node_name
                     ]
             status,output = run_process(args)        
             if status != 0:
@@ -40,6 +39,7 @@ class aipAnalysis(SourceValidation):
                     '-n',f'{appl}',
                     '-f', f'{aip_work_folder}\\AIP',
                     '-s',config.aip_url,
+                    '--node-name',config.node_name,
                     '--verbose' , 'false'
                     ]
             status,output = run_process(args)        
