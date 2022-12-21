@@ -8,16 +8,25 @@ import re
 import os
 from xlwt import Workbook
 import xlwt
+from util import create_folder
 
-class sqlDiscovery(SourceValidation):
+
+class SQLDiscovery(SourceValidation):
 
     def __init__(cls, log_level:int):
         super().__init__(cls.__class__.__name__,log_level)
         
+    @property
+    def base(cls):
+        return f'{cls.config.base}\\sql-discovery' 
+    @property
+    def project(cls):
+        return f'{cls.base}\\{cls.config.project}'
 
     #def runCodeCleanup(self,dirLoc,dirname,output_path):
     def run(cls,config:Config):
          #get the current date and time.
+        cls.config = config
         dateTimeObj=datetime.now()
         file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
 
@@ -28,26 +37,20 @@ class sqlDiscovery(SourceValidation):
         trigger_list=[]
         file_list=[]
 
-        work_folder = f'{config.base}\\work\\{config.project}' 
+        create_folder(cls.base)
+        create_folder(cls.project)
 
-        SQL_XLS_File=output_path+f"\\SQL_Output_{file_suffix}.xls"
-        
-        sql_base = f'{config.base}\\sql'
-        if not exists(sql_base):
-            mkdir(sql_base)
-        cloc_project = f'{sql_base}\\{config.project}'
-        cls._workbook_name = f'{cloc_project}\\sql_{config.project}.xls'
-        
-        dir = getcwd()
-        work_folder = f'{config.base}\\work\\{config.project}'
-        
+        work_folder = f'{config.base}\\work\\{config.project}' 
+        SQL_XLS_File=f'{cls.project}\\SQL_Output_{file_suffix}.xls'
+        cls._workbook_name = f'{cls.project}\\sql_{config.project}.xls'
+                
         # Read SQL Files and extract neccessary info using regex.
         apps= config.application
         found = True
         while found:
             found = False
             for app in apps:
-                app_folder = f'{work_folder}\\{app}'
+                app_folder = f'{work_folder}\\{app}\\AIP'
                 def read_sql_file(file_path,file):
                     #print(file)
                     file_list.append(file)
@@ -74,6 +77,7 @@ class sqlDiscovery(SourceValidation):
                         trig_pattern='[C|c][R|r][E|e][A|a][T|t][E|e]\s{1,}[T|t][R|r][I|i][G|g][G|g][E|e][R|r]\s{1,}([^\n|^\s|^\(]+)'
                         trig_list=re.findall(trig_pattern,content)
                         trigger_list.extend(trig_list)
+                        f.close()
 
                 #get the list of files from the directory
                 def list_of_files(dirName):
@@ -95,7 +99,7 @@ class sqlDiscovery(SourceValidation):
                 #path = r"C:\Users\SHP\Desktop\Python\Temp\Temp"
 
                 # Change the directory
-                os.chdir(app)
+                os.chdir(app_folder)
 
                 files=list_of_files(path)
 

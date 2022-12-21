@@ -13,7 +13,7 @@ class Prepare(SourceValidation):
         pass
 
     def run(cls,config:Config):
-        cls._log.info('Running environment preparation step')
+        cls._log.debug('Running environment preparation step')
         deliver_folder = f'{config.base}\\deliver\\{config.project}'        
         work_folder = f'{config.base}\\work\\{config.project}'        
 

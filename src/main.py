@@ -1,16 +1,20 @@
 from logger import Logger
 from config import Config
+
+from analysis.analysis import Analysis
 from unzip import Unzip
 from prep import Prepare
-from cloc import ClocPreCleanup#,ClocPostCleanup
+from cloc import ClocPreCleanup,ClocPostCleanup
 from cleanup import cleanUpAIP,cleanUpHL
+from sqlDiscovery import SQLDiscovery
+from analysis.highlight import Highlight
 from logger import INFO
 from argparse import ArgumentParser
 from os.path import isfile,isdir
+from pandas import ExcelWriter
 
 #from discovery import Unzip,Prepare
 
-from xlwt import Workbook
 
 from sourceValidation import SourceValidation 
 
@@ -58,21 +62,31 @@ if __name__ == '__main__':
     if args.hlInstance is not None: 
         config.hl_instance=args.hlInstance
 
-    workbook = Workbook()
+    cloc_pre_cleanup = ClocPreCleanup(config,log_level)
+    cloc_post_cleanup = ClocPostCleanup(config,log_level)
+    workbook_name = f'{cloc_pre_cleanup.cloc_project}\\cloc-{config.project}.xlsx'
+    writer = ExcelWriter(workbook_name, engine='xlsxwriter')
+
     process = [
         Prepare(log_level),
         Unzip(log_level),
-        ClocPreCleanup(log_level),
+        cloc_pre_cleanup,
         cleanUpAIP(log_level),
-        cleanUpHL(log_level)
-#        ClocPostCleanup(workbook,log_level),
-
-        
+        cleanUpHL(log_level),
+        cloc_post_cleanup,
+        SQLDiscovery(log_level),
+        Highlight(log_level)
     ]
 
     step = 1
     for p in process:
         log.info(f'Step {step} - {p.__class__.__name__}')
-        if issubclass(type(p), SourceValidation):
+        if issubclass(type(p), SourceValidation) or issubclass(type(p), Analysis) :
             status = p.run(config)
-        step = step + 1
+        
+        #generate the cloc exell file 
+        if issubclass(type(p), ClocPreCleanup):
+            p.format_table(writer)
+            p.save_xlsx(writer)
+
+        step += 1

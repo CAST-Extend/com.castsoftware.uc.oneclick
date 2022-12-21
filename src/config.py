@@ -103,6 +103,18 @@ class Config():
         self._save()
 
     @property
+    def hl_cli(self):
+        return self.highlight['cli']
+
+    @property
+    def perlInstallDir(self):
+        return self.highlight['perlInstallDir']
+
+    @property
+    def analyzerDir(self):
+        return self.highlight['analyzerDir']
+
+    @property
     def project(self):
         return self._config['project']
     @project.setter
@@ -126,17 +138,25 @@ class Config():
         self._config['base']=value
         self._save()
 
+
+    @property
+    def settings(self):
+        return self._config['setting']
+
     @property
     def reset(self):
-        return self._config['setting']['restart']
+        return self.settings['restart']
     @reset.setter
     def reset(self,value):
         if value is None:
-            self._config['setting']['restart']=False
+            self.settings['restart']=False
         else:
-            self._config['setting']['restart']=value
+            self.settings['restart']=value
         self._save()
 
+    @property
+    def java_home(self):
+        return self.settings['java_home']
 
     @property
     def rest(self):

@@ -1,47 +1,62 @@
-from sourceValidation import SourceValidation 
-from os import mkdir,getcwd,remove
-from os.path import dirname,exists
 from config import Config
-from pandas import DataFrame
+from logger import Logger
+from logger import INFO
+from sourceValidation import SourceValidation 
+
+from os import getcwd
 from re import findall
-from xlwt import Workbook,easyxf
-from subprocess import Popen,PIPE
+from pandas import DataFrame
+
+from util import run_process,create_folder,format_table
+
+
 
 class ClocPreCleanup(SourceValidation):
-    def __init__(cls,workbook:Workbook,log_level:int):
+    def __init__(cls, config: Config, log_level:int=INFO, name = None):
+        if name is None: 
+            name = cls.__class__.__name__
         super().__init__(cls.__class__.__name__,log_level)
-
-        cls._workbook = workbook
-
+        cls.config = config
+        cls._df = {}
         pass
-
 
     @property
     def phase(cls):
         return 'Before'
 
+    @property
+    def cloc_base(cls):
+        return f'{cls.config.base}\\cloc' 
+    @property
+    def cloc_project(cls):
+        return f'{cls.cloc_base}\\{cls.config.project}'
+
+    @property
+    def cloc_results(cls):
+        return cls._df
+
+    def _run_cloc(cls,cloc_project:str,work_folder:str,cloc_output:str):
+        cloc_path=f'{getcwd()}\\scripts\\cloc-1.64.exe'
+        args = [cloc_path,work_folder,"--report-file",cloc_output]
+        return run_process(args)
+
     def run(cls,config:Config):
-        cloc_base = f'{config.base}\\cloc'    
-        if not exists(cloc_base):
-            mkdir(cloc_base)
+        create_folder(cls.cloc_base)
+        create_folder(cls.cloc_project)
 
-        cloc_project = f'{cloc_base}\\{config.project}'
-        if not exists(cloc_project):
-            mkdir(cloc_project)
-
-        dir = getcwd()
-        cloc_path=f'{dir}\\scripts\\cloc-1.64.exe'
-        list_of_tech_file=f'{dir}\\scripts\\ListOfTechnologies.csv'
-
-        cls._workbook_name = f'{cloc_project}\\cloc_{config.project}.xls'
+        list_of_tech_file=f'{getcwd()}\\scripts\\ListOfTechnologies.csv'
+        with open(list_of_tech_file) as f:
+            tech_list = f.read().splitlines()
+            f.close()
 
         for appl in config.application:
             cls._log.info(f'Running {cls.phase} cloc for {config.project}\{appl}')
-            cloc_output = f'{cloc_project}\\cloc_{appl}_{cls.phase}.txt'
-            work_folder = f'{config.base}\\work\\{config.project}\\{appl}'  
+            cloc_output = f'{cls.cloc_project}\\cloc_{appl}_{cls.phase}.txt'
+            work_folder = f'{config.base}\\work\\{config.project}\\{appl}\AIP'  
 
-            p = Popen([cloc_path,work_folder,"--quiet","--report-file",cloc_output], shell=True, stdout = PIPE)
-            stdout, stderr = p.communicate()
+            ret,output = cls._run_cloc(cls.cloc_project,work_folder,cloc_output)
+            if ret != 0:
+                raise RuntimeError(f'Error running cloc on {work_folder}')
 
             #reading cloc_output.txt file
             summary_list=[]   
@@ -51,78 +66,34 @@ class ClocPreCleanup(SourceValidation):
                 summary_list= [line.rstrip('\n').lstrip() for line in f]
                 #print(summary_list)
 
-            su_list=[]
-            for i in summary_list:
-                if i.__contains__('http'):
-                    break
-                else:
-                    su_list.append(i)
-            #print(su_list)
-
             #extracting required data from content of cloc_output.txt using python regex
             pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
             statistics_list=findall(pattern,content)
-            statistics_list.insert(0,('LANGUAGE','FILES','BLANK','COMMENT','CODE','APPLICABLE'))
-
-            for i in range(len(statistics_list)):
-                statistics_list[i]=list(statistics_list[i])   
-
-            #extracting supported technologies from ListOfTechnologies.csv file into sup_tech list
-            sup_tech = []
-            with open(list_of_tech_file, 'r') as f:   
-                sup_tech = f.readlines()
-                sup_tech = [line.rstrip(',YES\n').lower() for line in sup_tech if line.__contains__(',YES') ]
-                f.close()
-
-            #if technology present in sup_tech list then mark it as YES otherwise Mark is as NO
-            for i in range(1,len(statistics_list)-1):
-                if statistics_list[i][0].lower() in sup_tech:
-                    statistics_list[i].append('YES')
-                else:
-                    statistics_list[i].append('NO')
-
-            su_sheet = cls._workbook.add_sheet(f'{appl}-Summary-{cls.phase}-Cleanup')
-            su_list.insert(0,f'Cloc Summary {cls.phase} CleanUP')
-            #write value into excel sheet one by one
-            style = easyxf('pattern: pattern solid, fore_colour light_green;'
-                              'font: colour black, bold True;')
-            for i in range(len(su_list)):
-                if i==0:
-                    su_sheet.write(i, 0, su_list[i],style) 
-                else:
-                    su_sheet.write(i, 0, su_list[i])
+            df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
+            df['APPLICABLE']=df['LANGUAGE'].isin(tech_list)
+            cls._df[appl]=df
             
-            sheet = cls._workbook.add_sheet(f'{appl}-Stats-{cls.phase}-Cleanup')
-            #write value into excel sheet one by one
-            for i in range(len(statistics_list)):
-                for j in range(len(statistics_list[i])):
-                    if i==0:
-                        sheet.write(i, j, statistics_list[i][j],style)
-                    else:
-                        sheet.write(i, j, statistics_list[i][j])
-            pass
+        return True
 
-        cls.save_workbook()
+    def format_table(cls,writer):
+        for key in cls.cloc_results:
+            format_table(writer,cls.cloc_results[key],f'{cls.phase}-Cleanup({key})')
 
+    def save_xlsx(cls,writer):
         pass
 
-    # def save_workbook(cls):
-    #     pass
 
-    def save_workbook(cls):
-        pass
 
 
 class ClocPostCleanup(ClocPreCleanup):
-    def __init__(cls, log_level:int):
-        super().__init__(cls.__class__.__name__,log_level)
-        pass
+
+    def __init__(cls, config: Config, log_level:int=INFO, name = None):
+        super().__init__(config,log_level,cls.__class__.__name__)
 
     @property
     def phase(cls):
         return 'After'
+    
+    def save_xlsx(cls,writer):
+        writer.close()
 
-    def save_workbook(cls):
-        if exists(cls._workbook_name):
-            remove(cls._workbook_name)
-        cls._workbook.save(cls._workbook_name)
