@@ -1,26 +1,47 @@
 {
-    "rest":{
-        "AIP":{
-            "Active":true,
-			"URL":"http://sha-dd-node03:8087/rest/",
-            "user":"cast",
-            "password":"cast"
+    "rest": {
+        "AIP": {
+            "Active": true,
+            "URL": "http://localhost:8087/rest/",
+            "user": "******************",
+            "password": "******************"
         },
-        "AIPConsole":{
-            "Active":true,
-			"URL":"http://sha-dd-node03:8081/",
-            "API_Key":"xxxxxxxxxxxxxxx"
+        "AIPConsole": {
+            "Active": true,
+            "URL": "http://localhost:8081/",
+            "API_Key": "eng212WK.BmcQazSvf7cKtRJVo4KncrlGh3zugqwp",
+            "cli": "D:\\com.castsoftware.aip.console.tools.1.29.0-funcrel\\aip-console-tools-cli.jar",
+            "node": ""
         },
-        "Highlight":{
-            "Active":true,
-            "URL":"https://rpa.casthighlight.com/WS2/",
-            "user":"n.kaplan+Irth4iq@castsoftware.com",
-            "password":"vadKpBFAZ8KIKb2f2y",
-            "instance":"20881"
+        "Highlight": {
+            "Active": true,
+            "URL": "https://rpa.casthighlight.com/WS2/",
+            "user": "******************",
+            "password": "******************",
+            "instance": "******************",
+            "cli": "D:\\Highlight-Automation-Command\\HighlightAutomation.jar",
+            "perlInstallDir": "D:\\Program Files\\CAST\\HighlightAgent\\strawberry\\perl",
+            "analyzerDir": "D:\\Program Files\\CAST\\HighlightAgent\\perl"
         }
+    },
+    "Database": {
+        "database": "postgres",
+        "user": "******************",
+	"password": "******************",
+        "host": "******************",
+        "port": "2284"
+    },
+ 	"logging":{
+		"config":"info",
+		"aip":"info",
+		"highlight":"info",
+		"generate":"info"
 	},
-	"Database":{
-		"user":"username",
-		"password":"pw"
-	}
+   "template": "",
+    "setting": {
+        "arg-template": "z:/Work/Decks/DD Findings - Template.pptx",
+        "java_home": "D:\\Program Files\\OpenJDK\\jdk-11.0.17.8-hotspot",
+        "base": "d:\\code",
+        "reset": false
+    }
 }
