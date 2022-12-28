@@ -6,6 +6,7 @@ from logger import Logger
 from json import load
 from argparse import ArgumentParser
 from json import JSONDecodeError,dump
+from os.path import abspath,exists
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -14,38 +15,45 @@ __email__ = "n.kaplan@castsoftware.com"
 class Config():
     log = None
     log_translate = {} 
-    def __init__(self, config='config.json',log_level: int=INFO):
+    def __init__(self,base_folder:str,project_name,config='config.json',log_level: int=INFO):
         self.log = Logger(self.__class__.__name__,log_level)
 
         #do all required fields contain data
         try:
-            with open(config, 'rb') as config_file:
+            config_loc = abspath(f'{base_folder}/.oneclick/{project_name}.json')
+            if not exists(config_loc):
+                self._config_file=abspath('./config.json')
+            else:
+                self._config_file=config_loc
+            with open(abspath(self._config_file), 'rb') as config_file:
                 self._config = load(config_file)
                 config_file.close()
 
-            self._config_file = config
+            self.base = base_folder
+            self.project = project_name
 
             if 'rest' not in self._config:
                 raise ValueError(f"Required field 'rest' is missing from config.json")
 
-            for v in ['AIP','highlight']:
+            for v in ['AIP','Highlight','AIPConsole']:
                 if v not in self._config['rest']:
                     raise ValueError(f"Required field '{v}' is missing from config.json")
 
-            self._rest_settings(self._config['rest']['AIP'])
-            self._rest_settings(self._config['rest']['highlight'])
-            if 'instance' not in self._config['rest']['highlight']:
+            self._rest_settings(self.aip)#  config['rest']['AIP'])
+            self._rest_settings(self.highlight)# _config['rest']['highlight'])
+            if 'instance' not in self.highlight: #_config['rest']['highlight']:
                 raise ValueError(f"Required field 'instance' is missing from config.json")
 
             if 'setting' not in self._config:
                 self._config['setting']={}
-            if 'application' not in self._config:
-                self._config['application']=[]
-            
+
+            self._config_file = config_loc
+            self._save()
+
 
         except JSONDecodeError as e:
             msg = str(e)
-            self.error('Configuration file must be in a JSON format')
+            self.log.error(f'Configuration file {self._config_file} must be in a JSON format {msg}')
             exit()
 
         except ValueError as e:
@@ -63,9 +71,10 @@ class Config():
             dump(self._config, f,indent=4)
             f.close()
 
+    """ **************** Highlight entries ************************ """
     @property
     def highlight(self):
-        return self.rest['highlight']
+        return self.rest['Highlight']
     @property
     def hl_active(self):
         return self.highlight['Active']
@@ -114,73 +123,173 @@ class Config():
     def analyzerDir(self):
         return self.highlight['analyzerDir']
 
+    """ **************** Project related entries ************************ """
     @property
     def project(self):
         return self._config['project']
     @project.setter
     def project(self,value):
-        self._config['project']=value
-        self._save()
+        if type(value) is not str:
+            raise ValueError(f'Expecting a the project name, got {type(value)}')
+
+        self.log.info('New project: {value}')
+        if 'project' not in self._config:
+            self._config['project']={}
+            self._config['project']['name']=value
+            self._config['project']['application']={}
+
+        elif value != self.project_name:
+            raise ValueError("Can't rename a project")
 
     @property
+    def project_name(self):
+        return self.project['name']
+
+    @property
+    def company_name(self):
+        return self.project['company_name']
+    @company_name.setter
+    def company_name(self,value):
+        self.project['company_name']=value
+
+    """ **************** Application related entries ************************ """
+    @property
     def application(self):
-        return self._config['application']
+        return self.project['application']
     @application.setter
-    def application(self,value):
-        self._config['application']=value
-        self._save()
+    def application(self,value:list):
+        if type(value) is not list:
+            raise ValueError(f'Expecting a list of application names, got {type(value)}')
+
+        update = False
+        for appl_name in value:
+            if appl_name in self.application.keys():
+                pass
+            else:
+                self.project['application'][appl_name]={'aip':'','hl':''}
+                update = True
+
+
+        # self._config['application']=value
+        if update:
+            self._save()
+
+    @application.deleter
+    def application(self):
+        self.project['application']={}
+
+
+
+
+    @property
+    def deliver(self):
+        return f'{self.base}\\deliver\\{self.project_name}'
+    @property
+    def work(self):
+        return f'{self.base}\\work\\{self.project_name}'
+
+    """ **************** Setting related entries ************************ """
+    @property 
+    def setting(self):
+        return self._config['setting']
+
+    @property
+    def arg_template(self):
+        return self.setting['arg-template']
 
     @property
     def base(self):
-        return self._config['base']
+        return self.setting['base']
     @base.setter
     def base(self,value):
-        self._config['base']=value
+        self.setting['base']=value
         self._save()
 
     @property
     def reset(self):
-        return self._config['setting']['restart']
+        return self.setting['reset']
     @reset.setter
     def reset(self,value):
         if value is None:
-            self._config['setting']['restart']=False
+            self.setting['reset']=False
         else:
-            self._config['setting']['restart']=value
+            self.setting['reset']=value
         self._save()
 
     @property
     def java_home(self):
-        return self.settings['java_home']
+        return self.setting['java_home']
 
+    """ **************** AIP REST related entries ************************ """
     @property
     def rest(self):
         return self._config['rest']
 
     @property
-    def aip_active(self):
-        return self.rest['AIP']['Active']
+    def aip(self):
+        return self.rest['AIP']
+
+    @property
+    def aip_active(self)->bool:
+        return self.aip['Active']
 
     @property
     def aip_url(self):
-        return self.rest['AIP']['URL']
+        return self.aip['URL']
 
     @property
     def aip_user(self):
-        return self.rest['AIP']['user']
+        return self.aip['user']
 
     @property
     def aip_password(self):
-        return self.rest['AIP']['password']
+        return self.aip['password']
+
+    """ **************** Console REST related entries ************************ """
+    @property
+    def console(self):
+        return self.rest['AIPConsole']
+
+    def cosole_active(self)->bool:
+        return self.console['Active']
 
     @property
-    def aip_key(self):
-        return self.rest['AIP']['api_key']
+    def console_url(self)->str:
+        return self.console['URL']
+
+    @property
+    def console_key(self)->str:
+        return self.console['API_Key']
 
     @property
     def aip_cli(self):
-        return self.rest['AIP']['aip_cli']
+        return self.console['cli']
 
     @property
-    def node_name(self):
-        return self.rest['AIP']['node_name']    
+    def node(self):
+        return self.console['node']   
+
+    """ **************** Action Plan related entries ************************ """
+    @property
+    def database(self):
+        return self._config['Database']['database']
+
+    @property
+    def user(self):
+        return self._config['Database']['user']
+
+    @property
+    def password(self):
+        return self._config['Database']['password']
+    
+    @property
+    def host(self):
+        return self._config['Database']['host']
+    
+    @property
+    def port(self):
+        return self._config['Database']['port']
+    
+    @property
+    def template(self):
+        return self._config['template']    

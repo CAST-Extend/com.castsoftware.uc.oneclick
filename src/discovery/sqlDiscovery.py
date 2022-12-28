@@ -1,4 +1,4 @@
-from sourceValidation import SourceValidation 
+from discovery.sourceValidation import SourceValidation 
 from config import Config
 from datetime import datetime
 from xlwt import Workbook
@@ -21,7 +21,7 @@ class SQLDiscovery(SourceValidation):
         return f'{cls.config.base}\\sql-discovery' 
     @property
     def project(cls):
-        return f'{cls.base}\\{cls.config.project}'
+        return f'{cls.base}\\{cls.config.project_name}'
 
     #def runCodeCleanup(self,dirLoc,dirname,output_path):
     def run(cls,config:Config):
@@ -37,12 +37,8 @@ class SQLDiscovery(SourceValidation):
         trigger_list=[]
         file_list=[]
 
-        create_folder(cls.base)
-        create_folder(cls.project)
-
-        work_folder = f'{config.base}\\work\\{config.project}' 
-        SQL_XLS_File=f'{cls.project}\\SQL_Output_{file_suffix}.xls'
-        cls._workbook_name = f'{cls.project}\\sql_{config.project}.xls'
+        SQL_XLS_File=f'{config.work}\\SQL_Output_{file_suffix}.xls'
+        cls._workbook_name = f'{config.work}\\sql_{config.project_name}.xls'
                 
         # Read SQL Files and extract neccessary info using regex.
         apps= config.application
@@ -50,7 +46,7 @@ class SQLDiscovery(SourceValidation):
         while found:
             found = False
             for app in apps:
-                app_folder = f'{work_folder}\\{app}\\AIP'
+                app_folder = f'{config.work}\\{app}\\AIP'
                 def read_sql_file(file_path,file):
                     #print(file)
                     file_list.append(file)

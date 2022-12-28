@@ -1,17 +1,20 @@
-from sourceValidation import SourceValidation 
-import pandas as pd
+from discovery.sourceValidation import SourceValidation 
+from pandas import DataFrame,read_excel
 import docx
 from config import Config
 
-class discoveryReport(SourceValidation):
+class DiscoveryReport(SourceValidation):
 
     def __init__(cls, log_level:int):
         super().__init__(cls.__class__.__name__,log_level)
         
     def run(cls,config:Config):
-        try:
+        for appl in config.application:
+
+
+
             # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
-            df = pd.read_excel(output_path+f"\\Cloc_Output_{sourceDiscovery.file_suffix}.xls",sheet_name='Stats Before Code CleanUP')
+            df = read_excel(output_path+f"\\Cloc_Output_{sourceDiscovery.file_suffix}.xls",sheet_name='Stats Before Code CleanUP')
             
             #extract total cout of applicable code from 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
             filt=(df['APPLICABLE']=='YES')
@@ -86,5 +89,3 @@ class discoveryReport(SourceValidation):
             doc.save(output_path+f'\Source code discovery_{sourceDiscovery.file_suffix}.docx')
             print('MS Word Document has been generated and available in the location -> '+output_path)
 
-        except Exception as e:
-            print("An exception occurred while Generating Docx report\n"+e)

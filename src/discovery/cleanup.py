@@ -2,7 +2,7 @@ from datetime import datetime
 from os import mkdir,getcwd,walk,remove
 from os.path import exists,join
 from shutil import rmtree
-from sourceValidation import SourceValidation
+from discovery.sourceValidation import SourceValidation
 from config import Config
 from logger import INFO
 
@@ -21,7 +21,7 @@ class cleanUpAIP(SourceValidation):
     def run(cls,config:Config):
         cls._log.debug('Source Code cleanup is in progress')
         
-        output_path = f'{config.base}\\log'    
+        output_path = f'{config.work}\\log'    
         if not exists(output_path):
             mkdir(output_path)
 
@@ -39,24 +39,20 @@ class cleanUpAIP(SourceValidation):
             folder_list = f.read().splitlines()
             f.close()
 
-        clean_up_log_file= f"{output_path}\\{cls.cleanup_file_prefix}{config.project}_deletedFiles_{file_suffix}.txt"
-        clean_up_log_folder= f"{output_path}\\{cls.cleanup_file_prefix}{config.project}_eletedFolders_{file_suffix}.txt"
-
-        work_folder = f'{config.base}\\work\\{config.project}'  
-
+        clean_up_log_file= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_deletedFiles_{file_suffix}.txt"
+        clean_up_log_folder= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_eletedFolders_{file_suffix}.txt"
 
         apps= config.application
         found = True
         while found:
             found = False
             for app in apps:
-                app_folder = f'{work_folder}\\{app}\\{cls.cleanup_file_prefix}'
+                app_folder = f'{config.work}\\{app}\\{cls.cleanup_file_prefix}'
 
-                cls._log.info(f'Removing unwanted folders from {app_folder}')
                 with open (clean_up_log_folder, 'a+') as file2: 
                     s=''
                         
-                    count=1
+                    count=0
                     for subdir, dirs, files in walk(app_folder):
                             for dir in dirs:
                                 if dir in folder_list:
@@ -68,13 +64,14 @@ class cleanUpAIP(SourceValidation):
                                     file2.write(s)
                                     file2.write('\n') 
                     file2.close()
-                cls._log.info(f'{count} folders found')
+                cls._log.info(f'Removed {count} unwanted folders from {app_folder}')
+                if count > 0:
+                    config.application[app]['aip']=""
+                    config._save()
 
-
-                cls._log.info(f'Removing unwanted files from {app_folder}')
                 with open (clean_up_log_file, 'a+') as file1: 
                     s=''
-                    count=1
+                    count=0
                     for subdir, dirs, files in walk(app_folder):
                         for file in files:
                             fileN=join(subdir, file) 
@@ -88,7 +85,10 @@ class cleanUpAIP(SourceValidation):
                                     file1.write(s)
                                     file1.write('\n') 
                     file1.close()
-                cls._log.info(f'{count} files found')
+                cls._log.info(f'Removed {count} unwanted files from {app_folder}')
+                if count > 0:
+                    config.application[app]['aip']=""
+                    config._save()
 
         cls._log.debug('Source Code cleanup done')
 
@@ -99,4 +99,4 @@ class cleanUpHL(cleanUpAIP):
 
     @property
     def cleanup_file_prefix(cls):
-        return "Highlight"
+        return "HL"
