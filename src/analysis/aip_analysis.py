@@ -23,7 +23,7 @@ class AIPAnalysis(Analysis):
                 args = [f'{config.java_home}\\bin\\java.exe',
                         '-jar',config.aip_cli,
                         'add',
-                        '-n',f'{appl}',
+                        '-n',appl,
                         '-f', f'{config.project_name}//{appl}//AIP',
                         '-s',config.console_url,
                         '--apikey',config.console_key,

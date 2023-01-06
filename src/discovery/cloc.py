@@ -4,12 +4,14 @@ from logger import INFO
 from discovery.sourceValidation import SourceValidation 
 
 from os import getcwd
-from os.path import exists
+from os.path import exists,abspath
 from re import findall
 from pandas import DataFrame,ExcelWriter
 
-from util import run_process,format_table,check_process
+from util import run_process,format_table,check_process,create_folder
 
+#TODO: Convert total line to formulas
+#TODO: Numbers are being formatted as text
 
 class ClocPreCleanup(SourceValidation):
     writer = None
@@ -17,7 +19,9 @@ class ClocPreCleanup(SourceValidation):
     def __init__(cls, config: Config, log_level:int=INFO, name = None):
         if name is None: 
             name = cls.__class__.__name__
-        super().__init__(cls.__class__.__name__,log_level)
+
+        super().__init__(config,cls.__class__.__name__,log_level)
+
         cls.config = config
         cls._df = {}
         pass
@@ -38,17 +42,17 @@ class ClocPreCleanup(SourceValidation):
         return cls._df
 
     def _run_cloc(cls,cloc_project:str,work_folder:str,cloc_output:str):
-        cloc_path=f'{getcwd()}\\scripts\\cloc-1.64.exe'
+        cloc_path=abspath(f'{getcwd()}\\scripts\\cloc-1.64.exe')
         args = [cloc_path,work_folder,"--report-file",cloc_output,"--quiet"]
         return run_process(args,False)
 
     def open_excel_writer(cls,config:Config):
-        ClocPreCleanup.writer = ExcelWriter(f'{config.work}\\cloc-{config.project_name}.xlsx', engine='xlsxwriter')
+        ClocPreCleanup.writer = ExcelWriter(abspath(f'{config.output}\\report\cloc-{config.project_name}.xlsx'), engine='xlsxwriter')
 
     def run(cls,config:Config):
         cls.open_excel_writer(config)
 
-        list_of_tech_file=f'{getcwd()}\\scripts\\ListOfTechnologies.csv'
+        list_of_tech_file=abspath(f'{getcwd()}\\scripts\\ListOfTechnologies.csv')
         with open(list_of_tech_file) as f:
             tech_list = f.read().splitlines()
             f.close()
@@ -56,8 +60,8 @@ class ClocPreCleanup(SourceValidation):
         process = {}
         for appl in config.application:
             cls._log.info(f'Running {config.project_name}\{appl}')
-            cloc_output = f'{config.work}\\{appl}\cloc\cloc_{appl}_{cls.phase}.txt'
-            work_folder = f'{config.work}\\{appl}\AIP'  
+            cloc_output = abspath(f'{config.output}\\{appl}\cloc\cloc_{appl}_{cls.phase}.txt')
+            work_folder = abspath(f'{config.work}\\{appl}\AIP')
 
             #if the report is already out there - no need to continue
             if exists(cloc_output):
@@ -69,7 +73,9 @@ class ClocPreCleanup(SourceValidation):
 
         #has all cloc processing completed
         for p in process:
-            cloc_output = f'{config.work}\\{p}\cloc\cloc_{p}_{cls.phase}.txt'
+            cloc_folder = abspath(f'{config.output}\\{p}\cloc')
+            create_folder(cloc_folder)
+            cloc_output = abspath(f'{cloc_folder}\cloc_{p}_{cls.phase}.txt')
             if not process[p] is None:
                 cls._log.info(f'Checking results for {config.project_name}\{p}')
                 ret,output = check_process(process[p],False)

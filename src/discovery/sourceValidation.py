@@ -1,10 +1,13 @@
 from logger import Logger
 from json import dump
+from config import Config
+from os.path import abspath
 
 class SourceValidation:
 
-    def __init__(cls,log_name:str,log_level:int):
-        cls._log = Logger(log_name,log_level)
+    def __init__(cls,config:Config,log_name:str,log_level:int):
+        log_file = abspath(f'{config.logger}/source-code-discovery.log')
+        cls._log = Logger(name=log_name,level=log_level,file_name=log_file)
         pass
 
     @property

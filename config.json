@@ -27,17 +27,10 @@
     "Database": {
         "database": "postgres",
         "user": "******************",
-	"password": "******************",
+        "password": "******************",
         "host": "******************",
         "port": "2284"
     },
- 	"logging":{
-		"config":"info",
-		"aip":"info",
-		"highlight":"info",
-		"generate":"info"
-	},
-   "template": "",
     "setting": {
         "arg-template": "z:/Work/Decks/DD Findings - Template.pptx",
         "java_home": "D:\\Program Files\\OpenJDK\\jdk-11.0.17.8-hotspot",

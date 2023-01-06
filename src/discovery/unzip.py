@@ -1,4 +1,6 @@
 from os import walk,remove
+from os.path import abspath
+
 from shutil import unpack_archive
 
 from discovery.sourceValidation import SourceValidation 
@@ -6,8 +8,8 @@ from config import Config
 
 class Unzip(SourceValidation):
 
-   def __init__(cls, log_level:int):
-      super().__init__(cls.__class__.__name__,log_level)
+   def __init__(cls, config:Config, log_level:int):
+        super().__init__(config,cls.__class__.__name__,log_level)
 
 
    def run(cls,config:Config):
@@ -19,6 +21,7 @@ class Unzip(SourceValidation):
       #    apps.extend(dirnames)
 
       found = True
+      cls._log.info(f'Running {cls.__class__.__name__} for all applications')
       while found:
          found = False
          for app in apps:

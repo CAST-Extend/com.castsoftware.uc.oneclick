@@ -2,7 +2,7 @@ from analysis.analysis import Analysis
 from subprocess import Popen,PIPE
 from config import Config
 from hlRestCall import HLRestCall
-from util import run_process,check_process
+from util import run_process,create_folder
 
 import sys
 
@@ -24,6 +24,9 @@ class HLAnalysis(Analysis):
                     cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
                     app_id = rest.get_app_id(appl)
                     hl_work_folder = f'{config.base}\\work\\{config.project_name}\\{appl}'
+
+                    create_folder(f'{hl_work_folder}\\HL-WORK')
+
                     args = [f'{config.java_home}\\bin\\java.exe',
                             '-jar',config.hl_cli,
                             '--sourceDir', f'{hl_work_folder}\\HL',
