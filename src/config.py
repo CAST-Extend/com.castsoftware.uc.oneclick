@@ -7,6 +7,7 @@ from json import load
 from argparse import ArgumentParser
 from json import JSONDecodeError,dump
 from os.path import abspath,exists
+from util import create_folder
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -67,6 +68,7 @@ class Config():
                 raise ValueError(f"Required field '{v}' is missing from config.json")
 
     def _save(self):
+        create_folder(abspath(f'{self.base}/.oneClick'))
         with open(self._config_file, "w") as f:
             dump(self._config, f,indent=4)
             f.close()
@@ -84,32 +86,36 @@ class Config():
         return self.highlight['URL'] 
     @hl_url.setter
     def hl_url(self,value):
-        self.highlight['URL']=value
-        self._save()
+        if value is not None:
+            self.highlight['URL']=value
+            self._save()
 
     @property
     def hl_user(self):
         return self.highlight['user']  
     @hl_user.setter
     def hl_user(self,value):
-        self.highlight['user']=value
-        self._save()
+        if value is not None:
+            self.highlight['user']=value
+            self._save()
 
     @property
     def hl_password(self):
         return self.highlight['password']   
     @hl_password.setter
     def hl_password(self,value):
-        self.highlight['password']=value
-        self._save()
+        if value is not None:
+            self.highlight['password']=value
+            self._save()
 
     @property
     def hl_instance(self):
         return self.highlight['instance']   
     @hl_instance.setter
     def hl_instance(self,value):
-        self.highlight['instance']=value
-        self._save()
+        if value is not None:
+            self.highlight['instance']=value
+            self._save()
 
     @property
     def hl_cli(self):
@@ -132,7 +138,7 @@ class Config():
         if type(value) is not str:
             raise ValueError(f'Expecting a the project name, got {type(value)}')
 
-        self.log.info('New project: {value}')
+        self.log.info(f'New project: {value}')
         if 'project' not in self._config:
             self._config['project']={}
             self._config['project']['name']=value
@@ -150,7 +156,9 @@ class Config():
         return self.project['company_name']
     @company_name.setter
     def company_name(self,value):
-        self.project['company_name']=value
+        if value is not None:
+            self.project['company_name']=value
+            self._save()
 
     """ **************** Application related entries ************************ """
     @property
@@ -178,15 +186,21 @@ class Config():
     def application(self):
         self.project['application']={}
 
-
-
-
     @property
     def deliver(self):
         return f'{self.base}\\deliver\\{self.project_name}'
     @property
     def work(self):
-        return f'{self.base}\\work\\{self.project_name}'
+        return f'{self.base}\\WORK\\{self.project_name}'
+    @property
+    def output(self):
+        return f'{self.work}\\OUTPUT'
+    @property
+    def report(self):
+        return f'{self.output}\\REPORT'
+    @property
+    def logger(self):
+        return f'{self.work}\\LOGS'
 
     """ **************** Setting related entries ************************ """
     @property 
@@ -202,8 +216,9 @@ class Config():
         return self.setting['base']
     @base.setter
     def base(self,value):
-        self.setting['base']=value
-        self._save()
+        if value is not None:
+            self.setting['base']=value
+            self._save()
 
     @property
     def reset(self):
@@ -236,14 +251,29 @@ class Config():
     @property
     def aip_url(self):
         return self.aip['URL']
-
+    @aip_url.setter
+    def aip_url(self,value):
+        if value is not None:
+            self.aip['URL']=value
+            self._save()
+            
     @property
     def aip_user(self):
         return self.aip['user']
+    @aip_user.setter
+    def aip_user(self,value):
+        if value is not None:
+            self.aip['user']=value
+            self._save()
 
     @property
     def aip_password(self):
         return self.aip['password']
+    @aip_password.setter
+    def aip_password(self,value):
+        if value is not None:
+            self.aip['password']=value
+            self._save()
 
     """ **************** Console REST related entries ************************ """
     @property
@@ -256,10 +286,20 @@ class Config():
     @property
     def console_url(self)->str:
         return self.console['URL']
+    @console_url.setter
+    def console_url(self,value):
+        if value is not None:
+            self.console['URL']=value
+            self._save()
 
     @property
     def console_key(self)->str:
         return self.console['API_Key']
+    @console_key.setter
+    def console_key(self,value):
+        if value is not None:
+            self.console['API_Key']=value
+            self._save()
 
     @property
     def aip_cli(self):
@@ -273,23 +313,48 @@ class Config():
     @property
     def database(self):
         return self._config['Database']['database']
+    @database.setter
+    def database(self,value):
+        if value is not None:
+            self._config['Database']['database']=value
+            self._save()
 
     @property
     def user(self):
         return self._config['Database']['user']
+    @user.setter
+    def user(self,value):
+        if value is not None:
+            self._config['Database']['user']=value
+            self._save()
 
     @property
     def password(self):
         return self._config['Database']['password']
+    @password.setter
+    def password(self,value):
+        if value is not None:
+            self._config['Database']['password']=value
+            self._save()
     
     @property
     def host(self):
         return self._config['Database']['host']
+    @host.setter
+    def host(self,value):
+        if value is not None:
+            self._config['Database']['host']=value
+            self._save()
     
     @property
     def port(self):
         return self._config['Database']['port']
+    @port.setter
+    def port(self,value):
+        if value is not None:
+            self._config['Database']['port']=value
+            self._save()
     
-    @property
-    def template(self):
-        return self._config['template']    
+    # @property
+    # def template(self):
+    #     return self._config['template']    

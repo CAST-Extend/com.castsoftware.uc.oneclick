@@ -20,17 +20,17 @@ class RunARG():
 
     def run(cls,config:Config,appl_name:str=None,operation:str=None) -> bool:
         if appl_name is None:
-            appl_name = 'full'
+            appl_name = 'FULL'
         
         cfg = {}
         cfg['company']=config.company_name
         cfg['project']=config.project['name']
         cfg['template']=abspath(config.arg_template)
-        cfg['output']=abspath(f'{config.work}/arg/{appl_name}')
+        cfg['output']=abspath(f'{config.output}/REPORT/{appl_name}')
         cfg['cause']=abspath(f'{config.base}/scripts/cause.json')
 
         application=[]
-        if appl_name == 'full':
+        if appl_name == 'FULL':
             for appl in config.application:
                 application.append({"aip":appl,"highlight":appl,"title":appl})
         else: 
@@ -42,7 +42,7 @@ class RunARG():
         create_folder(f'{config.work}/arg')
         create_folder(cfg['output'])
 
-        arg_cfg_file = f'{config.work}/arg/{appl_name}/config.json'
+        arg_cfg_file = f'{config.output}/REPORT/{appl_name}/config.json'
         with open(arg_cfg_file, "w") as f:
             dump(cfg,f,indent=4)
             f.close()

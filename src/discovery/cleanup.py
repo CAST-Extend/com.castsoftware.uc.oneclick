@@ -1,17 +1,18 @@
 from datetime import datetime
 from os import mkdir,getcwd,walk,remove
-from os.path import exists,join
+from os.path import abspath,join
 from shutil import rmtree
 from discovery.sourceValidation import SourceValidation
 from config import Config
 from logger import INFO
+from util import create_folder
 
 class cleanUpAIP(SourceValidation):
 
-    def __init__(cls, name = None, log_level:int=INFO):
+    def __init__(cls, config:Config, name = None, log_level:int=INFO):
         if name is None: 
             name = cls.__class__.__name__
-        super().__init__(cls.__class__.__name__,log_level)
+        super().__init__(config,cls.__class__.__name__,log_level)
 
     @property
     def cleanup_file_prefix(cls):
@@ -21,9 +22,8 @@ class cleanUpAIP(SourceValidation):
     def run(cls,config:Config):
         cls._log.debug('Source Code cleanup is in progress')
         
-        output_path = f'{config.work}\\log'    
-        if not exists(output_path):
-            mkdir(output_path)
+        output_path = f'{config.output}\\LOGS'    
+        create_folder(output_path)
 
         dir = getcwd()
         dateTimeObj=datetime.now()
@@ -39,14 +39,15 @@ class cleanUpAIP(SourceValidation):
             folder_list = f.read().splitlines()
             f.close()
 
-        clean_up_log_file= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_deletedFiles_{file_suffix}.txt"
-        clean_up_log_folder= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_eletedFolders_{file_suffix}.txt"
-
         apps= config.application
+        cls._log.info(f'Running {cls.__class__.__name__} for all applications')
         found = True
         while found:
             found = False
             for app in apps:
+                clean_up_log_file= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFiles_{file_suffix}.txt"
+                clean_up_log_folder= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFolders_{file_suffix}.txt"
+
                 app_folder = f'{config.work}\\{app}\\{cls.cleanup_file_prefix}'
 
                 with open (clean_up_log_folder, 'a+') as file2: 
@@ -94,8 +95,8 @@ class cleanUpAIP(SourceValidation):
 
 
 class cleanUpHL(cleanUpAIP):
-    def __init__(cls, log_level:int):
-        super().__init__(cls.__class__.__name__,log_level)
+    def __init__(cls,config:Config, log_level:int):
+        super().__init__(config,cls.__class__.__name__,log_level)
 
     @property
     def cleanup_file_prefix(cls):

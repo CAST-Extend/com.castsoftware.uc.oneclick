@@ -4,7 +4,7 @@ from config import Config
 from analysis.analysis import Analysis,Process
 from subprocess import TimeoutExpired
 from time import sleep
-from util import find_in_list
+#from util import find_in_list
 
 class TrackAnalysis(Analysis):
     def __init__(cls, post_aip_opertion, log_level:int):
@@ -46,8 +46,8 @@ class TrackAnalysis(Analysis):
                         else:
                             stdout, stderr = process.communicate()
                             for line in stdout.split('\n'):
-                                if len(find_in_list(line,p.log))==0:
-                                    p.log.append(line)
+                                #if len(find_in_list(line,p.log))==0:
+                                p.log.append(line)
                             if process.returncode == 0:
                                 p.status = 'OK'
                             else:
@@ -66,10 +66,12 @@ class TrackAnalysis(Analysis):
                         print(f'\t{line}')
 
                     if p.status=='OK' and  p.operation == 'AIP':
+                        cls._log.info('Running post analsis jobs...')
                         for proc in cls._post_aip:
                             if proc.__class__.__name__ not in config.application[p.name] or \
                                 config.application[p.name][proc.__class__.__name__] != 'OK':
 
+                                cls._log.info(f'******************* {proc.__class__.__name__} *******************************')
                                 proc.run(p.name)
                                 
                                 config.application[p.name][proc.__class__.__name__]='OK'
@@ -83,11 +85,14 @@ class TrackAnalysis(Analysis):
                     break 
             if not running:
                 cls._log.info(f'All processing complete')
+                error = False
                 for p in cls._pid:
                     cls._log.info(f"{p.operation} for {config.project_name}\{p.name}: {p.status}")
+                    if "OK" not in p.status:
+                        error = True
                 break
             sleep(60)
-
+        return error
 
 
         #     status,output = check_process(process[appl])
