@@ -191,16 +191,13 @@ class Config():
         return f'{self.base}\\deliver\\{self.project_name}'
     @property
     def work(self):
-        return f'{self.base}\\WORK\\{self.project_name}'
-    @property
-    def output(self):
-        return f'{self.work}\\OUTPUT'
+        return f'{self.base}\\STAGED\\{self.project_name}'
     @property
     def report(self):
-        return f'{self.output}\\REPORT'
+        return f'{self.base}\\REPORT'
     @property
-    def logger(self):
-        return f'{self.work}\\LOGS'
+    def logs(self):
+        return f'{self.base}\\LOGS'
 
     """ **************** Setting related entries ************************ """
     @property 

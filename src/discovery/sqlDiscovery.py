@@ -7,6 +7,8 @@ from re import findall
 from util import  format_table
 from pandas import DataFrame,ExcelWriter,Series
 
+#TODO: Add filename and location for each item (d1)
+
 class SQLDiscovery(SourceValidation):
 
     def __init__(cls, config:Config, log_level:int):
@@ -18,8 +20,6 @@ class SQLDiscovery(SourceValidation):
         cls.view_list=[]
         cls.trigger_list=[]
         cls.file_list=[]
-
-
 
     def run(cls,config:Config):
         
@@ -70,7 +70,7 @@ class SQLDiscovery(SourceValidation):
                 if i not in file_dict.keys():
                     file_dict[i]=cls.file_list.count(i)
 
-            filename = abspath(f'{config.output}/{app}/report/SQLReport.xlsx')
+            filename = abspath(f'{config.report}/{config.project_name}/{app}-SQLReport.xlsx')
             writer = ExcelWriter(filename, engine='xlsxwriter')
             tabs = []
 

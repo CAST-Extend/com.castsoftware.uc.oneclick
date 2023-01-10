@@ -26,7 +26,7 @@ class RunARG():
         cfg['company']=config.company_name
         cfg['project']=config.project['name']
         cfg['template']=abspath(config.arg_template)
-        cfg['output']=abspath(f'{config.output}/REPORT/{appl_name}')
+        cfg['output']=abspath(f'{config.report}/{config.project_name}/{appl_name}')
         cfg['cause']=abspath(f'{config.base}/scripts/cause.json')
 
         application=[]
@@ -39,10 +39,9 @@ class RunARG():
 
         cfg['rest'] = config.rest
 
-        create_folder(f'{config.work}/arg')
         create_folder(cfg['output'])
 
-        arg_cfg_file = f'{config.output}/REPORT/{appl_name}/config.json'
+        arg_cfg_file = abspath(f'{config.report}/{config.project_name}/{appl_name}-config.json')
         with open(arg_cfg_file, "w") as f:
             dump(cfg,f,indent=4)
             f.close()

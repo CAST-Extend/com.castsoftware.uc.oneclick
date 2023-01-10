@@ -62,8 +62,9 @@ class TrackAnalysis(Analysis):
 
                 cls._log.info(f"{p.operation} analysis for {config.project_name}\{p.name}: {p.status}")
                 if just_completed == True:
-                    for line in p.log:
-                        print(f'\t{line}')
+                    if p.status != 'OK':
+                        for line in p.log:
+                            print(f'\t{line}')
 
                     if p.status=='OK' and  p.operation == 'AIP':
                         cls._log.info('Running post analsis jobs...')

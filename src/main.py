@@ -33,7 +33,7 @@ __author__ = "Nevin Kaplan"
 __email__ = "n.kaplan@castsoftware.com"
 __copyright__ = "Copyright 2022, CAST Software"
 
-
+#TODO: Ability to install onclick with all its components via PIP (d2)
 
 if __name__ == '__main__':
 
@@ -49,7 +49,6 @@ if __name__ == '__main__':
     parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location')
     parser.add_argument('-c','--companyName', required=True, help='Name of the project')
     parser.add_argument('-p','--projectName', required=True, help='Name of the project')
-    parser.add_argument('-r','--reset', required=False,help='Cleanup all work and start over')
 
     parser.add_argument('-s','--stop', required=False, help='Stop running at this step')
 
@@ -75,13 +74,12 @@ if __name__ == '__main__':
     parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
     parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
     
-    # TODO: add args for aip and console rest setup
-    # TODO: add arg to reset analysis status for specific application
+    # TODO: add args for aip and console rest setup (d2)
+    # TODO: add arg to reset analysis status for specific application (d2)
 
     args = parser.parse_args()
 
     config=Config(args.baseFolder,args.projectName)
-    config.reset=args.reset    
     config.company_name=args.companyName
 
     config.hl_url=args.hlURL
@@ -102,11 +100,12 @@ if __name__ == '__main__':
     config.password=args.dbPassword
     config.database=args.dbDatabase
 
-    create_folder(abspath(f'{config.base}/work'))
+    create_folder(abspath(f'{config.base}/STAGED'))
     create_folder(abspath(config.work))
-    create_folder(abspath(config.logger))
-    create_folder(abspath(config.output))
+    create_folder(abspath(config.logs))
+    create_folder(abspath(f'{config.logs}/{config.project_name}'))
     create_folder(abspath(config.report))
+    create_folder(abspath(f'{config.report}/{config.project_name}'))
 
     post_aip = [
         ActionPlan(config,log_level),
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     ]
 
     post_highlight = [
-        #TODO generate Highlight BOM report (phase 2)
+        #TODO generate Highlight BOM report (d1)
     ]
 
     process = [
@@ -132,7 +131,6 @@ if __name__ == '__main__':
 
         # reporting
         SQLDiscovery(config,log_level),
-        #TODO discovery report on project level, should be in app level
         DiscoveryReport(config,log_level),
 
         # application analysis process
@@ -143,8 +141,8 @@ if __name__ == '__main__':
 
         RunARG(config,log_level)
 
-        #TODO continue processing after analysis is done (phase 2)
-        #TODO generate obsolescence report (phase 2)
+        #TODO continue processing after analysis is done (d2)
+        #TODO generate obsolescence report (d2)
     ]
 
     step = 1

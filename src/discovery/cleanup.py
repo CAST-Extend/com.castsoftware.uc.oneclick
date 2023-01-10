@@ -7,6 +7,8 @@ from config import Config
 from logger import INFO
 from util import create_folder
 
+#todo: review cleanup lists for aip and hl, do we need separate or can we keep it as one and run HL from AIP folder?
+
 class cleanUpAIP(SourceValidation):
 
     def __init__(cls, config:Config, name = None, log_level:int=INFO):
@@ -18,11 +20,10 @@ class cleanUpAIP(SourceValidation):
     def cleanup_file_prefix(cls):
         return "AIP"
 
-    #def runCodeCleanup(self,dirLoc,dirname,output_path):
     def run(cls,config:Config):
         cls._log.debug('Source Code cleanup is in progress')
         
-        output_path = f'{config.output}\\LOGS'    
+        output_path = f'{config.logs}'    
         create_folder(output_path)
 
         dir = getcwd()
