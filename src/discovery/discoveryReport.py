@@ -5,6 +5,9 @@ import docx
 from config import Config
 from util import convert_LOC
 
+#todo: add totals to the cloc report (d1)
+#todo: if SQL problems, add bullet under SQL Delivery to describe (d1)
+
 class DiscoveryReport(SourceValidation):
 
     def __init__(cls, config:Config, log_level:int):
@@ -27,8 +30,8 @@ class DiscoveryReport(SourceValidation):
 
     def run(cls,config:Config):
 
-        cloc_report = abspath(f'{config.output}/report/cloc-{config.project_name}.xlsx')
-        discovery_report = abspath(f'{config.output}/report/source-code-discovery-{config.project_name}.docx')
+        cloc_report = abspath(f'{config.report}/{config.project_name}/{config.project_name}-cloc.xlsx')
+        discovery_report = abspath(f'{config.report}/{config.project_name}/{config.project_name}-source-code-discovery.docx')
         # create an instance of a word document
         doc = docx.Document()
         # add a heading of level 0 (largest heading)
@@ -38,7 +41,7 @@ class DiscoveryReport(SourceValidation):
         for appl in config.application:
             cls._log.info(f'Running {cls.__class__.__name__} for {appl}')
 
-            sql_report = abspath(f'{config.output}/{appl}/report/SQLReport.xlsx')
+            sql_report = abspath(f'{config.report}/{config.project_name}/{appl}-SQLReport.xlsx')
 
             # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
             before_df = cls.cloc_report(cloc_report,f'Before-Cleanup({appl})')
@@ -78,7 +81,6 @@ class DiscoveryReport(SourceValidation):
             total = int(bsuport['CODE'].sum())
             total, unit = convert_LOC(total)
 
-            #TODO:  
             lang_list = list(nsuport['LANGUAGE'])
             lang_list[-1]=f'and {lang_list[-1]}'
             bsup_lang = ', '.join(lang_list)

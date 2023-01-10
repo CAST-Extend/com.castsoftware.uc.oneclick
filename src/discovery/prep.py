@@ -41,34 +41,29 @@ class Prepare(SourceValidation):
 
         """create the application folders under 'work'
             base
-            |-work
-              |-project
-                |-application 1
-                  |-AIP
-                  |-HL
-                  |-HL-WORK
-                |-application 2
-                  |-AIP
-                  |-HL
-                  |-HL-WORK
-                |-OUTPUT
-                  |-LOGS
-                  |-application 1
-                    |-CLOC
-                    |-Report
-                  |-application 2
-                    |-CLOC
-                    |-Report
-
+            |-DELIVER
+            |-STAGE
+            | |-project
+            |   +-application 1
+            |   |  +-AIP
+            |   |  +-HL
+            |   |  +-HL-WORK
+            |   +-application 2
+            |      +-AIP
+            |      +-HL
+            |      +-HL-WORK
+            |-REPORT
+            |     +-application 1
+            |     | +-CLOC
+            |     | +-ARG
+            |     +-application 2
+            |       +CLOC
+            |       +-ARG
+            |-LOGS
+            | +-project
+            |   +-application 1
+            |   +-application 2
         """
-        if config.reset:
-            if exists (config.work):
-                cls._log.info(f'-reset flag set, {config.work} destination before copy')
-                rmtree(config.work, ignore_errors=True)
-            if exists (config.output):
-                cls._log.info(f'-reset flag set, {config.output} destination before copy')
-                rmtree(config.output)
-
         #Finally copy the contents of deliver to work
         cls._log.info('Copying deliver to work')
 
@@ -78,9 +73,9 @@ class Prepare(SourceValidation):
             dst_aip_name = f'{dst_name}\\AIP'
             dst_hl_name = f'{dst_name}\\HL'
 
-            create_folder(abspath(f'{config.output}/{folder}'))
-            create_folder(abspath(f'{config.output}/{folder}/REPORT'))
-            create_folder(abspath(f'{config.output}/{folder}/CLOC'))
+            # create_folder(abspath(f'{config.output}/{folder}'))
+            # create_folder(abspath(f'{config.output}/{folder}/REPORT'))
+            # create_folder(abspath(f'{config.output}/{folder}/CLOC'))
 
             create_folder(dst_name)
 #            create_folder(f'{dst_name}\\SQLReport')

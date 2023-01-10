@@ -10,8 +10,9 @@ from pandas import DataFrame,ExcelWriter
 
 from util import run_process,format_table,check_process,create_folder
 
-#TODO: Convert total line to formulas
-#TODO: Numbers are being formatted as text
+#TODO: Convert total line to formulas (d1)
+#TODO: Format all numbers as integers not text (d1)
+#TODO: Group tabs in pairs (before, after) then by application (d2)
 
 class ClocPreCleanup(SourceValidation):
     writer = None
@@ -47,7 +48,7 @@ class ClocPreCleanup(SourceValidation):
         return run_process(args,False)
 
     def open_excel_writer(cls,config:Config):
-        ClocPreCleanup.writer = ExcelWriter(abspath(f'{config.output}\\report\cloc-{config.project_name}.xlsx'), engine='xlsxwriter')
+        ClocPreCleanup.writer = ExcelWriter(abspath(f'{config.report}/{config.project_name}/{config.project_name}-cloc.xlsx'), engine='xlsxwriter')
 
     def run(cls,config:Config):
         cls.open_excel_writer(config)
@@ -59,9 +60,9 @@ class ClocPreCleanup(SourceValidation):
 
         process = {}
         for appl in config.application:
-            cls._log.info(f'Running {config.project_name}\{appl}')
-            cloc_output = abspath(f'{config.output}\\{appl}\cloc\cloc_{appl}_{cls.phase}.txt')
-            work_folder = abspath(f'{config.work}\\{appl}\AIP')
+            cls._log.info(f'Running {config.project_name}/{appl}')
+            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}-cloc-{cls.phase}.txt')
+            work_folder = abspath(f'{config.work}/{appl}/AIP')
 
             #if the report is already out there - no need to continue
             if exists(cloc_output):
@@ -69,13 +70,10 @@ class ClocPreCleanup(SourceValidation):
                 continue 
 
             process[appl] = cls._run_cloc(cls.cloc_project,work_folder,cloc_output)
-#            ret,output = cls._run_cloc(cls.cloc_project,work_folder,cloc_output)
 
         #has all cloc processing completed
         for p in process:
-            cloc_folder = abspath(f'{config.output}\\{p}\cloc')
-            create_folder(cloc_folder)
-            cloc_output = abspath(f'{cloc_folder}\cloc_{p}_{cls.phase}.txt')
+            cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
             if not process[p] is None:
                 cls._log.info(f'Checking results for {config.project_name}\{p}')
                 ret,output = check_process(process[p],False)
