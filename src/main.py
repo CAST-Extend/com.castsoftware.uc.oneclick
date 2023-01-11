@@ -163,6 +163,8 @@ if __name__ == '__main__':
                 if status and issubclass(type(p), TrackAnalysis):
                     log.error('One or more analysis failed, review logs and restart')
                     break
+                elif status > 0:
+                    break
 
         if args.end == 'Analysis':
             break

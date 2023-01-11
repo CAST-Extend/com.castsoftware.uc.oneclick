@@ -33,13 +33,18 @@ class AIPAnalysis(Analysis):
 
                 if len(config.node) > 0:
                     args = args + ['--node-name',config.node_name]
-
-                process = run_process(args,wait=False)
+                try:
+                    process = run_process(args,wait=False)
+                except FileNotFoundError as e:
+                    cls._log.error(f'Unable to launch analysis process {e}')
+                    cls._log.error(args)
+                    return e.errno
             else:
                 cls._log.info(f'{appl} has already been successfully analyized, skipping step')
                 process = None
 
             cls.track_process(process,"AIP",appl)
+        return 0
 
         #TrackAnalysis(INFO).run(config)
         
