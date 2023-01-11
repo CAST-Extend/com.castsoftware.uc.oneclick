@@ -37,12 +37,17 @@ class HLAnalysis(Analysis):
                             '--applicationId', str(app_id),
                             '--login',config.hl_user,
                             '--password',config.hl_password]
-                    proc = run_process(args,wait=False)
+                    try:
+                        proc = run_process(args,wait=False)
+                    except FileNotFoundError as e:
+                        cls._log.error(f'Unable to launch analysis process {e}')
+                        cls._log.error(args)
+                        return e.errno
                 else:
                     proc = None
 
                 cls.track_process(proc,"Highlight",appl)
-
+            return 0
 
 
             # error = False
