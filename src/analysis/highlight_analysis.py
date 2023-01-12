@@ -25,12 +25,12 @@ class HLAnalysis(Analysis):
                     app_id = rest.get_app_id(appl)
                     hl_work_folder = f'{config.base}\\work\\{config.project_name}\\{appl}'
 
-                    create_folder(f'{hl_work_folder}\\HL-WORK')
+                    create_folder(f'{hl_work_folder}/HL-WORK')
 
-                    args = [f'{config.java_home}\\bin\\java.exe',
+                    args = [f'{config.java_home}/bin/java.exe',
                             '-jar',config.hl_cli,
-                            '--sourceDir', f'{hl_work_folder}\\HL',
-                            '--workingDir' , f'{hl_work_folder}\\HL-WORK',
+                            '--sourceDir', f'{hl_work_folder}/HL',
+                            '--workingDir' , f'{hl_work_folder}/HL-WORK',
                             '--companyId', str(config.hl_instance),
                             '--analyzerDir',config.analyzerDir,
                             '--perlInstallDir',config.perlInstallDir,

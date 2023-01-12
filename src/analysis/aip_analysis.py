@@ -2,6 +2,8 @@ from analysis.analysis import Analysis
 from logger import INFO
 from config import Config
 from util import run_process
+from json import dumps
+from os.path import abspath
 
 from analysis.trackAnalysis import TrackAnalysis
 
@@ -20,16 +22,17 @@ class AIPAnalysis(Analysis):
                 #add a new appication in AIP Console
                 cls._log.info(f'Running analysis for {config.project_name}\{appl}')
                 
-                args = [f'{config.java_home}\\bin\\java.exe',
+                args = [abspath(f'{config.java_home}/bin/java.exe'),
                         '-jar',config.aip_cli,
                         'add',
                         '-n',appl,
-                        '-f', f'{config.project_name}//{appl}//AIP',
+                        '-f', f'{config.project_name}/{appl}/AIP',
                         '-s',config.console_url,
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
                         '--auto-create','--blueprint'
                         ]
+                cls._log.debug(dumps(args, indent=2))
 
                 if len(config.node) > 0:
                     args = args + ['--node-name',config.node_name]
@@ -46,7 +49,7 @@ class AIPAnalysis(Analysis):
             cls.track_process(process,"AIP",appl)
         return 0
 
-        #TrackAnalysis(INFO).run(config)
+        TrackAnalysis(INFO).run(config)
         
         
 
