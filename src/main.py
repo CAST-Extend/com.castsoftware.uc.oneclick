@@ -33,8 +33,8 @@ __author__ = "Nevin Kaplan"
 __email__ = "n.kaplan@castsoftware.com"
 __copyright__ = "Copyright 2022, CAST Software"
 
-#TODO: Ability to install onclick with all its components via PIP (d2)
-
+#TODO: d2-Ability to install onclick with all its components via PIP (d2)
+#TODO: d1-send emails (d1-SHP)
 if __name__ == '__main__':
 
     #printing some inital messages to the user

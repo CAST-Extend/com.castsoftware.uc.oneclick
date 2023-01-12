@@ -1,4 +1,4 @@
-.github
+.git
 target
 sample
 example
@@ -12,10 +12,6 @@ beta
 __test__
 obj
 release
-test
-tests
-sample
-example
 __MACOSX
 debug
 obj

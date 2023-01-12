@@ -1,8 +1,11 @@
 .gitignore
 .class
 .exe
-.zip
+.pdf
 .doc
-.gif
-.png
 .xlsx
+.pptx
+.bmp
+.gif
+.tif
+.png

@@ -8,7 +8,6 @@ from util import  format_table
 from pandas import DataFrame,ExcelWriter,Series
 
 #TODO: Add filename and location for each item (d1)
-
 class SQLDiscovery(SourceValidation):
 
     def __init__(cls, config:Config, log_level:int):
@@ -117,6 +116,7 @@ class SQLDiscovery(SourceValidation):
         if fn in cls.file_list:
             return
 
+        #todo: identify additional patterns to recongize addition sql code (d1)
         cls.file_list.append(fn)
         with open(fn, encoding="cp437") as f:
             content = f.read()
