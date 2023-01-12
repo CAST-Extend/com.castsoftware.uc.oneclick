@@ -10,8 +10,8 @@ from pandas import DataFrame,ExcelWriter
 
 from util import run_process,format_table,check_process,create_folder
 
-#TODO: Convert total line to formulas (d1)
-#TODO: Format all numbers as integers not text (d1)
+#TODO: Convert total line to formulas (d1-SHP)
+#TODO: Format all numbers as integers not text (d1-SHP)
 #TODO: Group tabs in pairs (before, after) then by application (d2)
 
 class ClocPreCleanup(SourceValidation):
