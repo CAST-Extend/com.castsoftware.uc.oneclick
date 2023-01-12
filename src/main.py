@@ -16,7 +16,7 @@ from analysis.trackAnalysis import TrackAnalysis
 from action_plan import ActionPlan
 from runArg import RunARGAIP,RunARG
 
-from logger import INFO
+from logger import INFO,DEBUG
 from argparse import ArgumentParser
 
 from util import create_folder
@@ -47,10 +47,10 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='One Click')
     parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location')
-    parser.add_argument('-c','--companyName', required=True, help='Name of the project')
+    parser.add_argument('-c','--companyName', required=False, help='Name of the project')
     parser.add_argument('-p','--projectName', required=True, help='Name of the project')
 
-    parser.add_argument('-s','--stop', required=False, help='Stop running at this step')
+    parser.add_argument('-d','--debug', required=False, default=False,type=bool)
 
     parser.add_argument('--hlURL', required=False, help='Highlight URL')
     parser.add_argument('--hlUser', required=False, help='Highlight User')
@@ -73,11 +73,15 @@ if __name__ == '__main__':
 
     parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
     parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
-    
+
+
+
     # TODO: add args for aip and console rest setup (d2)
     # TODO: add arg to reset analysis status for specific application (d2)
 
     args = parser.parse_args()
+    if args.debug:
+        log_level=DEBUG
 
     config=Config(args.baseFolder,args.projectName)
     config.company_name=args.companyName
