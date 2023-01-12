@@ -9,9 +9,9 @@
         "AIPConsole": {
             "Active": true,
             "URL": "http://localhost:8081/",
-            "API_Key": "eng212WK.BmcQazSvf7cKtRJVo4KncrlGh3zugqwp",
+            "API_Key": "**************************",
             "cli": "D:\\com.castsoftware.aip.console.tools.1.29.0-funcrel\\aip-console-tools-cli.jar",
-            "node": ""
+            "node": "local"
         },
         "Highlight": {
             "Active": true,
@@ -29,12 +29,11 @@
         "user": "******************",
         "password": "******************",
         "host": "******************",
-        "port": "2284"
+        "port": "####"
     },
     "setting": {
         "arg-template": "z:/Work/Decks/DD Findings - Template.pptx",
         "java_home": "D:\\Program Files\\OpenJDK\\jdk-11.0.17.8-hotspot",
-        "base": "d:\\code",
-        "reset": false
+        "base": "d:\\code"   
     }
 }

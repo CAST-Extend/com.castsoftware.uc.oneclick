@@ -217,16 +217,16 @@ class Config():
             self.setting['base']=value
             self._save()
 
-    @property
-    def reset(self):
-        return self.setting['reset']
-    @reset.setter
-    def reset(self,value):
-        if value is None:
-            self.setting['reset']=False
-        else:
-            self.setting['reset']=value
-        self._save()
+    # @property
+    # def reset(self):
+    #     return self.setting['reset']
+    # @reset.setter
+    # def reset(self,value):
+    #     if value is None:
+    #         self.setting['reset']=False
+    #     else:
+    #         self.setting['reset']=value
+    #     self._save()
 
     @property
     def java_home(self):
@@ -304,6 +304,8 @@ class Config():
 
     @property
     def node(self):
+        if self.console['node'] is None or len(self.console['node'])==0:
+            return 'local'
         return self.console['node']   
 
     """ **************** Action Plan related entries ************************ """
