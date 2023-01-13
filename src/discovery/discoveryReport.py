@@ -18,7 +18,7 @@ class DiscoveryReport(SourceValidation):
         
         # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
         df = read_excel(file,sheet_name=sheet)
-        df = df[df['LANGUAGE']!='SUM:'] # remove the total row
+        #df = df[df['LANGUAGE']!='SUM:'] # remove the total row
 
         # #extract total cout of applicable code from 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
         # filt=(df['APPLICABLE']==True)
