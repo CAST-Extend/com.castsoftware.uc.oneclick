@@ -95,6 +95,13 @@ class ClocPreCleanup(SourceValidation):
             statistics_list=findall(pattern,content)
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
             df['APPLICABLE']=df['LANGUAGE'].isin(tech_list)
+
+            #converting column values into int from string
+            df['FILES'] = df['FILES'].astype('int')
+            df['BLANK'] = df['BLANK'].astype('int')
+            df['COMMENT'] = df['COMMENT'].astype('int')
+            df['CODE'] = df['CODE'].astype('int')
+
             format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({p})')
         return True
 
