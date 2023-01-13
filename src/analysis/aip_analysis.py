@@ -30,13 +30,11 @@ class AIPAnalysis(Analysis):
                         '-s',config.console_url,
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
-                        '--auto-create','--blueprint'
+                        '--auto-create','--blueprint',
                         '--node-name',config.node
                         ]
                 cls._log.debug(dumps(args, indent=2))
 
-                if len(config.node) > 0:
-                    args = args + ['--node-name',config.node_name]
                 try:
                     process = run_process(args,wait=False)
                 except FileNotFoundError as e:
