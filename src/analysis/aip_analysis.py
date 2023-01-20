@@ -31,11 +31,11 @@ class AIPAnalysis(Analysis):
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
                         '--auto-create','--blueprint'
-                        '--node-name',config.node
+                        '--node-name',config.node_name
                         ]
                 cls._log.debug(dumps(args, indent=2))
 
-                if len(config.node) > 0:
+                if len(config.node_name) > 0:
                     args = args + ['--node-name',config.node_name]
                 try:
                     process = run_process(args,wait=False)

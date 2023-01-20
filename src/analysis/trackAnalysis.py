@@ -52,7 +52,7 @@ class TrackAnalysis(Analysis):
                                 p.status = 'OK'
                             else:
                                 p.status = f'Error: {process.returncode}'
-                                cls._log(f'error running {p.name}')
+                                cls._log.error(f'error running {p.name}')
                                 cls._log.error('\n'.join(p.log))
 
                             if p.operation == 'AIP':
