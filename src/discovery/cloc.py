@@ -75,7 +75,7 @@ class ClocPreCleanup(SourceValidation):
         for p in process:
             cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
             if not process[p] is None:
-                cls._log.info(f'Checking results for {config.project_name}\{p}')
+                cls._log.info(f'Checking results for {config.project_name}/{p}')
                 ret,output = check_process(process[p],False)
                 if ret != 0:
                     raise RuntimeError(f'Error running cloc on {cloc_output}')
@@ -95,6 +95,13 @@ class ClocPreCleanup(SourceValidation):
             statistics_list=findall(pattern,content)
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
             df['APPLICABLE']=df['LANGUAGE'].isin(tech_list)
+
+            #converting column values into int from string
+            df['FILES'] = df['FILES'].astype('int')
+            df['BLANK'] = df['BLANK'].astype('int')
+            df['COMMENT'] = df['COMMENT'].astype('int')
+            df['CODE'] = df['CODE'].astype('int')
+
             format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({p})')
         return True
 

@@ -18,11 +18,9 @@ class Prepare(SourceValidation):
         cls._log.info('****************** Source Code Validation Log *********************')
         cls._log.info(f'Running {cls.__class__.__name__} for all applications')
 
-        if config.reset:
-          del config.application
-
         """is the minimal enviroment configured
             base
+            |-.oneClick
             |-deliver
               |-project
                 |-application 1
