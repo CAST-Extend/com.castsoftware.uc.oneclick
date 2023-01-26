@@ -205,6 +205,26 @@ class Config():
         return self._config['setting']
 
     @property
+    def from_email_addrs(self):
+        return self.setting['from-email-addrs']
+
+    @property
+    def from_email_passwd(self):
+        return self.setting['from-email-passwd']
+
+    @property
+    def to_email_addrs(self):
+        return self.setting['to-email-addrs']
+
+    @property
+    def email_body(self):
+        return self.setting['email-body']     
+
+    @property
+    def email_subject(self):
+        return self.setting['email-subject'] 
+
+    @property
     def arg_template(self):
         return self.setting['arg-template']
 
@@ -356,4 +376,4 @@ class Config():
     
     # @property
     # def template(self):
-    #     return self._config['template']    
+    #     return self._config['template']

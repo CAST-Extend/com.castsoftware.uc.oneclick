@@ -18,6 +18,7 @@ from runArg import RunARGAIP,RunARG
 
 from logger import INFO,DEBUG
 from argparse import ArgumentParser
+from sendEmail import EmailNotification
 
 from util import create_folder
 from os.path import abspath
@@ -136,6 +137,7 @@ if __name__ == '__main__':
         # reporting
         SQLDiscovery(config,log_level),
         DiscoveryReport(config,log_level),
+        EmailNotification(config,log_level),
 
         # application analysis process
         #TODO DLM module?

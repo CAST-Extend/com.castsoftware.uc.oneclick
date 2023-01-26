@@ -32,6 +32,14 @@
         "port": "####"
     },
     "setting": {
+        "from-email-addrs": "s.p@castsoftware.com",
+        "from-email-passwd": "",
+        "to-email-addrs": [
+            "s.p@castsoftware.com",
+            "n.kaplan@castsoftware.com"
+        ],
+        "email-body": "Hi,\nThis is the mail body!",
+        "email-subject": "This is mail subject.",
         "arg-template": "z:/Work/Decks/DD Findings - Template.pptx",
         "java_home": "D:\\Program Files\\OpenJDK\\jdk-11.0.17.8-hotspot",
         "base": "d:\\code"   
