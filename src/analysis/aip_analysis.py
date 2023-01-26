@@ -30,8 +30,8 @@ class AIPAnalysis(Analysis):
                         '-s',config.console_url,
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
-                        '--auto-create','--blueprint',
-                        '--node-name',config.node
+                        '--auto-create','--blueprint'
+                        '--node-name',config.node_name
                         ]
                 cls._log.debug(dumps(args, indent=2))
 

@@ -303,7 +303,7 @@ class Config():
         return self.console['cli']
 
     @property
-    def node(self):
+    def node_name(self):
         if self.console['node'] is None or len(self.console['node'])==0:
             return 'local'
         return self.console['node']   
