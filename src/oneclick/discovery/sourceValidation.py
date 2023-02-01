@@ -1,6 +1,6 @@
-from logger import Logger
+from cast_common.logger import Logger
 from json import dump
-from config import Config
+from oneclick.config import Config
 from os.path import abspath
 
 class SourceValidation:

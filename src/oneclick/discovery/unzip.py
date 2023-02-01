@@ -3,8 +3,8 @@ from os.path import abspath
 
 from shutil import unpack_archive
 
-from discovery.sourceValidation import SourceValidation 
-from config import Config
+from oneclick.discovery.sourceValidation import SourceValidation 
+from oneclick.config import Config
 
 class Unzip(SourceValidation):
 
@@ -29,6 +29,7 @@ class Unzip(SourceValidation):
             for root, dirs, files in walk(app_folder):
                for file in files:
                   if file.endswith(".zip") or \
+                     file.endswith(".7z") or \
                      file.endswith(".tar") or \
                      file.endswith(".gztar") or \
                      file.endswith(".bztar"):

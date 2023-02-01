@@ -1,11 +1,11 @@
-from analysis.analysis import Analysis
-from logger import INFO
-from config import Config
-from util import run_process
+from oneclick.analysis.analysis import Analysis
+from oneclick.analysis.trackAnalysis import TrackAnalysis
+from oneclick.config import Config
+from cast_common.logger import INFO
+from cast_common.util import run_process
 from json import dumps
 from os.path import abspath
 
-from analysis.trackAnalysis import TrackAnalysis
 
 class AIPAnalysis(Analysis):
 
@@ -23,7 +23,7 @@ class AIPAnalysis(Analysis):
                 cls._log.info(f'Running analysis for {config.project_name}\{appl}')
                 
                 args = [abspath(f'{config.java_home}/bin/java.exe'),
-                        '-jar',config.aip_cli,
+                        '-jar',config.console_cli,
                         'add',
                         '-n',appl,
                         '-f', f'{config.project_name}/{appl}/AIP',
@@ -36,7 +36,7 @@ class AIPAnalysis(Analysis):
                 cls._log.debug(dumps(args, indent=2))
 
                 if len(config.node) > 0:
-                    args = args + ['--node-name',config.node_name]
+                    args = args + ['--node-name',config.node]
                 try:
                     process = run_process(args,wait=False)
                 except FileNotFoundError as e:

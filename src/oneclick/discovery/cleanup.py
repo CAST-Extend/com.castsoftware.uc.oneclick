@@ -2,10 +2,10 @@ from datetime import datetime
 from os import mkdir,getcwd,walk,remove
 from os.path import abspath,join
 from shutil import rmtree
-from discovery.sourceValidation import SourceValidation
-from config import Config
-from logger import INFO
-from util import create_folder
+from oneclick.discovery.sourceValidation import SourceValidation
+from oneclick.config import Config
+from cast_common.logger import INFO
+from cast_common.util import create_folder
 
 #todo: review cleanup lists for aip and hl, do we need separate or can we keep it as one and run HL from AIP folder?
 

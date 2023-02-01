@@ -1,11 +1,11 @@
-from logger import Logger
+from cast_common.logger import Logger
+from cast_common.util import create_folder
 from os import mkdir,walk
 from os.path import exists,abspath
 from shutil import copytree,rmtree
 
-from discovery.sourceValidation import SourceValidation 
-from config import Config
-from util import create_folder
+from oneclick.discovery.sourceValidation import SourceValidation 
+from oneclick.config import Config
 
 class Prepare(SourceValidation):
 
@@ -17,9 +17,6 @@ class Prepare(SourceValidation):
         cls._log.info('')
         cls._log.info('****************** Source Code Validation Log *********************')
         cls._log.info(f'Running {cls.__class__.__name__} for all applications')
-
-        if config.reset:
-          del config.application
 
         """is the minimal enviroment configured
             base
