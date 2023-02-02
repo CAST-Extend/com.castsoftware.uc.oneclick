@@ -1,5 +1,9 @@
 from cast_common.logger import Logger,INFO
+<<<<<<<< HEAD:src/oneclick/analysis/analysis.py
 from oneclick.config import Config
+========
+from config import Config
+>>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/analysis/analysis.py
 from cast_common.util import run_process
 from subprocess import Popen
 

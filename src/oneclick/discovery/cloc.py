@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:src/oneclick/discovery/cloc.py
 from oneclick.config import Config
 from cast_common.logger import Logger,INFO
 from cast_common.util import run_process,format_table,check_process,create_folder
 from oneclick.discovery.sourceValidation import SourceValidation 
+========
+from config import Config
+from cast_common.logger import Logger,INFO
+from cast_common.util import run_process,format_table,check_process,create_folder
+from discovery.sourceValidation import SourceValidation 
+>>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/discovery/cloc.py
 
 from os import getcwd
 from os.path import exists,abspath

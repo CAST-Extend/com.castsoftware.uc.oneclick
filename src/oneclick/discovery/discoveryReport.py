@@ -2,7 +2,11 @@ from oneclick.discovery.sourceValidation import SourceValidation
 from pandas import DataFrame,read_excel
 from os.path import abspath
 import docx
+<<<<<<<< HEAD:src/oneclick/discovery/discoveryReport.py
 from oneclick.config import Config
+========
+from config import Config
+>>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/discovery/discoveryReport.py
 from cast_common.util import convert_LOC
 
 #todo: add totals to the cloc report (d1)
