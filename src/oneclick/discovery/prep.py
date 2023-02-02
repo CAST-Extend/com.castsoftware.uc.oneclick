@@ -19,6 +19,7 @@ class Prepare(SourceValidation):
 
         """is the minimal enviroment configured
             base
+            |-.oneClick
             |-deliver
               |-project
                 |-application 1
