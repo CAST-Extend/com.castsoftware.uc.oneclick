@@ -93,6 +93,7 @@ class ClocPreCleanup(SourceValidation):
             #extracting required data from content of cloc_output.txt using python regex
             pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
             statistics_list=findall(pattern,content)
+            statistics_list= statistics_list[:-1]
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
             df['APPLICABLE']=df['LANGUAGE'].isin(tech_list)
 
@@ -101,6 +102,15 @@ class ClocPreCleanup(SourceValidation):
             df['BLANK'] = df['BLANK'].astype('int')
             df['COMMENT'] = df['COMMENT'].astype('int')
             df['CODE'] = df['CODE'].astype('int')
+
+            #converting total line to formulas
+            total_files='=SUBTOTAL(9,B2:B'+str(len(df['FILES'])+1)+')'
+            total_blank='=SUBTOTAL(9,C2:C'+str(len(df['FILES'])+1)+')'
+            total_comment='=SUBTOTAL(9,D2:D'+str(len(df['FILES'])+1)+')'
+            total_code='=SUBTOTAL(9,E2:E'+str(len(df['FILES'])+1)+')'
+            
+            #converting total line to formulas
+            df.loc[len(df.index)] = ['SUM:', total_files, total_blank, total_comment, total_code, ' ']
 
             format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({p})')
         return True
