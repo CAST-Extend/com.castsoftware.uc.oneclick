@@ -1,13 +1,6 @@
-<<<<<<<< HEAD:src/oneclick/analysis/aip_analysis.py
-from oneclick.analysis.analysis import Analysis
-from oneclick.analysis.trackAnalysis import TrackAnalysis
-from oneclick.config import Config
-from cast_common.logger import INFO
-========
 from analysis.analysis import Analysis
 from cast_common.logger import INFO
 from config import Config
->>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/analysis/aip_analysis.py
 from cast_common.util import run_process
 from json import dumps
 from os.path import abspath

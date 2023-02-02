@@ -1,10 +1,6 @@
 from oneclick.analysis.analysis import Analysis
 from subprocess import Popen,PIPE
-<<<<<<<< HEAD:src/oneclick/analysis/highlight_analysis.py
 from oneclick.config import Config
-========
-from config import Config
->>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/analysis/highlight_analysis.py
 from cast_common.hlRestCall import HLRestCall
 from cast_common.util import run_process,create_folder
 

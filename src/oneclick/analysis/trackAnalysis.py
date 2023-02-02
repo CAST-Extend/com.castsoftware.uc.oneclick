@@ -1,11 +1,6 @@
 from cast_common.logger import Logger,INFO
-<<<<<<<< HEAD:src/oneclick/analysis/trackAnalysis.py
 from oneclick.config import Config
 from oneclick.analysis.analysis import Analysis,Process
-========
-from config import Config
-from analysis.analysis import Analysis,Process
->>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/analysis/trackAnalysis.py
 from subprocess import TimeoutExpired
 from time import sleep
 #from util import find_in_list

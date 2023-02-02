@@ -2,13 +2,8 @@ from datetime import datetime
 from os import mkdir,getcwd,walk,remove
 from os.path import abspath,join
 from shutil import rmtree
-<<<<<<<< HEAD:src/oneclick/discovery/cleanup.py
 from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
-========
-from discovery.sourceValidation import SourceValidation
-from config import Config
->>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/discovery/cleanup.py
 from cast_common.logger import INFO
 from cast_common.util import create_folder
 

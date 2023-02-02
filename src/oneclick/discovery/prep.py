@@ -3,14 +3,8 @@ from cast_common.util import create_folder
 from os import mkdir,walk
 from os.path import exists,abspath
 from shutil import copytree,rmtree
-
-<<<<<<<< HEAD:src/oneclick/discovery/prep.py
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
-========
-from discovery.sourceValidation import SourceValidation 
-from config import Config
->>>>>>>> fe64007846c4588545834f8c2472b599179237fb:src/build/lib/one-click/discovery/prep.py
 
 class Prepare(SourceValidation):
 
