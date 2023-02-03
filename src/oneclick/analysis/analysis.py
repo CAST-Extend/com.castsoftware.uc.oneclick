@@ -1,7 +1,6 @@
-from logger import Logger
-from logger import INFO
-from config import Config
-from util import run_process
+from cast_common.logger import Logger,INFO
+from oneclick.config import Config
+from cast_common.util import run_process
 from subprocess import Popen
 
 

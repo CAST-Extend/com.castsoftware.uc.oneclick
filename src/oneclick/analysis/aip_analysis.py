@@ -1,11 +1,10 @@
 from analysis.analysis import Analysis
-from logger import INFO
+from cast_common.logger import INFO
 from config import Config
-from util import run_process
+from cast_common.util import run_process
 from json import dumps
 from os.path import abspath
 
-from analysis.trackAnalysis import TrackAnalysis
 
 class AIPAnalysis(Analysis):
 
@@ -23,7 +22,7 @@ class AIPAnalysis(Analysis):
                 cls._log.info(f'Running analysis for {config.project_name}\{appl}')
                 
                 args = [abspath(f'{config.java_home}/bin/java.exe'),
-                        '-jar',config.aip_cli,
+                        '-jar',config.console_cli,
                         'add',
                         '-n',appl,
                         '-f', f'{config.project_name}/{appl}/AIP',
@@ -31,7 +30,7 @@ class AIPAnalysis(Analysis):
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
                         '--auto-create','--blueprint'
-                        '--node-name',config.node_name
+                        '--node-name',config.node
                         ]
                 cls._log.debug(dumps(args, indent=2))
 

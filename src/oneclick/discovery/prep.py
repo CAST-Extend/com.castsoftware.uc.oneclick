@@ -1,11 +1,10 @@
-from logger import Logger
+from cast_common.logger import Logger
+from cast_common.util import create_folder
 from os import mkdir,walk
 from os.path import exists,abspath
 from shutil import copytree,rmtree
-
-from discovery.sourceValidation import SourceValidation 
-from config import Config
-from util import create_folder
+from oneclick.discovery.sourceValidation import SourceValidation 
+from oneclick.config import Config
 
 class Prepare(SourceValidation):
 

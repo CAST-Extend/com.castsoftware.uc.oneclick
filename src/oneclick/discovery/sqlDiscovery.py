@@ -1,10 +1,10 @@
-from discovery.sourceValidation import SourceValidation 
-from config import Config
+from oneclick.discovery.sourceValidation import SourceValidation 
+from oneclick.config import Config
 from os import walk
 from os.path import abspath
 from re import findall
 
-from util import  format_table
+from cast_common.util import  format_table
 from pandas import DataFrame,ExcelWriter,Series
 
 #TODO: Add filename and location for each item (d1)

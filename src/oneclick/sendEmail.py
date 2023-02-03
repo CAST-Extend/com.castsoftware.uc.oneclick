@@ -4,9 +4,9 @@ from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from string import Template
 
-from discovery.sourceValidation import SourceValidation
+from oneclick.discovery.sourceValidation import SourceValidation
 from os.path import abspath
-from config import Config
+from oneclick.config import Config
 
 import smtplib
 
