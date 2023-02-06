@@ -1,8 +1,5 @@
 from cast_common.logger import Logger,DEBUG, INFO, WARN, ERROR
 from oneclick.config import Config
-from logger import Logger
-from logging import DEBUG, INFO, WARN, ERROR
-from config import Config
 from cast_arg.config import Config as ARGConfig
 from cast_arg.convert import GeneratePPT 
 from cast_common.util import create_folder

@@ -30,24 +30,7 @@ class Config():
             self.setting['base'] = base_folder
             self.project = project_name
 
-            if 'rest' not in self._config:
-                raise ValueError(f"Required field 'rest' is missing from config.json")
-
-            for v in ['AIP','Highlight','AIPConsole']:
-                if v not in self._config['rest']:
-                    raise ValueError(f"Required field '{v}' is missing from config.json")
-
-            self._rest_settings(self.aip)#  config['rest']['AIP'])
-            self._rest_settings(self.highlight)# _config['rest']['highlight'])
-            if 'instance' not in self.highlight: #_config['rest']['highlight']:
-                raise ValueError(f"Required field 'instance' is missing from config.json")
-
-            if 'setting' not in self._config:
-                self._config['setting']={}
-
-            self._config_file = config_loc
             self._save()
-
 
         except JSONDecodeError as e:
             msg = str(e)

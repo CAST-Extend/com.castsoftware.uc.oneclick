@@ -2,10 +2,6 @@ from oneclick.config import Config
 from cast_common.logger import Logger,INFO
 from cast_common.util import run_process,format_table,check_process,create_folder
 from oneclick.discovery.sourceValidation import SourceValidation 
-from config import Config
-from logger import Logger
-from logger import INFO
-from discovery.sourceValidation import SourceValidation 
 
 from os import getcwd
 from os.path import exists,abspath
@@ -81,7 +77,7 @@ class ClocPreCleanup(SourceValidation):
                 cls._log.info(f'Checking results for {config.project_name}/{p}')
                 ret,output = check_process(process[p],False)
                 if ret != 0:
-                    raise RuntimeError(f'Error running cloc on {cloc_output}')
+                    raise RuntimeError(f'Error running cloc on {cloc_output} ({ret})')
 
             #reading cloc_output.txt file
             cls._log.info(f'Processing {cloc_output}')

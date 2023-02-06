@@ -4,8 +4,6 @@ from os.path import abspath,join
 from shutil import rmtree
 from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
-from discovery.sourceValidation import SourceValidation
-from config import Config
 from cast_common.logger import INFO
 from cast_common.util import create_folder
 

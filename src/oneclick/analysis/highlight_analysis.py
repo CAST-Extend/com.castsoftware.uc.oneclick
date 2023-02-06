@@ -1,9 +1,8 @@
 from oneclick.analysis.analysis import Analysis
 from subprocess import Popen,PIPE
 from oneclick.config import Config
-from config import Config
-from hlRestCall import HLRestCall
-from util import run_process,create_folder
+from cast_common.hlRestCall import HLRestCall
+from cast_common.util import run_process,create_folder
 
 import sys
 

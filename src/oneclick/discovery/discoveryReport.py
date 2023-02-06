@@ -1,9 +1,9 @@
-from discovery.sourceValidation import SourceValidation 
+from oneclick.discovery.sourceValidation import SourceValidation 
 from pandas import DataFrame,read_excel
 from os.path import abspath
 import docx
 from oneclick.config import Config
-from util import convert_LOC
+from cast_common.util import convert_LOC
 
 #todo: add totals to the cloc report (d1)
 #todo: if SQL problems, add bullet under SQL Delivery to describe (d1)
