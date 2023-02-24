@@ -1,10 +1,11 @@
 from oneclick.config import Config
 from cast_common.logger import Logger,INFO
-from cast_common.util import run_process,format_table,check_process,create_folder
+from cast_common.util import run_process,check_process,format_table
 from oneclick.discovery.sourceValidation import SourceValidation 
+from time import sleep
 
 from os import getcwd
-from os.path import exists,abspath
+from os.path import exists,abspath,getsize
 from re import findall
 from pandas import DataFrame,ExcelWriter
 
@@ -41,10 +42,16 @@ class ClocPreCleanup(SourceValidation):
     def cloc_results(cls):
         return cls._df
 
-    def _run_cloc(cls,cloc_project:str,work_folder:str,cloc_output:str):
+    def _run_cloc(cls,work_folder:str,cloc_output:str):
         cloc_path=abspath(f'{getcwd()}\\scripts\\cloc-1.64.exe')
         args = [cloc_path,work_folder,"--report-file",cloc_output,"--quiet"]
-        return run_process(args,False)
+        proc = run_process(args,False)
+
+        sleep(10)
+        if proc.poll() is not None and exists(cloc_output):
+            return 'DONE'
+        else:
+            return proc
 
     def open_excel_writer(cls,config:Config):
         ClocPreCleanup.writer = ExcelWriter(abspath(f'{config.report}/{config.project_name}/{config.project_name}-cloc.xlsx'), engine='xlsxwriter')
@@ -58,6 +65,7 @@ class ClocPreCleanup(SourceValidation):
             f.close()
 
         process = {}
+        cloc_run=False
         for appl in config.application:
             cls._log.info(f'Running {config.project_name}/{appl}')
             cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}-cloc-{cls.phase}.txt')
@@ -67,19 +75,32 @@ class ClocPreCleanup(SourceValidation):
             if exists(cloc_output):
                 process[appl]=None
                 continue 
-
-            process[appl] = cls._run_cloc(cls.cloc_project,work_folder,cloc_output)
+            cloc_run=True
+            process[appl] = cls._run_cloc(work_folder,cloc_output)
 
         #has all cloc processing completed
-        for p in process:
-            cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
-            if not process[p] is None:
-                cls._log.info(f'Checking results for {config.project_name}/{p}')
-                ret,output = check_process(process[p],False)
-                if ret != 0:
-                    raise RuntimeError(f'Error running cloc on {cloc_output} ({ret})')
+        all_done=False
+        while (not all_done):
+            all_done=True
+            for p in process:
+                if process[p]=='DONE':
+                    continue
+                all_done=False
+                cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
+                if not process[p] is None:
+                    cls._log.info(f'Checking results for {config.project_name}/{p}')
+                    ret,output = check_process(process[p],False)
+                    if ret != 0 and not exists(cloc_output) and getsize(cloc_output) == 0:
+                        cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
 
+                if exists(cloc_output):
+                    process[p]='DONE'
+            if cloc_run:
+                sleep(60)
+
+        for appl in config.application:
             #reading cloc_output.txt file
+            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}-cloc-{cls.phase}.txt')
             cls._log.info(f'Processing {cloc_output}')
             summary_list=[]   
             with open(cloc_output, 'r') as f:
@@ -87,7 +108,6 @@ class ClocPreCleanup(SourceValidation):
                 f.seek(0)
                 summary_list= [line.rstrip('\n').lstrip() for line in f]
                 #print(summary_list)
-                f.close()
 
             #extracting required data from content of cloc_output.txt using python regex
             pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
@@ -103,15 +123,15 @@ class ClocPreCleanup(SourceValidation):
             df['CODE'] = df['CODE'].astype('int')
 
             #converting total line to formulas
-            total_files='=SUBTOTAL(9,B2:B'+str(len(df['FILES'])+1)+')'
-            total_blank='=SUBTOTAL(9,C2:C'+str(len(df['FILES'])+1)+')'
-            total_comment='=SUBTOTAL(9,D2:D'+str(len(df['FILES'])+1)+')'
-            total_code='=SUBTOTAL(9,E2:E'+str(len(df['FILES'])+1)+')'
+            # total_files='=SUBTOTAL(109,[FILES])'
+            # total_blank='=SUBTOTAL(109,[BLANK])'
+            # total_comment='=SUBTOTAL(109,[COMMENT])'
+            # total_code='=SUBTOTAL(9,E2:E'+str(len(df['FILES'])+1)+')'
             
             #converting total line to formulas
-            df.loc[len(df.index)] = ['SUM:', total_files, total_blank, total_comment, total_code, ' ']
+#            df.loc[len(df.index)] = [' ', total_files, total_blank, total_comment, total_code, ' ']
 
-            format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({p})')
+            format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({appl})')
         return True
 
 
@@ -131,3 +151,8 @@ class ClocPostCleanup(ClocPreCleanup):
     def run(cls,config:Config):
         super().run(config)
         ClocPreCleanup.writer.close()
+        pass
+
+
+
+        

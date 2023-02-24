@@ -75,7 +75,7 @@ class DiscoveryReport(SourceValidation):
             lang_list = list(bsuport['LANGUAGE'])
             lang_list[-1]=f'and {lang_list[-1]}'
             bsup_lang = ', '.join(lang_list)
-            doc.add_paragraph(f"{len(bsuport)} are supported by CAST, {bsup_lang} containing {total} {unit} and are in scope.",style='List Bullet 2')
+            doc.add_paragraph(f"{len(bsuport)} are relevant for the CAST analysis, {bsup_lang}.",style='List Bullet 2')
 
             nsuport = before_df[before_df['APPLICABLE']==False]
             total = int(bsuport['CODE'].sum())
@@ -84,7 +84,7 @@ class DiscoveryReport(SourceValidation):
             lang_list = list(nsuport['LANGUAGE'])
             lang_list[-1]=f'and {lang_list[-1]}'
             bsup_lang = ', '.join(lang_list)
-            doc.add_paragraph(f"The remaining {len(nsuport)} are unsupported, {bsup_lang} containing ({total} {unit}) and considered out of scope.",style='List Bullet 2')
+            doc.add_paragraph(f"The remaining {len(nsuport)} are irrelevant and will not be analyzed, {bsup_lang}.",style='List Bullet 2')
 
             # in scope code base
             asuport = after_df[before_df['APPLICABLE']==True]
