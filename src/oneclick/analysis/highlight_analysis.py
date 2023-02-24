@@ -13,6 +13,9 @@ class HLAnalysis(Analysis):
         pass
 
     def run(cls, config:Config):
+        if not config.is_hl_active:
+            return 
+        
         rest = HLRestCall(config.hl_url,config.hl_user,config.hl_password,config.hl_instance)
 
         try:

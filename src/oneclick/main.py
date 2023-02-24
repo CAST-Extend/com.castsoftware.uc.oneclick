@@ -66,9 +66,9 @@ if __name__ == '__main__':
     parser.add_argument('--consoleCLI', required=False, help='AIP Console Key')
 
     parser.add_argument('--dbHost', required=False, help='Database Host')
-    parser.add_argument('--dbPort', required=False, help='Database Port',default="2284")
+    parser.add_argument('--dbPort', required=False, help='Database Port')
     parser.add_argument('--dbUser', required=False, help='Database User',default="operator")
-    parser.add_argument('--dbPassword', required=False, help='Database Password')
+    parser.add_argument('--dbPassword', required=False, help='Database Password',default="CastAIP")
     parser.add_argument('--dbDatabase', required=False, help='Database Database',default="postgres")
 
     parser.add_argument('--JavaHome', required=False, help='Location of the JRE')
@@ -116,8 +116,8 @@ if __name__ == '__main__':
     config.database=args.dbDatabase
 
     config.java_home=args.JavaHome
-    if not config.is_hl_config_valid:
-        exit(1)
+    # if not config.is_hl_config_valid:
+    #     exit(1)
 
     create_folder(abspath(f'{config.base}/STAGED'))
     create_folder(abspath(config.work))
@@ -169,13 +169,15 @@ if __name__ == '__main__':
 
     step = 1
     for p in process:
+        if issubclass(type(p), Analysis) and args.end == 'Discovery':
+            log.info('--end Discovery selected, process stopping here')
+            break
+
+
         log.info(f'******************* Step {step} - {p.__class__.__name__} *******************************')
         if args.start == 'Discovery':
             if issubclass(type(p), SourceValidation):
                 status = p.run(config)
-
-        if args.end == 'Discovery':
-            break
 
         if args.start in ['Discovery','Analysis']:
             if issubclass(type(p), Analysis):

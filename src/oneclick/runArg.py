@@ -43,7 +43,6 @@ class RunARG():
         arg_cfg_file = abspath(f'{config.report}/{config.project_name}/{appl_name}-config.json')
         with open(arg_cfg_file, "w") as f:
             dump(cfg,f,indent=4)
-            f.close()
 
         GeneratePPT(ARGConfig(arg_cfg_file)).save_ppt()
         pass

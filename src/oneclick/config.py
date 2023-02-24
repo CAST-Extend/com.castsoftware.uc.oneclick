@@ -67,10 +67,10 @@ class Config():
     def _set_active(self,node,chk_lst):
         chk = True
         for item in chk_lst:
-            if item not in node:
+            if item not in node or node[item]=='':
                 chk = False
-        if chk:
-            node['active']=True
+                break
+        node['Active']=chk
 
     def _get(self,base,key,default=''):
         if key not in base:
@@ -90,11 +90,11 @@ class Config():
     def highlight(self):
         if 'Highlight' not in self.rest:
             self.rest['Highlight']={}
-            self.highlight['active']=False
+            self.highlight['Active']=False
         return self.rest['Highlight']
     @property
     def is_hl_active(self):
-        return self.highlight['active']
+        return self.highlight['Active']
 
     def _set_hl_active(self):
         self._set_active(self.highlight,['URL','user','password','instance'])

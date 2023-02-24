@@ -22,7 +22,7 @@ class AIPAnalysis(Analysis):
                 #add a new appication in AIP Console
                 cls._log.info(f'Running analysis for {config.project_name}\{appl}')
                 
-                args = [abspath(f'{config.java_home}/bin/java.exe'),
+                args = [f'{config.java_home}java.exe',
                         '-jar',config.console_cli,
                         'add',
                         '-n',appl,
