@@ -131,7 +131,7 @@ class ClocPreCleanup(SourceValidation):
             #converting total line to formulas
 #            df.loc[len(df.index)] = [' ', total_files, total_blank, total_comment, total_code, ' ']
 
-            format_table(ClocPreCleanup.writer,df,f'{cls.phase}-Cleanup({appl})')
+            format_table(ClocPreCleanup.writer,df,f'{cls.phase}({appl})')
         return True
 
 
