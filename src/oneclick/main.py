@@ -33,6 +33,14 @@ __author__ = "Nevin Kaplan"
 __email__ = "n.kaplan@castsoftware.com"
 __copyright__ = "Copyright 2022, CAST Software"
 
+def get_argparse_defaults(parser):
+    defaults = {}
+    for action in parser._actions:
+        if not action.required and action.dest != "help":
+            defaults[action.dest] = action.default
+    return defaults
+
+
 #TODO: d2-Ability to install onclick with all its components via PIP (d2)
 #TODO: d1-send emails (d1-SHP)
 if __name__ == '__main__':
@@ -53,7 +61,13 @@ if __name__ == '__main__':
     """
     config_parser = subparsers.add_parser('config')
     config_parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location',metavar='BASE_FOLDER')
-    config_parser.add_argument('-d','--debug',  default=False,type=bool)
+    config_parser.add_argument('-d','--debug',type=bool)
+    config_parser.add_argument('-p','--projectName', help='Name of the project')
+
+    #settings
+    settings=config_parser.add_argument_group('General Settings')
+    settings.add_argument('--java_home', help='Set if java is not part of the system path')
+    settings.add_argument('--report_template', help='Set if java is not part of the system path')
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
@@ -63,7 +77,7 @@ if __name__ == '__main__':
 
     #highlight
     highlight=config_parser.add_argument_group('CAST Highlight Access')
-    highlight.add_argument('--hlURL',default='https://rpa.casthighlight.com/WS2/', help='Highlight URL',metavar='URL')
+    highlight.add_argument('--hlURL',default='https://rpa.casthighlight.com', help='Highlight URL',metavar='URL')
     highlight.add_argument('--hlUser',  help='Highlight User',metavar='USER')
     highlight.add_argument('--hlPassword',  help='Highlight Password',metavar='PASSWORD')
     highlight.add_argument('--hlInstance',  help='Highlight Instance Id',type=int,metavar='ID')
@@ -97,7 +111,6 @@ if __name__ == '__main__':
     """
     run_parser = subparsers.add_parser('run')
     run_parser.add_argument('-b','--baseFolder', help='Base Folder Location')
-    run_parser.add_argument('-p','--projectName', help='Name of the project')
     run_parser.add_argument('-n','--consoleNode', help='AIP Console Node Name',metavar='NAME')
     run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
 
@@ -106,12 +119,23 @@ if __name__ == '__main__':
 
     run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
+    default_args = get_argparse_defaults(config_parser)
     args = parser.parse_args()
 
     log.info(f'Running {args.command}')
 
     try:
-        config=Config(args)
+        config=Config(parser,default_args)
+
+        if args.command == 'config':
+            file = ''
+            if args.projectName is None:
+                file='Default'
+            else:
+                file = args.projectName
+            log.info(f'{file} configuration file successfuly updated')
+            exit ()
+
     except NoConfigFound as ex:
         log.error(config_parser.format_help())
         log.error(ex)
