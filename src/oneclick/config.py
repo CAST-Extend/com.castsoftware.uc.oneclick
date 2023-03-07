@@ -18,44 +18,67 @@ __email__ = "n.kaplan@castsoftware.com"
 class Config():
     log = None
     log_translate = {} 
-    def __init__(self,args:ArgumentParser,log_level: int=INFO):
+
+    def __init__(self,parser:ArgumentParser,default_args,log_level: int=INFO):
         self.log = Logger(self.__class__.__name__,log_level)
+
+
+        args = parser.parse_args()
 
         base_config=abspath(f'{args.baseFolder}/.oneclick/config.json')
         if not exists(base_config) and args.command == 'run':
             raise NoConfigFound('Base configuration file found, please run with the "config" option')
 
         if args.command == 'config':
-            self._config={}
-            self._config_file=base_config
-            self.base = args.baseFolder
+            if not exists(base_config):
+                self._config={}
+                self._config_file=base_config
+                self.base = args.baseFolder
+            else: 
+                if args.projectName is None:
+                    self._config_file = abspath(f'{args.baseFolder}/.oneclick/config.json')
+                else:
+                    self._config_file = abspath(f'{args.baseFolder}/.oneclick/{args.projectName}.json')
+
+                with open(abspath(self._config_file), 'rb') as config_file:
+                    self._config = load(config_file)
+            if args.java_home is None:
+                self.java_home = ''
+            else:
+                self.java_home = args.java_home
 
             #Dashboard
-            self.aip_url=args.aipURL
-            self.aip_password=args.aipPassword
-            self.aip_user=args.aipUser
+            if args.aipURL is not None: self.aip_url = args.aipURL
+            if args.aipPassword is not None: self.aip_password = args.aipPassword
+            if args.aipUser is not None: self.aip_user = args.aipUser
 
             #Highlight
-            self.hl_url=args.hlURL
-            self.hl_user=args.hlUser
-            self.hl_password=args.hlPassword
-            self.hl_instance=args.hlInstance
-            self.hl_cli=args.hlCLI
-            self.perl_install_dir=args.HLPerlInstallDir
-            self.analyzer_dir=args.HLAnalyzerDir
+            if self.check_default(args.hlURL,self.hl_url,default_args['hlURL']):
+                self.hl_url = f'{args.hlURL}/WS2'
+            if args.hlUser is not None: self.hl_user = args.hlUser
+            if args.hlPassword is not None: self.hl_password = args.hlPassword
+            if args.hlInstance is not None: self.hl_instance = args.hlInstance
+            if self.check_default(args.hlCLI,self.hl_cli,default_args['hlCLI']):
+                self.hl_cli = args.hlCLI
+            if self.check_default(args.HLPerlInstallDir,self.perl_install_dir,default_args['HLPerlInstallDir']):
+                self.perl_install_dir = args.HLPerlInstallDir
+            if self.check_default(args.HLAnalyzerDir,self.analyzer_dir,default_args['HLAnalyzerDir']):
+                self.analyzer_dir = args.HLAnalyzerDir
 
             #AIPConsole
-            self.console_url=args.consoleURL
-            self.console_key=args.consoleKey
-            self.console_cli=args.consoleCLI
-            self.console_node='' 
+            if args.consoleURL is not None: self.console_url = args.consoleURL
+            if args.consoleKey is not None: self.console_key = args.consoleKey
+            if args.consoleCLI is not None: self.console_cli = args.consoleCLI
 
             #Database
-            self.db_host=args.dbHost
-            self.db_port=args.dbPort
-            self.db_user=args.dbUser
-            self.db_password=args.dbPassword
-            self.db_database=args.dbDatabase
+            if args.dbHost is not None: self.db_host = args.dbHost
+            if args.dbPort is not None: self.db_port = args.dbPort
+            if self.check_default(args.dbUser,self.db_user,default_args['dbUser']):
+                self.db_user = args.dbUser
+            if self.check_default(args.dbPassword,self.db_password,default_args['dbPassword']):
+                self.db_password = args.dbPassword
+            if self.check_default(args.dbDatabase,self.db_database,default_args['dbDatabase']):
+                self.db_database = args.dbDatabase
 
             return
 
@@ -90,6 +113,14 @@ class Config():
                 self.log.error(msg)
                 exit()
 
+    def check_default(self,arg_value,cfg_value,default_value) -> bool:
+        rtn =  False
+        if arg_value is not None: 
+            if (cfg_value is None or cfg_value=='') or arg_value != default_value:
+                rtn =  True
+        return rtn
+
+
     def clean_creds(self,value):
         if type(value) is dict:
             for skey, svalue in value.items():  
@@ -98,6 +129,10 @@ class Config():
                 else:
                     self.clean_creds(svalue)
         return
+
+    def _if_set(self,target,param):
+        if param is not None:
+            target[0]=param
 
     def _save(self):
         create_folder(abspath(f'{self.base}/.oneClick'))
@@ -250,21 +285,21 @@ class Config():
 
     @property
     def aip_url(self):
-        return self.aip['URL']
+        return self._get(self.aip,'URL')
     @aip_url.setter
     def aip_url(self,value):
         self._set_aip_active('URL',value,'')
             
     @property
     def aip_user(self):
-        return self.aip['user']
+        return self._get(self.aip,'user')
     @aip_user.setter
     def aip_user(self,value):
         self._set_aip_active('user',value,'')
 
     @property
     def aip_password(self):
-        return self.aip['password']
+        return self._get(self.aip,'password')
     @aip_password.setter
     def aip_password(self,value):
         self._set_aip_active('password',value,'')
@@ -284,30 +319,28 @@ class Config():
 
     @property
     def console_url(self)->str:
-        return self.console['URL']
+        return self._get(self.console,'URL')
     @console_url.setter
     def console_url(self,value):
         self._set_console_active('URL',value,'')
 
     @property
     def console_key(self)->str:
-        return self.console['API_Key']
+        return self._get(self.console,'API_Key')
     @console_key.setter
     def console_key(self,value):
         self._set_console_active('API_Key',value,'')
 
     @property
     def console_cli(self):
-        return self.console['cli']
+        return self._get(self.console,'cli')
     @console_cli.setter
     def console_cli(self,value):
         self._set_console_active('cli',value,'')
 
     @property
     def console_node(self):
-        if self.console['node'] is None or len(self.console['node'])==0:
-            return 'local'
-        return self.console['node']   
+        return self._get(self.console,'node')
     @console_node.setter
     def console_node(self,value):
         self._set_console_active('node',value,'')
