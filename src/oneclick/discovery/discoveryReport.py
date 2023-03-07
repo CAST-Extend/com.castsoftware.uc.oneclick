@@ -44,7 +44,7 @@ class DiscoveryReport(SourceValidation):
             sql_report = abspath(f'{config.report}/{config.project_name}/{appl}-SQLReport.xlsx')
 
             # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
-            before_df = cls.cloc_report(cloc_report,f'Before-Cleanup({appl})')
+            before_df = cls.cloc_report(cloc_report,f'Before({appl})')
 
             filt=(before_df['APPLICABLE']==False)
             l=before_df.loc[filt,['LANGUAGE','CODE']].sort_values(by=['CODE'], ascending=False) 
@@ -55,7 +55,7 @@ class DiscoveryReport(SourceValidation):
                 non_code= str(l.iloc[0]['CODE']//1000) +' KLOC of '+ l.iloc[0]['LANGUAGE'] +' non code files and ~'+ str(l.iloc[1]['CODE']//1000) +' KLOC of '+ l.iloc[1]['LANGUAGE']
 
             # read by 'Stats After Code CleanUP' sheet of an Cloc_Output excel file
-            after_df = cls.cloc_report(cloc_report,f'After-Cleanup({appl})')
+            after_df = cls.cloc_report(cloc_report,f'After({appl})')
 
             # read by 'Summary' sheet of an SQL_Output excel file
             sql_df = read_excel(sql_report,sheet_name='Summary')
