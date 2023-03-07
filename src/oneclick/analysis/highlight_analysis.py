@@ -26,17 +26,24 @@ class HLAnalysis(Analysis):
 
                     cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
                     app_id = rest.get_app_id(appl)
+                    if app_id is None:
+                        cls._log.error(f'Application {appl} not found in Highlight')
+                        continue
+
                     hl_work_folder = f'{config.base}\\STAGED\\{config.project_name}\\{appl}'
 
                     create_folder(f'{hl_work_folder}/HL-WORK')
+                    java_home = config.java_home
+                    if len(java_home) > 0:
+                        java_home = f'{java_home}/bin/'
 
-                    args = [f'{config.java_home}/bin/java.exe',
+                    args = [f'{config.java_home}java.exe',
                             '-jar',config.hl_cli,
                             '--sourceDir', f'{hl_work_folder}/HL',
                             '--workingDir' , f'{hl_work_folder}/HL-WORK',
                             '--companyId', str(config.hl_instance),
-                            '--analyzerDir',config.analyzerDir,
-                            '--perlInstallDir',config.perlInstallDir,
+                            '--analyzerDir',config.analyzer_dir,
+                            '--perlInstallDir',config.perl_install_dir,
                             '--applicationId', str(app_id),
                             '--login',config.hl_user,
                             '--password',config.hl_password]

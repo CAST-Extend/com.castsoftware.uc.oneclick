@@ -53,20 +53,20 @@ if __name__ == '__main__':
     """
     config_parser = subparsers.add_parser('config')
     config_parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location',metavar='BASE_FOLDER')
-    config_parser.add_argument('-d','--debug', required=False, default=False,type=bool)
+    config_parser.add_argument('-d','--debug',  default=False,type=bool)
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
-    dashboard.add_argument('--aipURL', required=True, help='AIP API URL')
-    dashboard.add_argument('--aipUser', required=True, help='AIP API  User')
-    dashboard.add_argument('--aipPassword', required=True, help='AIP API  Password')
+    dashboard.add_argument('--aipURL', help='AIP API URL')
+    dashboard.add_argument('--aipUser', help='AIP API  User')
+    dashboard.add_argument('--aipPassword', help='AIP API  Password')
 
     #highlight
     highlight=config_parser.add_argument_group('CAST Highlight Access')
-    highlight.add_argument('--hlURL', required=True,default='https://rpa.casthighlight.com/WS2/', help='Highlight URL',metavar='URL')
-    highlight.add_argument('--hlUser', required=False, help='Highlight User',metavar='USER')
-    highlight.add_argument('--hlPassword', required=False, help='Highlight Password',metavar='PASSWORD')
-    highlight.add_argument('--hlInstance', required=False, help='Highlight Instance Id',type=int,metavar='ID')
+    highlight.add_argument('--hlURL',default='https://rpa.casthighlight.com/WS2/', help='Highlight URL',metavar='URL')
+    highlight.add_argument('--hlUser',  help='Highlight User',metavar='USER')
+    highlight.add_argument('--hlPassword',  help='Highlight Password',metavar='PASSWORD')
+    highlight.add_argument('--hlInstance',  help='Highlight Instance Id',type=int,metavar='ID')
     highlight.add_argument('--hlCLI',
                             default='c:/Program Files/CAST/Highlight-Automation-Command/HighlightAutomation.jar', 
                             help='Highlight CLI Location',
@@ -81,30 +81,30 @@ if __name__ == '__main__':
                            metavar='LOCATION')
 
     console=config_parser.add_argument_group('CAST AIP Console')
-    console.add_argument('--consoleURL', required=False, help='AIP Console URL',metavar='URL')
-    console.add_argument('--consoleKey', required=False, help='AIP Console Key',metavar='KEY')
-    console.add_argument('--consoleCLI', required=False, help='AIP Console CLI Location',metavar='LOCATION')
+    console.add_argument('--consoleURL',  help='AIP Console URL',metavar='URL')
+    console.add_argument('--consoleKey',  help='AIP Console Key',metavar='KEY')
+    console.add_argument('--consoleCLI',  help='AIP Console CLI Location',metavar='LOCATION')
 
     database=config_parser.add_argument_group('CAST AIP Core Database')
-    database.add_argument('--dbHost', required=False, help='Database Host')
-    database.add_argument('--dbPort', required=False, help='Database Port')
-    database.add_argument('--dbUser', required=False, help='Database User',default="operator")
-    database.add_argument('--dbPassword', required=False, help='Database Password',default="CastAIP")
-    database.add_argument('--dbDatabase', required=False, help='Database Database',default="postgres")
+    database.add_argument('--dbHost',  help='Database Host')
+    database.add_argument('--dbPort',  help='Database Port')
+    database.add_argument('--dbUser',  help='Database User',default="operator")
+    database.add_argument('--dbPassword',  help='Database Password',default="CastAIP")
+    database.add_argument('--dbDatabase',  help='Database Database',default="postgres")
 
     """
         OneClick "Run" parameters
     """
     run_parser = subparsers.add_parser('run')
-    run_parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location')
-    run_parser.add_argument('-p','--projectName', required=True, help='Name of the project')
-    run_parser.add_argument('-n','--consoleNode', required=True, help='AIP Console Node Name',metavar='NAME')
-    run_parser.add_argument('-c','--companyName', required=False, default='Company Name', help='Name of the project')
+    run_parser.add_argument('-b','--baseFolder', help='Base Folder Location')
+    run_parser.add_argument('-p','--projectName', help='Name of the project')
+    run_parser.add_argument('-n','--consoleNode', help='AIP Console Node Name',metavar='NAME')
+    run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
 
     run_parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
     run_parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
 
-    run_parser.add_argument('-d','--debug', required=False, default=False,type=bool)
+    run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
     args = parser.parse_args()
 
@@ -117,12 +117,12 @@ if __name__ == '__main__':
         log.error(ex)
         exit()
 
-    # parser.add_argument('-c','--companyName', required=False, default='Company Name', help='Name of the project')
-    # parser.add_argument('--JavaHome', required=False, help='Location of the JRE')
-    # parser.add_argument('--from-email', required=False, help='Email sending from')
-    # parser.add_argument('--from-to', required=False, help='Email sending from')
-    # parser.add_argument('--from-email', required=False, help='Email sending from')
-    # parser.add_argument('--from-email', required=False, help='Email sending from')
+    # parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
+    # parser.add_argument('--JavaHome',  help='Location of the JRE')
+    # parser.add_argument('--from-email',  help='Email sending from')
+    # parser.add_argument('--from-to',  help='Email sending from')
+    # parser.add_argument('--from-email',  help='Email sending from')
+    # parser.add_argument('--from-email',  help='Email sending from')
 
     # TODO: add args for aip and console rest setup (d2)
     # TODO: add arg to reset analysis status for specific application (d2)

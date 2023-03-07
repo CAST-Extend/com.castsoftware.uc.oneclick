@@ -21,8 +21,12 @@ class AIPAnalysis(Analysis):
             if aip_status == '' or aip_status.startswith('Error'):
                 #add a new appication in AIP Console
                 cls._log.info(f'Running analysis for {config.project_name}\{appl}')
+
+                java_home = config.java_home
+                if len(java_home) > 0:
+                    java_home = f'{java_home}/bin/'
                 
-                args = [f'{config.java_home}java.exe',
+                args = [f'{java_home}java.exe',
                         '-jar',config.console_cli,
                         'add',
                         '-n',appl,
@@ -31,7 +35,7 @@ class AIPAnalysis(Analysis):
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
                         '--auto-create','--blueprint'
-                        '--node-name',config.node
+                        '--node-name',config.console_node
                         ]
                 cls._log.debug(dumps(args, indent=2))
 
