@@ -68,6 +68,7 @@ if __name__ == '__main__':
     settings=config_parser.add_argument_group('General Settings')
     settings.add_argument('--java_home', help='Set if java is not part of the system path')
     settings.add_argument('--report_template', help='Set if java is not part of the system path')
+    #settings.add_argument('--cloc_version', help='set the version of cloc exe')
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
@@ -113,6 +114,7 @@ if __name__ == '__main__':
     run_parser.add_argument('-b','--baseFolder', help='Base Folder Location')
     run_parser.add_argument('-n','--consoleNode', help='AIP Console Node Name',metavar='NAME')
     run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
+    run_parser.add_argument('-p','--projectName', help='Name of the project')
 
     run_parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
     run_parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
@@ -221,8 +223,11 @@ if __name__ == '__main__':
                 if status and issubclass(type(p), TrackAnalysis):
                     log.error('One or more analysis failed, review logs and restart')
                     break
+                elif status == None:
+                    log.warning(f'Highlight is not configured, analysis will not run')
                 elif status > 0:
                     break
+
 
         if args.end == 'Analysis':
             break

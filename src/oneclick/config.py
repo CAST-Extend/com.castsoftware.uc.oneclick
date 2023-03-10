@@ -47,6 +47,8 @@ class Config():
             else:
                 self.java_home = args.java_home
 
+            if args.cloc_version is not None: self.cloc_version = args.cloc_version
+
             #Dashboard
             if args.aipURL is not None: self.aip_url = args.aipURL
             if args.aipPassword is not None: self.aip_password = args.aipPassword
@@ -261,6 +263,9 @@ class Config():
             msg.append('analyzerDir')
         if len(self.java_home) == 0:
             msg.append('java_home')
+        if len(self.cloc_version) == 0:
+            msg.append('cloc_version')
+
         
         if len(msg) > 0:
             fmt_msg=', '.join(msg)
@@ -510,6 +515,14 @@ class Config():
             self.setting['base']=value
             self._save()
 
+    @property
+    def cloc_version(self):
+        return self.setting['cloc_version']
+    @cloc_version.setter
+    def cloc_version(self,value):
+        if value is not None:
+            self.setting['cloc_version']=value
+            self._save()
     # @property
     # def reset(self):
     #     return self.setting['reset']
