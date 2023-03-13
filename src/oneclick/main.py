@@ -68,6 +68,7 @@ if __name__ == '__main__':
     settings=config_parser.add_argument_group('General Settings')
     settings.add_argument('--java_home', help='Set if java is not part of the system path')
     settings.add_argument('--report_template', help='Set if java is not part of the system path')
+    #settings.add_argument('--cloc_version', help='set the version of cloc exe')
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
@@ -226,6 +227,7 @@ if __name__ == '__main__':
                     log.warning(f'Highlight is not configured, analysis will not run')
                 elif status > 0:
                     break
+
 
         if args.end == 'Analysis':
             break

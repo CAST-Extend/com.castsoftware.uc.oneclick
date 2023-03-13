@@ -43,7 +43,7 @@ class ClocPreCleanup(SourceValidation):
         return cls._df
 
     def _run_cloc(cls,work_folder:str,cloc_output:str):
-        cloc_path=abspath(f'{getcwd()}\\scripts\\cloc-1.64.exe')
+        cloc_path=abspath(f'{getcwd()}\\scripts\\{cls.config.cloc_version}')
         args = [cloc_path,work_folder,"--report-file",cloc_output,"--quiet"]
         proc = run_process(args,False)
 

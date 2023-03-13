@@ -42,6 +42,7 @@
         "email-subject": "This is mail subject.",
         "arg-template": "z:/Work/Decks/DD Findings - Template.pptx",
         "java_home": "D:\\Program Files\\OpenJDK\\jdk-11.0.17.8-hotspot",
-        "base": "d:\\code"   
+        "base": "d:\\code",
+        "cloc_version": "cloc-1.64.exe"   
     }
 }
