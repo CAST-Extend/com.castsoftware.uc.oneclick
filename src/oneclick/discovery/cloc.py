@@ -89,9 +89,13 @@ class ClocPreCleanup(SourceValidation):
                 cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
                 if not process[p] is None:
                     cls._log.info(f'Checking results for {config.project_name}/{p}')
-                    ret,output = check_process(process[p],False)
-                    if ret != 0 and not exists(cloc_output) and getsize(cloc_output) == 0:
-                        cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                    try:
+                        ret,output = check_process(process[p],False)
+                        if ret != 0 and not exists(cloc_output) and getsize(cloc_output) == 0:
+                            cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                    except IOError:
+                        if not exists(cloc_output) and getsize(cloc_output) == 0:
+                            cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
 
                 if exists(cloc_output):
                     process[p]='DONE'

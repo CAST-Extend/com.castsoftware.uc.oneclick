@@ -361,35 +361,35 @@ class Config():
 
     @property
     def db_database(self):
-        return self.db['database']
+        return self._get(self.db,'database')
     @db_database.setter
     def db_database(self,value):
         self._set_database_active('database',value,'')
 
     @property
     def db_user(self):
-        return self.db['user']
+        return self._get(self.db,'user')
     @db_user.setter
     def db_user(self,value):
         self._set_database_active('user',value,'')
 
     @property
     def db_password(self):
-        return self.db['password']
+        return self._get(self.db,'password')
     @db_password.setter
     def db_password(self,value):
         self._set_database_active('password',value,'')
     
     @property
     def db_host(self):
-        return self.db['host']
+        return self._get(self.db,'host')
     @db_host.setter
     def db_host(self,value):
         self._set_database_active('host',value,'')
     
     @property
     def db_port(self):
-        return self.db['port']
+        return self._get(self.db,'port')
     @db_port.setter
     def db_port(self,value):
         self._set_database_active('port',value,'')
