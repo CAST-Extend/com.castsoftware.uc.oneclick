@@ -113,6 +113,7 @@ if __name__ == '__main__':
     run_parser.add_argument('-b','--baseFolder', help='Base Folder Location')
     run_parser.add_argument('-n','--consoleNode', help='AIP Console Node Name',metavar='NAME')
     run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
+    run_parser.add_argument('-p','--projectName', help='Name of the project')
 
     run_parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
     run_parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
@@ -221,6 +222,8 @@ if __name__ == '__main__':
                 if status and issubclass(type(p), TrackAnalysis):
                     log.error('One or more analysis failed, review logs and restart')
                     break
+                elif status == None:
+                    log.warning(f'Highlight is not configured, analysis will not run')
                 elif status > 0:
                     break
 

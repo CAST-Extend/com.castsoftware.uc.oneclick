@@ -1,7 +1,7 @@
 [project]
 name='com.castsoftware.uc.oneclick'
 description="Assessment Generator"
-version='0.1.8' #prod version
+version='0.1.9' #prod version
 dependencies = [
     'pandas','python-pptx==0.6.18','python-docx',
     'com.castsoftware.uc.python.common>=0.1.6',
