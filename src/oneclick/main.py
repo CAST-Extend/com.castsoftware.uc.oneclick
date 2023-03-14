@@ -25,7 +25,7 @@ from os.path import abspath
 from argparse_formatter import FlexiFormatter,ParagraphFormatter
 
 from oneclick.discovery.sourceValidation import SourceValidation 
-from oneclick.exceptions import NoConfigFound
+from oneclick.exceptions import NoConfigFound,InvalidConfiguration
 
 import sys
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     settings=config_parser.add_argument_group('General Settings')
     settings.add_argument('--java_home', help='Set if java is not part of the system path')
     settings.add_argument('--report_template', help='Set if java is not part of the system path')
-    #settings.add_argument('--cloc_version', help='set the version of cloc exe')
+    settings.add_argument('--cloc_version',default='cloc-1.96.exe', help='set the version of cloc exe')
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
@@ -128,9 +128,9 @@ if __name__ == '__main__':
 
     log.info(f'Running {args.command}')
 
+    config = NotImplemented
     try:
         config=Config(parser,default_args)
-
         if args.command == 'config':
             file = ''
             if args.projectName is None:
@@ -139,11 +139,27 @@ if __name__ == '__main__':
                 file = args.projectName
             log.info(f'{file} configuration file successfuly updated')
             exit ()
+        elif args.command == 'run':
+            config.validate_for_run()
 
     except NoConfigFound as ex:
         log.error(config_parser.format_help())
         log.error(ex)
         exit()
+
+    except InvalidConfiguration as ex:
+        log.error("Invalid Configuration")
+        log.error(ex)
+        cfg = ''
+        if 'CLOC' in str(ex):
+            cfg = '--cloc_version <cloc.exe>'
+
+        log.info('To update the default configuraiton file use')
+        log.info(f'     python -m oneclick.main config -b {config.base} {cfg}')
+        log.info('To update the application configuraiton file use:')
+        log.info(f'     python -m oneclick.main config -b {config.base} -p {config.project_name} {cfg}')
+        exit()
+
 
     # parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
     # parser.add_argument('--JavaHome',  help='Location of the JRE')
@@ -155,7 +171,7 @@ if __name__ == '__main__':
     # TODO: add args for aip and console rest setup (d2)
     # TODO: add arg to reset analysis status for specific application (d2)
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
     if args.debug:
         log_level=DEBUG
 
