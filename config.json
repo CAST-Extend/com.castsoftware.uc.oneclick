@@ -11,7 +11,9 @@
             "URL": "http://localhost:8081/",
             "API_Key": "**************************",
             "cli": "D:\\com.castsoftware.aip.console.tools.1.29.0-funcrel\\aip-console-tools-cli.jar",
-            "node": "local"
+            "node": "local",
+            "enable-security-assessment": "true",
+            "blueprint": "true"
         },
         "Highlight": {
             "Active": true,
