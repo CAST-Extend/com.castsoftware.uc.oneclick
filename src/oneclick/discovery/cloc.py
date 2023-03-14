@@ -118,7 +118,12 @@ class ClocPreCleanup(SourceValidation):
             statistics_list=findall(pattern,content)
             statistics_list= statistics_list[:-1]
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
-            df['APPLICABLE']=df['LANGUAGE'].isin(tech_list)
+
+            #making technolgy check as case sensitive
+            def all_lower(my_list):
+                return list(map(lambda x: x.lower(), my_list))
+            tech_list = all_lower(tech_list)
+            df['APPLICABLE']=df['LANGUAGE'].str.lower().isin(tech_list)
 
             #converting column values into int from string
             df['FILES'] = df['FILES'].astype('int')
