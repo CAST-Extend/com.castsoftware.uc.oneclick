@@ -42,7 +42,6 @@ class AIPAnalysis(Analysis):
                 cls._log.debug(dumps(args, indent=2))
 
                 try:
-                    #print(args)
                     process = run_process(args,wait=False)
                 except FileNotFoundError as e:
                     cls._log.error(f'Unable to launch analysis process {e}')
