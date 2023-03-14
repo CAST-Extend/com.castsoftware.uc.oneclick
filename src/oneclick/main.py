@@ -99,6 +99,8 @@ if __name__ == '__main__':
     console.add_argument('--consoleURL',  help='AIP Console URL',metavar='URL')
     console.add_argument('--consoleKey',  help='AIP Console Key',metavar='KEY')
     console.add_argument('--consoleCLI',  help='AIP Console CLI Location',metavar='LOCATION')
+    console.add_argument('--enable-security-assessment', help='AIP Console security-assessment')
+    console.add_argument('--blueprint', help='AIP Console blueprint design')
 
     database=config_parser.add_argument_group('CAST AIP Core Database')
     database.add_argument('--dbHost',  help='Database Host')

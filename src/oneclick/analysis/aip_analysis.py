@@ -35,11 +35,14 @@ class AIPAnalysis(Analysis):
                         '--apikey',config.console_key,
                         '--verbose' , 'false',
                         '--auto-create','--blueprint'
-                        '--node-name',config.console_node
+                        '--node-name',config.console_node,
+                        '--enable-security-assessment', config.enable_security_assessment,
+                        '--blueprint', config.enable_security_assessment
                         ]
                 cls._log.debug(dumps(args, indent=2))
 
                 try:
+                    #print(args)
                     process = run_process(args,wait=False)
                 except FileNotFoundError as e:
                     cls._log.error(f'Unable to launch analysis process {e}')

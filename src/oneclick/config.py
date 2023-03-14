@@ -71,6 +71,8 @@ class Config():
             if args.consoleURL is not None: self.console_url = args.consoleURL
             if args.consoleKey is not None: self.console_key = args.consoleKey
             if args.consoleCLI is not None: self.console_cli = args.consoleCLI
+            if args.enable_security_assessment is not None: self.enable_security_assessment = args.enable_security_assessment
+            if args.blueprint is not None: self.blueprint = args.blueprint
 
             #Database
             if args.dbHost is not None: self.db_host = args.dbHost
@@ -349,6 +351,20 @@ class Config():
     @console_node.setter
     def console_node(self,value):
         self._set_console_active('node',value,'')
+
+    @property
+    def enable_security_assessment(self):
+        return self._get(self.console,'enable-security-assessment')
+    @enable_security_assessment.setter
+    def enable_security_assessment(self,value):
+        self._set_console_active('enable-security-assessment',value,'')
+
+    @property
+    def blueprint(self):
+        return self._get(self.console,'blueprint')
+    @blueprint.setter
+    def blueprint(self,value):
+        self._set_console_active('blueprint',value,'')
 
     """ **************** Action Plan related entries ************************ """
     def _set_database_active(self,key,value,default=''):
