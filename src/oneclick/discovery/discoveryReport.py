@@ -101,9 +101,28 @@ class DiscoveryReport(SourceValidation):
             #doc.add_paragraph(f'After removing all Sample, Test and other non production related code there is ({total} {unit}) in scope for this project',style='List Bullet 2')
             #print(sql_df)
             tables=sql_df['Total'][0]
-            views=sql_df['Total'][4]
             procedures=sql_df['Total'][1]
-            doc.add_paragraph(f'The database contains a total of  {tables} tables, {views} views and {procedures} stored procedures/functions.',style='List Bullet')
+            functions=sql_df['Total'][2]
+            triggers=sql_df['Total'][3]
+            views=sql_df['Total'][4]
+            sql_items=''
+
+            if tables == 0 and procedures == 0 and functions == 0 and triggers == 0 and views == 0:
+                doc.add_paragraph(f'The source code does not contains SQL items.',style='List Bullet')
+            else:
+                if tables>0:
+                    sql_items = sql_items + str(tables) +' tables, '
+                if procedures>0:
+                    sql_items = sql_items + str(procedures) +' stored procedures, '
+                if functions>0:
+                    sql_items = sql_items + str(functions) +' functions, ' 
+                if triggers>0:
+                    sql_items = sql_items + str(triggers) +' triggers, '
+                if views>0:
+                    sql_items = sql_items + str(views) +' views '
+                
+                doc.add_paragraph(f'The database contains a total of '+sql_items+'.',style='List Bullet')
+
             # line = []
             # for index, row in sql_df.iterrows():
             #     line.append(f"{row['Unique']} {row['Catagory']}")
@@ -133,7 +152,7 @@ class DiscoveryReport(SourceValidation):
                 for j in range(after_df.shape[-1]):
                     number = after_df.values[i,j]
                     if type(number) is int:
-                        number = "{:,}".format(number)
+                        number = "{}".format(number)
                     t.cell(i+1,j).text = number
             
             # Adding style to a table
