@@ -7,6 +7,7 @@ from json import load
 from argparse import ArgumentParser
 from json import JSONDecodeError,dump
 from os.path import abspath,exists
+from os import getcwd
 
 from argparse import ArgumentParser
 from oneclick.exceptions import NoConfigFound,InvalidConfiguration
@@ -124,6 +125,10 @@ class Config():
     def validate_for_run(self):
         if self.cloc_version == '':
             raise InvalidConfiguration('Missing CLOC executable name')
+        exec = f'{getcwd()}\\scripts\\{self.cloc_version}'
+        if not exists(exec):
+            raise InvalidConfiguration(f'CLOC executable not found: {exec}')
+
 
     def check_default(self,arg_value,cfg_value,default_value) -> bool:
         rtn =  False

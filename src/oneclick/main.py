@@ -99,8 +99,8 @@ if __name__ == '__main__':
     console.add_argument('--consoleURL',  help='AIP Console URL',metavar='URL')
     console.add_argument('--consoleKey',  help='AIP Console Key',metavar='KEY')
     console.add_argument('--consoleCLI',  help='AIP Console CLI Location',metavar='LOCATION')
-    console.add_argument('--enable-security-assessment', help='AIP Console security-assessment')
-    console.add_argument('--blueprint', help='AIP Console blueprint design')
+    console.add_argument('--enable-security-assessment', help='AIP Console security-assessment', default=True)
+    console.add_argument('--blueprint', help='AIP Console blueprint design', default=True)
 
     database=config_parser.add_argument_group('CAST AIP Core Database')
     database.add_argument('--dbHost',  help='Database Host')
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     create_folder(abspath(f'{config.report}/{config.project_name}'))
 
     post_aip = [
-        ActionPlan(config,log_level),
+        #ActionPlan(config,log_level),
         RunARGAIP(config,log_level)
     ]
 
