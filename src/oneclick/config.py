@@ -124,6 +124,8 @@ class Config():
     def validate_for_run(self):
         if self.cloc_version == '':
             raise InvalidConfiguration('Missing CLOC executable name')
+        if not self.is_console_active:
+            self.log.warning('Invalid console configuration, AIP Analysis will not be performed')
 
     def check_default(self,arg_value,cfg_value,default_value) -> bool:
         rtn =  False
@@ -326,11 +328,12 @@ class Config():
             self._save()
 
     @property
+    def is_console_active(self)->bool:
+        return self.console['Active']
+
+    @property
     def console(self):
         return self._get(self.rest,'AIPConsole',{})
-
-    def cosole_active(self)->bool:
-        return self.console['Active']
 
     @property
     def console_url(self)->str:

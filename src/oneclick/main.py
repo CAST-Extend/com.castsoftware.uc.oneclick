@@ -183,7 +183,7 @@ if __name__ == '__main__':
     create_folder(abspath(f'{config.report}/{config.project_name}'))
 
     post_aip = [
-        ActionPlan(config,log_level),
+        #ActionPlan(config,log_level),
         RunARGAIP(config,log_level)
     ]
 
