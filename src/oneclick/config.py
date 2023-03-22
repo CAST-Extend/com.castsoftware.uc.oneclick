@@ -129,7 +129,6 @@ class Config():
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
 
-
     def check_default(self,arg_value,cfg_value,default_value) -> bool:
         rtn =  False
         if arg_value is not None: 
@@ -331,11 +330,12 @@ class Config():
             self._save()
 
     @property
+    def is_console_active(self)->bool:
+        return self.console['Active']
+
+    @property
     def console(self):
         return self._get(self.rest,'AIPConsole',{})
-
-    def cosole_active(self)->bool:
-        return self.console['Active']
 
     @property
     def console_url(self)->str:
