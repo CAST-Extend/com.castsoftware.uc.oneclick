@@ -69,7 +69,7 @@ class SQLDiscovery(SourceValidation):
                 if i not in file_dict.keys():
                     file_dict[i]=cls.file_list.count(i)
 
-            filename = abspath(f'{config.report}/{config.project_name}/{app}-SQLReport.xlsx')
+            filename = abspath(f'{config.report}/{config.project_name}/{app}/{app}-SQLReport.xlsx')
             writer = ExcelWriter(filename, engine='xlsxwriter')
             tabs = []
 

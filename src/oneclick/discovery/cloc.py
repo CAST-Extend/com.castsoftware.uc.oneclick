@@ -1,6 +1,6 @@
 from oneclick.config import Config
 from cast_common.logger import Logger,INFO
-from cast_common.util import run_process,check_process,format_table
+from cast_common.util import run_process,check_process,format_table,create_folder
 from oneclick.discovery.sourceValidation import SourceValidation 
 from time import sleep
 
@@ -68,8 +68,9 @@ class ClocPreCleanup(SourceValidation):
         cloc_run=False
         for appl in config.application:
             cls._log.info(f'Running {config.project_name}/{appl}')
-            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}-cloc-{cls.phase}.txt')
-            work_folder = abspath(f'{config.work}/{appl}/AIP')
+            create_folder(f'{config.report}/{config.project_name}/{appl}')
+            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
+            work_folder = abspath(f'{config.work}/AIP/{config.project_name}/{appl}')
 
             #if the report is already out there - no need to continue
             if exists(cloc_output):
@@ -104,7 +105,7 @@ class ClocPreCleanup(SourceValidation):
 
         for appl in config.application:
             #reading cloc_output.txt file
-            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}-cloc-{cls.phase}.txt')
+            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
             cls._log.info(f'Processing {cloc_output}')
             summary_list=[]   
             with open(cloc_output, 'r') as f:

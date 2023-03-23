@@ -25,8 +25,8 @@ class Unzip(SourceValidation):
       while found:
          found = False
          for app in apps:
-            app_folder = f'{config.work}\\{app}'
-            for root, dirs, files in walk(app_folder):
+            app_folder_aip = f'{config.work}\\AIP\\{config.project_name}\\{app}'
+            for root, dirs, files in walk(app_folder_aip):
                for file in files:
                   if file.endswith(".zip") or \
                      file.endswith(".7z") or \
@@ -39,6 +39,22 @@ class Unzip(SourceValidation):
                      cls._log.info(f'Unzipping {full_name}')
                      unpack_archive(full_name,root)
                      remove(full_name)
+
+            app_folder_hl = f'{config.work}\\HL\\{config.project_name}\\{app}'
+            for root, dirs, files in walk(app_folder_hl):
+               for file in files:
+                  if file.endswith(".zip") or \
+                     file.endswith(".7z") or \
+                     file.endswith(".tar") or \
+                     file.endswith(".gztar") or \
+                     file.endswith(".bztar"):
+                     found = True
+                     
+                     full_name = f'{root}\\{file}'
+                     cls._log.info(f'Unzipping {full_name}')
+                     unpack_archive(full_name,root)
+                     remove(full_name)
+
       cls._log.info('Unzip step complete')
                                 
 

@@ -182,8 +182,11 @@ if __name__ == '__main__':
 
     create_folder(abspath(f'{config.base}/STAGED'))
     create_folder(abspath(config.work))
-    create_folder(abspath(config.logs))
-    create_folder(abspath(f'{config.logs}/{config.project_name}'))
+    #create_folder(abspath(config.logs))
+    #create_folder(abspath(f'{config.logs}/{config.project_name}'))
+    create_folder(abspath(config.oneclick_work))
+    create_folder(abspath(f'{config.oneclick_work}/{config.project_name}'))
+    create_folder(abspath(f'{config.oneclick_work}/{config.project_name}/LOGS'))
     create_folder(abspath(config.report))
     create_folder(abspath(f'{config.report}/{config.project_name}'))
 

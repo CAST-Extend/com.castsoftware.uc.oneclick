@@ -66,23 +66,32 @@ class Prepare(SourceValidation):
 
         for folder in dir:
             src_name = f'{config.deliver}\\{folder}'
-            dst_name = f'{config.work}\\{folder}'
-            dst_aip_name = f'{dst_name}\\AIP'
-            dst_hl_name = f'{dst_name}\\HL'
+            dst_aip_name = f'{config.work}\\AIP'
+            dst_hl_name = f'{config.work}\\HL'
+            create_folder(dst_aip_name)
+            create_folder(dst_hl_name)
 
             # create_folder(abspath(f'{config.output}/{folder}'))
             # create_folder(abspath(f'{config.output}/{folder}/REPORT'))
             # create_folder(abspath(f'{config.output}/{folder}/CLOC'))
 
-            create_folder(dst_name)
-#            create_folder(f'{dst_name}\\SQLReport')
 
-            if not exists(dst_aip_name):
-                cls._log.info(f'Copy from {src_name} to {dst_aip_name}')
-                copytree(src_name,dst_aip_name)
-            if not exists(dst_hl_name):
-                cls._log.info(f'Copy from {src_name} to {dst_hl_name}')
-                copytree(src_name,dst_hl_name)
+            dst_aip_project=f'{dst_aip_name}\\{config.project_name}'
+            dst_hl_project=f'{dst_hl_name}\\{config.project_name}'
+            create_folder(dst_aip_project)
+            create_folder(dst_hl_project)
+
+            dst_aip_app=f'{dst_aip_project}\\{folder}'
+            dst_hl_app=f'{dst_hl_project}\\{folder}'
+
+            #create_folder(f'{dst_name}\\SQLReport')
+
+            if not exists(dst_aip_app):
+                cls._log.info(f'Copy from {src_name} to {dst_aip_app}')
+                copytree(src_name,dst_aip_app)
+            if not exists(dst_hl_app):
+                cls._log.info(f'Copy from {src_name} to {dst_hl_app}')
+                copytree(src_name,dst_hl_app)
 
         cls._log.info('Environment preparation step complete')
 
