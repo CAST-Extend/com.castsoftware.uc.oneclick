@@ -492,13 +492,16 @@ class Config():
         return f'{self.base}\\deliver\\{self.project_name}'
     @property
     def work(self):
-        return f'{self.base}\\STAGED\\{self.project_name}'
+        return f'{self.base}\\STAGED'
     @property
     def report(self):
         return f'{self.base}\\REPORT'
     @property
     def logs(self):
         return f'{self.base}\\LOGS'
+    @property
+    def oneclick_work(self):
+        return f'{self.base}\\ONECLICK_WORK'
 
     """ **************** Email related entries ************************ """
     @property 
@@ -533,7 +536,7 @@ class Config():
 
     @property
     def arg_template(self):
-        return self.setting['arg-template']
+        return self._get(self.setting,'arg-template')
 
     @property
     def base(self):

@@ -47,7 +47,7 @@ class DiscoveryReport(SourceValidation):
         for appl in config.application:
             cls._log.info(f'Running {cls.__class__.__name__} for {appl}')
 
-            sql_report = abspath(f'{config.report}/{config.project_name}/{appl}-SQLReport.xlsx')
+            sql_report = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-SQLReport.xlsx')
 
             # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
             before_df = cls.cloc_report(cloc_report,f'Before({appl})')

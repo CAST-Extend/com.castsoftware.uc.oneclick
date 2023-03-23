@@ -30,7 +30,7 @@ class AIPAnalysis(Analysis):
                         '-jar',config.console_cli,
                         'add',
                         '-n',appl,
-                        '-f', f'{config.project_name}/{appl}/AIP',
+                        '-f', f'AIP/{config.project_name}/{appl}',
                         '-s',config.console_url,
                         '--apikey',config.console_key,
                         '--verbose' , 'false',

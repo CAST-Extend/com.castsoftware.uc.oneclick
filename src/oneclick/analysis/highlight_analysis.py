@@ -30,17 +30,18 @@ class HLAnalysis(Analysis):
                         cls._log.error(f'Application {appl} not found in Highlight')
                         continue
 
-                    hl_work_folder = f'{config.base}\\STAGED\\{config.project_name}\\{appl}'
-
-                    create_folder(f'{hl_work_folder}/HL-WORK')
+                    hl_sourceDir = f'{config.base}\\STAGED\\HL\\{config.project_name}\\{appl}'
+                    hl_workingDir = f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT\\{appl}'
+                    create_folder(f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT')
+                    create_folder(hl_workingDir)
                     java_home = config.java_home
                     if len(java_home) > 0:
                         java_home = f'{java_home}/bin/'
 
                     args = [f'{config.java_home}java.exe',
                             '-jar',config.hl_cli,
-                            '--sourceDir', f'{hl_work_folder}/HL',
-                            '--workingDir' , f'{hl_work_folder}/HL-WORK',
+                            '--sourceDir', hl_sourceDir,
+                            '--workingDir' , hl_workingDir,
                             '--companyId', str(config.hl_instance),
                             '--analyzerDir',config.analyzer_dir,
                             '--perlInstallDir',config.perl_install_dir,

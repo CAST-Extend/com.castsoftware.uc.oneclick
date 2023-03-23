@@ -23,8 +23,8 @@ class cleanUpAIP(SourceValidation):
     def run(cls,config:Config):
         cls._log.debug('Source Code cleanup is in progress')
         
-        output_path = f'{config.logs}'    
-        create_folder(output_path)
+        output_path = f'{config.oneclick_work}/{config.project_name}/LOGS'    
+        #create_folder(output_path)
 
         dir = getcwd()
         dateTimeObj=datetime.now()
@@ -46,10 +46,11 @@ class cleanUpAIP(SourceValidation):
         while found:
             found = False
             for app in apps:
-                clean_up_log_file= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFiles_{file_suffix}.txt"
-                clean_up_log_folder= f"{output_path}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFolders_{file_suffix}.txt"
+                create_folder(f'{output_path}\\{app}')
+                clean_up_log_file= f"{output_path}\\{app}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFiles_{file_suffix}.txt"
+                clean_up_log_folder= f"{output_path}\\{app}\\{cls.cleanup_file_prefix}{config.project_name}_{app}_deletedFolders_{file_suffix}.txt"
 
-                app_folder = f'{config.work}\\{app}\\{cls.cleanup_file_prefix}'
+                app_folder = f'{config.work}\\{cls.cleanup_file_prefix}\\{config.project_name}\\{app}'
 
                 with open (clean_up_log_folder, 'a+') as file2: 
                     s=''
