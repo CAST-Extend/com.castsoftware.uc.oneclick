@@ -10,7 +10,7 @@ from os.path import abspath,exists
 from os import getcwd
 
 from argparse import ArgumentParser
-from oneclick.exceptions import NoConfigFound,InvalidConfiguration
+from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -25,6 +25,9 @@ class Config():
 
 
         args = parser.parse_args()
+
+        if not exists(abspath(args.baseFolder)):
+            raise InvalidConfigNoBase(f'Base folder must exist: {args.baseFolder}')
 
         base_config=abspath(f'{args.baseFolder}/.oneclick/config.json')
         if not exists(base_config) and args.command == 'run':
@@ -300,7 +303,7 @@ class Config():
 
     @property
     def is_aip_active(self)->bool:
-        return self.aip['Active']
+        return self._get(self.aip,'Active',False)
 
     @property
     def aip_url(self):

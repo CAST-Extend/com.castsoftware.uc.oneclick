@@ -14,6 +14,10 @@ class AIPAnalysis(Analysis):
         pass
     
     def run(cls, config:Config):
+        if not config.is_aip_active:
+            cls._log.warning('AIP active flag is set to false, skipping analysis')
+            return 
+
         for appl in config.application:
 
             #has thi spplication already been run?
