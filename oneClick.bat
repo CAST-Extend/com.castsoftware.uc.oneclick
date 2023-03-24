@@ -1,9 +1,18 @@
-@echo off
-call z:\work\com.castsoftware.uc.oneclick\.venv\Scripts\activate.bat
+@@echo off
 
+set base=d:\code
+set option=%1
 
-set PYTHONPATH=src;..\com.castsoftware.uc.python.common\src;..\com.castsoftware.uc.action-plan;..\com.castsoftware.uc.arg
-set PYTHON=z:\work\com.castsoftware.uc.oneclick\.venv\Scripts\python.exe
+if "%option%x" == "x" goto error
+if "%option%" == "run" goto ok
+if "%option%" == "config" goto ok
+goto error
+:ok
 
-%PYTHON% src\main.py %*
+call .\.venv\scripts\activate
+for /f "tokens=1,* delims= " %%a in ("%*") do set ALL_BUT_FIRST=%%b
+python -m oneclick.main %option% -b %base% %ALL_BUT_FIRST%
 
+exit /b
+:error
+echo first parameter must be either "config" or "run"

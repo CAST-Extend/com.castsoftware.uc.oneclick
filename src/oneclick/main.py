@@ -20,12 +20,12 @@ from oneclick.runArg import RunARGAIP,RunARG
 from argparse import ArgumentParser,RawTextHelpFormatter
 from oneclick.sendEmail import EmailNotification
 from sys import exit
-from os.path import abspath
+from os.path import abspath,exists
 
 from argparse_formatter import FlexiFormatter,ParagraphFormatter
 
 from oneclick.discovery.sourceValidation import SourceValidation 
-from oneclick.exceptions import NoConfigFound,InvalidConfiguration
+from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
 
 import sys
 
@@ -147,6 +147,11 @@ if __name__ == '__main__':
         log.error(ex)
         exit()
 
+    except InvalidConfigNoBase as ex:
+        log.error("Invalid Configuration")
+        log.error(ex)
+        exit()
+
     except InvalidConfiguration as ex:
         log.error("Invalid Configuration")
         log.error(ex)
@@ -241,8 +246,6 @@ if __name__ == '__main__':
                 if status and issubclass(type(p), TrackAnalysis):
                     log.error('One or more analysis failed, review logs and restart')
                     break
-                elif status == None:
-                    log.warning(f'Highlight is not configured, analysis will not run')
                 elif status > 0:
                     break
 
