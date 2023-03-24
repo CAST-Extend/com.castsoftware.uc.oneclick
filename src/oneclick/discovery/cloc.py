@@ -87,7 +87,7 @@ class ClocPreCleanup(SourceValidation):
                 if process[p]=='DONE':
                     continue
                 all_done=False
-                cloc_output = abspath(f'{config.report}/{config.project_name}/{p}-cloc-{cls.phase}.txt')
+                cloc_output = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-{cls.phase}.txt')
                 if not process[p] is None:
                     cls._log.info(f'Checking results for {config.project_name}/{p}')
                     try:
