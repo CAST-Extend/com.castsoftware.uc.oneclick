@@ -1,19 +1,89 @@
 CAST OneClick
 
-A set of automation tools designed to analyze applications on a portfolio level. Providing the ability to perform
+# OneClick Prerequisites
 
--   Complete application discovery
--   MRI Analysis
--   Highlight Analysis
--   Portfolio level reporting
+Running OneClick requires access to:
 
-# Installation
+-   AIP Console
+-   Highlight
+-   REST API
+-   Database
 
-## OneClick Software Requirements
+In addition, it requires the installation and location the Console and Highlight automation tools. This software is available either on the CAST Extend website or Highlight portal. These common configuration is stored in a special configuration file, “config.json” found in the \<base folder location\>/.oneclick folder.
 
-To take advantage of all oneClick has to offer access to AIP Console, Highlight and the CAST REST API. OneClick also requires the installation and locations to the AIP Console and Highlight automation toolset, available on the CAST Extend website.
+# 
 
-## Environment
+# OneClick Installation
+
+1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
+    -   The tool was tested using python version 3.10
+    -   ![Graphical user interface, text, application Description automatically generated](media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
+2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
+3.  Create an empty base folder (name as desired) on your local machine.
+    -   This folder will hold all the automatically created files by OneClick.
+4.  Expand the nugget file into a folder, using zip.
+5.  Open a command prompt, hold down windows key and press r, then type cmd enter.
+6.  Using command prompt go to the folder containing the expanded nugget file.Type: install \<base folder location\>
+    -   The base folder location will hold all files used and/or created by the OneClick tool.
+    -   For more on this see the Environment section below.
+
+# Common Configuration Requirements
+
+To run oneClick requires access to AIP Console, Highlight, REST API and Database. In addition, it requires the installation and location the Console and Highlight automation tools. This software is available either on the CAST Extend website or Highlight portal. These common configuration is stored in a special configuration file, “config.json” found in the \<base folder location\>/.oneclick folder.
+
+## AIP Console
+
+OneClick requires AIP Console to run the MRI analysis. It has been tested using both 1.x and 2.x Enterprise version of Console. OneClick uses AIP Console integration tools to communicate with Console. AIP Console requires that the integration tools and Console versions match. Both can be downloaded from the CAST Extend Website at:
+
+-   [Console Enterprise Edition](https://extend.castsoftware.com/#/extension?id=com.castsoftware.aip.console&version=1.28.2-funcrel)
+-   [AIP Console integration tools](https://extend.castsoftware.com/#/extension?id=com.castsoftware.uc.aip.console.tools&version=1.0.1)
+
+Once installed the OneClick config.json file should be updated to include the AIP Console and integration tools information. The default configuration file can be updated using the oneClick config option as follows:
+
+oneClick config -b c:\\code
+
+\--consoleURL=http://\<server-name\>:\<console-ip\>
+
+\--consoleKey=\<console-key\>
+
+\--consoleCLI=\<console-integration-tool-location\>
+
+-   ![Graphical user interface, text, application, chat or text message Description automatically generated](media/f9d987571d6ba95cc1be2dce08915052.png)consoleURL is used to access AIP Console, the URL must match what is used to access the console
+-   consoleKEY is the equivalent of a username and password. To obtain the key login to AIP console and click on the twisty next to your username, from the menu choose “Profile”. This will launch the profile page where a key can be generated.
+-   consoleCLI is an extension used to access and remotely control AIP Console. This parameter must be an absolute location to the “aip-console-cli.jar” file included with the extension.
+
+## Highlight
+
+To analyze and upload an application to the Highlight portal two tools must be installed, the Highlight Agent and Command Line Interface (CLI). Both are found in the Highlight portal on the Application Scans page.
+
+![Graphical user interface, text, application, email Description automatically generated](media/655e6bf3ea23051dcde0c76e0df1410b.png)
+
+Once installed the OneClick default configuration file should be updated as follows:
+
+oneClick config -b c:\\code
+
+\--hlURL=\<portal-url\>
+
+\--hlUser=\<username\>
+
+\--hlPassword=\<password\>
+
+\--hlInstance=\<Instance-ID\>
+
+\--hlCLI=\<CLI-location\>
+
+\--HLPerlInstallDir=\<agent-location\>/strawberry/perl\>
+
+\--HLAnalyzerDir=\<agent-location\>/perl
+
+-   hlURL – There are currently four URL’s used to access Highlight, https://rpa.casthighlight.com, https://app.casthighlight.com, <https://cloud.casthighlight.com> and custom inhouse depending on where the license was obtained from.
+-   hlUser – the user Id used to access Highlight
+-   hlPassword
+-   hlCLI
+-   HLPerlInstallDir
+-   HLAnalyzerDir
+
+# Environment
 
 OneClick is designed to perform a due diligence assessment from beginning to end for one or more applications in a project. This includes:
 
@@ -25,107 +95,60 @@ OneClick is designed to perform a due diligence assessment from beginning to end
 
 To work properly the tool will need access to CAST AIP Console, CAST Highlight Rest API, Highlight Agent, Highlight CLI, and CAST MRI Rest API. The tool expects the working folder structure to be:
 
-![Graphical user interface, application Description automatically generated](media/6b19822d60bebff38eb6236cbc6b572a.png)
-
 -   code is the base folder referred to in the --baseFolder parameter.
 -   .oneclick is generated by the tool containing all of the project configuration files.
--   DELIVER holds all the delivered code organized by project and application. The tool is expecting one folder for each application, this name will be used to represent the application going forward.
-
-## Installing the tool
-
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already installed).
-    1.  The tool was tested using python version 3.10
-    2.  When installing python be sure to check the “Add Python to Path option”
-
-        ![Graphical user interface, text, application Description automatically generated](media/bc9c224100a437083c551e4bfb2da76d.png)
-
-2.  Download the OneClick extension from the CAST Extend web site.
-3.  Expand the nugget file into a folder, using zip.
-4.  Open a command prompt, hold down windows key and press r, then type cmd enter.
-5.  Go to the folder containing the expanded nugget file.
-6.  Type: install \<base folder location\>
-    1.  The base folder location will hold all files used and/or created by the OneClick tool.
-    2.  For more on this see the Environment section below.
+-   ![Graphical user interface, application Description automatically generated](media/a8a164e65148353b0e8f8253f432fd80.png)DELIVER holds all the delivered code organized by project and application. The tool is expecting one folder for each application, this name will be used to represent the application going forward.
 
 # Running the tool
 
 ## Command Line Arguments
 
-OneClick has two types of arguments, the first is used for both project and global configuration. Once the configuration is complete the second argument type is used to run the application analysis and generate the assessment report.
+OneClick has two types of arguments, the first are used to run the tool and the second to update the project configuration file. To properly run the tool, it requires a JSON file to be configured for each project. This file can be manually configured or using the tool.
 
-```
-oneClick config -b <base location> [-p <project name>] 
-		or
-oneClick run -b <base location> -p <project name>
-```
+### Parameters
 
-## Project Configuration Files
+Configuration Parameters fall into five categories, AIP, AIP Console, Highlight, Database and Settings. In addition, there are two required parameters, -b and -p. These parameters are used to identify the project and location the deliver folder.
 
-Configuration files are stored in the **\<base folder location\>/.oneclick** folder, created during installation. There are two types, global and project. The common configuration file, config.json, contains information common to all applications. When a new project is created the tool incorporates all global configuration items into the project specification configuration.
+Required Parameters:
 
-## Configuration Settings
+| Name             | Example | Description                                                                                               |
+|------------------|---------|-----------------------------------------------------------------------------------------------------------|
+| -b --baseFolder  | D:/code | The location of the folder containing the deliver folder                                                  |
+| -p --projectName | None    | The name of the project being worked on. (This field must match one of the folders in the deliver folder) |
+| --config         |         |                                                                                                           |
 
-### AIP Console
+AIP REST API Parameters:
 
-Oneclick has been tested using both 1.x and 2.x Enterprise version of AIP Console. The *AIP Console integration tools* is used to access the Console which can be downloaded:
+| Name          | Example                     | Description                                                                                                                 |
+|---------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| --aipURL      | http://localhost:8087/rest/ | The --hlURL URL to the AIP REST API                                                                                         |
+| --aipUser     | None                        | Username used access the REST API                                                                                           |
+| --aipPassword | None                        | Password used to access the REST API. This password will be encrypted before being added to the project configuration file. |
 
--   [Console Enterprise Edition](https://extend.castsoftware.com/#/extension?id=com.castsoftware.aip.console&version=1.28.2-funcrel)
--   [AIP Console integration tools](https://extend.castsoftware.com/#/extension?id=com.castsoftware.uc.aip.console.tools&version=1.0.1)
+AIP Console:
 
-Make sure the **integration tools** and **AIP Console** version matches. After both are installed update the common configuration file:
+| Name          | Example                | Description                                                                                                                                      |
+|---------------|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| --consoleURL  | http://localhost:8081/ | The AIP Console URL                                                                                                                              |
+| --consoleKey  | None                   | The console key is to access AIP Console and treated like a password. It will be encrypted before being added to the project configuration file. |
+| --consoleCLI  | None                   | The location of the “aip-console-tools-cli.jar”                                                                                                  |
+| --consoleNode | None                   | The default node to run the application on                                                                                                       |
 
-```
-oneClick config -b <base location> [-p <project name>] --consoleURL=http:\\<server>\ --consoleKey=<console-key> --consoleCLI=<console-integration-tool-location> --enable-security-assessment <true> --blueprint <true>
-```
+Highlight:
 
-| Parameter                  | Description                                                                                                                                    |                                                                                                                                |
-|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| consoleURL                 | The URL of AIP Console                                                                                                                         |                                                                                                                                |
-| consoleKEY                 | The console key provides access to the AIP Console and is retrieved from the user profile.                                                     | ![Graphical user interface, text, application Description automatically generated](media/f9d987571d6ba95cc1be2dce08915052.png) |
-| consoleCLI                 | The absolute location of the “aip-console-cli.jar” included with *AIP Console integration tools*                                               |                                                                                                                                |
-| enable-security-assessment | This is a Boolean parameter, if set to true the analysis will be run with security turned on. The default setting for this parameter is True.  |                                                                                                                                |
-| blueprint                  | This is a Boolean parameter, if set to true the analysis will be run in full blueprint mode. The default setting for this parameter is True.   |                                                                                                                                |
+| Name               | Example                                                       | Description                                                                                                                                                |
+|--------------------|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --hlURL            | https://rpa.casthighlight.com/WS2/                            | The URL to the Highlight REST API                                                                                                                          |
+| --hlUser           | None                                                          | Username used access Highlight                                                                                                                             |
+| --hlPassword       | None                                                          | Password used to access Highlight. This password will be encrypted before being added to the project configuration file.                                   |
+| --Instance         | None                                                          | The Highlight project instance id. This id can be obtained from the URL of the “Manage Applications” page. ![](media/cc0ad7df5c49324ddc9d8deb7518d2fc.png) |
+| --HLPerlInstallDir | HighlightAgent/strawberry/perl                                | Highlight comment line requirement – see Highlight documentation for more information                                                                      |
+| --HLAnalyzerDir    | HighlightAgent/perl                                           | Highlight comment line requirement                                                                                                                         |
+| --consoleCLI       | D:\\\\Highlight-Automation-Command\\\\HighlightAutomation.jar | The location of the highlight command line utility jar file                                                                                                |
 
-### Highlight
+Settings:
 
-To run Highlight scans both the Agent and CLI tool must be installed. The can be downloaded from the **Application Scans** page in the Highlight portal.
-
-![Graphical user interface, text, application, email Description automatically generated](media/655e6bf3ea23051dcde0c76e0df1410b.png)
-
-```
-oneClick config -b <base location> [-p <project name>] --hlURL=<portal-url> --hlUser=<username> --hlPassword=<password> --hlInstance=<Instance-ID> --hlCLI=<CLI-location> --HLPerlInstallDir=<agent-location>/strawberry/perl> --HLAnalyzerDir=<agent-location>/perl
-```
-
-| Parameter   | Description                                                       |
-|-------------|-------------------------------------------------------------------|
-| hlURL       | The Highlight portal URL                                          |
-| hlUser      | User Id                                                           |
-| hlPassword  | Password                                                          |
-| hlCLI       | Absolute folder location for the Highlight command line interface |
-| HLAgent     | Absolute folder location for the Highlight agent                  |
-
-### Imaging Rest API
-
-The AIP Rest API is part of the Health and Engineering Portal (HDED) installation and is used to generate the assessment report. There are two distinct portal versions Standalone and Integrated and OneClick will work with both. The REST API configuration is as follows:
-
-```
-oneClick config -b <code location> [-p <project name>] --aipURL <URL> --aipUser <username> --aipPassword <password>
-```
-
-| Parameter    | Description            |
-|--------------|------------------------|
-| aipURL       | The Imaging portal URL |
-| aipUser      | User Id                |
-| aipPassword  | Password               |
-
-### Other
-
-```
-oneClick config -b <code location> [-p <project name>] [--java_home <java>] --report_template <template> [cloc_version <cloc-1.96.exe>]
-```
-
-| Parameter       | Description                                                                                                                                                     |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| java_home       | Location of the java installation. This parameter can be omitted if the java bin folder is already part the system path.                                        |
-| report_template | The absolute location of the assessment report template.                                                                                                        |
-| cloc_version    | The cloc executable is located in the scripts folder and is set by default to cloc-1.96.exe. A new executable name can be added here to override this version.  |
+| Name          | Example | Description |
+|---------------|---------|-------------|
+| --companyName |         |             |
+|               |         |             |
