@@ -14,9 +14,9 @@ class AIPAnalysis(Analysis):
         pass
     
     def run(cls, config:Config):
-        if not config.is_aip_active:
-            cls._log.warning('AIP active flag is set to false, skipping analysis')
-            return 
+        if not config.is_console_active:
+            cls._log.warning('AIP Console configuration is incomplete, analysis will not run')
+            return 0
 
         for appl in config.application:
 
@@ -29,7 +29,19 @@ class AIPAnalysis(Analysis):
                 java_home = config.java_home
                 if len(java_home) > 0:
                     java_home = f'{java_home}/bin/'
+
+                node_name = ""
+                if len(config.console_node) > 0:
+                    node_name=f'--node-name={config.console_node}'
+
+                security_assessment=""
+                if config.enable_security_assessment:
+                    security_assessment='--enable-security-assessment'
                 
+                blueprint=""
+                if config.blueprint:
+                    blueprint='--blueprint'
+
                 args = [f'{java_home}java.exe',
                         '-jar',config.console_cli,
                         'add',
@@ -37,11 +49,9 @@ class AIPAnalysis(Analysis):
                         '-f', f'AIP/{config.project_name}/{appl}',
                         '-s',config.console_url,
                         '--apikey',config.console_key,
-                        '--verbose' , 'false',
-                        '--auto-create','--blueprint'
-                        '--node-name',config.console_node,
-                        '--enable-security-assessment', config.enable_security_assessment,
-                        '--blueprint', config.enable_security_assessment
+                        '--verbose',
+                        '--auto-create',
+                        node_name, security_assessment, blueprint
                         ]
                 cls._log.debug(dumps(args, indent=2))
 

@@ -254,7 +254,8 @@ if __name__ == '__main__':
 
 
         if args.end == 'Analysis':
-            break
+            if issubclass(type(p), RunARG):
+                break
 
         if args.start in ['Discovery','Analysis','Report']:
             if issubclass(type(p), RunARG):

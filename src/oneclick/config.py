@@ -131,6 +131,9 @@ class Config():
         exec = f'{getcwd()}\\scripts\\{self.cloc_version}'
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
+        if not self.is_console_active and not self.is_hl_active:
+            raise InvalidConfiguration('Both Hightlight and AIP configureations are incomplete, at least one must be')
+
 
     def check_default(self,arg_value,cfg_value,default_value) -> bool:
         rtn =  False

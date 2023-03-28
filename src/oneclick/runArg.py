@@ -18,6 +18,10 @@ class RunARG():
         pass
 
     def run(cls,config:Config,appl_name:str=None,operation:str=None) -> bool:
+        if not config.is_aip_active:
+            cls._log.warning('Dashboard configureaton is incomplete, Assessment report will NOT be generated')
+            return -1
+
         if appl_name is None:
             appl_name = 'FULL'
         
