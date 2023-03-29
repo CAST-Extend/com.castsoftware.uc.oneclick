@@ -42,9 +42,9 @@ class ClocPreCleanup(SourceValidation):
     def cloc_results(cls):
         return cls._df
 
-    def _run_cloc(cls,work_folder:str,cloc_output:str):
+    def _run_cloc(cls,work_folder:str,cloc_output:str,cloc_output_ignored:str):
         cloc_path=abspath(f'{getcwd()}\\scripts\\{cls.config.cloc_version}')
-        args = [cloc_path,work_folder,"--report-file",cloc_output,"--quiet"]
+        args = [cloc_path,work_folder,"--report-file",cloc_output,"--ignored",cloc_output_ignored,"--quiet"]
         proc = run_process(args,False)
 
         sleep(10)
@@ -70,6 +70,7 @@ class ClocPreCleanup(SourceValidation):
             cls._log.info(f'Running {config.project_name}/{appl}')
             create_folder(f'{config.report}/{config.project_name}/{appl}')
             cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
+            cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt')
             work_folder = abspath(f'{config.work}/AIP/{config.project_name}/{appl}')
 
             #if the report is already out there - no need to continue
@@ -77,7 +78,7 @@ class ClocPreCleanup(SourceValidation):
                 process[appl]=None
                 continue 
             cloc_run=True
-            process[appl] = cls._run_cloc(work_folder,cloc_output)
+            process[appl] = cls._run_cloc(work_folder,cloc_output,cloc_output_ignored)
 
         #has all cloc processing completed
         all_done=False
@@ -88,6 +89,7 @@ class ClocPreCleanup(SourceValidation):
                     continue
                 all_done=False
                 cloc_output = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-{cls.phase}.txt')
+                cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-ignored-{cls.phase}.txt')
                 if not process[p] is None:
                     cls._log.info(f'Checking results for {config.project_name}/{p}')
                     try:
@@ -106,6 +108,7 @@ class ClocPreCleanup(SourceValidation):
         for appl in config.application:
             #reading cloc_output.txt file
             cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
+            cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt') 
             cls._log.info(f'Processing {cloc_output}')
             summary_list=[]   
             with open(cloc_output, 'r') as f:
@@ -118,6 +121,11 @@ class ClocPreCleanup(SourceValidation):
             pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
             statistics_list=findall(pattern,content)
             statistics_list= statistics_list[:-1]
+            
+            with open(cloc_output_ignored, 'r') as fp:
+                lines = len(fp.readlines())
+            statistics_list.append(('Unknown Files',lines,'0','0','0'))
+
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
 
             #making technolgy check as case sensitive
