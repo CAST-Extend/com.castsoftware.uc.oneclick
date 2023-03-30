@@ -144,10 +144,11 @@ When running a project two pieces of information are required, the base location
 This extension is compatible with **all AIP versions from 8.3.3** and above, and will be also in future versions.
 
 <a name="expect"></a>
-# What results can you expect?
 
-AIP analysis and HL analysis will be kicked-off for the scope specified.
-What else to add ? any specific report generated ?
+1. Code discovery
+1. Run CAST MRI Analysis
+1. Run CAST Highlight Analysis
+1. Generate Due Diligence Assessment Report
 
 <a name="KnownIssues"></a>
 # Known issues
