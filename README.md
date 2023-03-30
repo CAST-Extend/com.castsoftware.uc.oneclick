@@ -26,7 +26,7 @@ In addition, it requires the installation and location of CAST Imaging Console a
 1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
     1.  The tool was tested using python version 3.10
 
-        ![Graphical user interface, text, application Description automatically generated](media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
+        ![Graphical user interface, text, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
 
 2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
 3.  Create an empty base folder (name as desired) on your local machine.
@@ -67,14 +67,14 @@ oneClick config -b <base location> [-p <project name>] --consoleURL=http:\\<serv
 | Parameter                    | Description                                                                                      | Default Value                                                                                                                                        |
 |------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | --consoleURL                 | The URL of AIP Console                                                                           |                                                                                                                                                      |
-| --consoleKey                 | The console key provides access to the AIP Console and is retrieved from the user profile.       | ![Graphical user interface, text, application, chat or text message Description automatically generated](media/f9d987571d6ba95cc1be2dce08915052.png) |
+| --consoleKey                 | The console key provides access to the AIP Console and is retrieved from the user profile.       | ![Graphical user interface, text, application, chat or text message Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/f9d987571d6ba95cc1be2dce08915052.png) |
 | --consoleCLI                 | The absolute location of the “aip-console-cli.jar” included with *AIP Console integration tools* |                                                                                                                                                      |
 | --enable-security-assessment | This is a Boolean parameter, if set to true the analysis will be run with security turned on.    | True                                                                                                                                                 |
 | --blueprint                  | This is a Boolean parameter, if set to true the analysis will be run in full blueprint mode.     | True                                                                                                                                                 |
 
 ## Highlight
 
-To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](media/655e6bf3ea23051dcde0c76e0df1410b.png)
+To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/655e6bf3ea23051dcde0c76e0df1410b.png)
 
 ```
 oneClick config -b <base location> [-p <project name>] --hlURL=<portal-url> --hlUser=<username> --hlPassword=<password> --hlInstance=<Instance-ID> --hlCLI=<CLI-location> --HLPerlInstallDir=<agent-location>/strawberry/perl> --HLAnalyzerDir=<agent-location>/perl
@@ -121,7 +121,7 @@ oneClick config -b <code location> [-p <project name>] [--java_home <java>] --re
 
 The first step in creating a new project is to create a folder in the DELIVER folder. The folder name is used to identify the project, it is recommended that the name be self-descriptive. Under the project folder, one or more application folders should be created. As with the project, the application folder names are used to identify each application going forward. OneClick uses this folder structure to create the application project file and tracks all projects using this folder structure.
 
-![Graphical user interface, application Description automatically generated](media/a8a164e65148353b0e8f8253f432fd80.png)
+![Graphical user interface, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/a8a164e65148353b0e8f8253f432fd80.png)
 
 ### Project Configuration
 
