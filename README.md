@@ -144,7 +144,7 @@ When running a project two pieces of information are required, the base location
 This extension is compatible with **all AIP versions from 8.3.3** and above, and will be also in future versions.
 
 <a name="expect"></a>
-#Expected Results
+# Expected results
 1. Code discovery
 1. Run CAST MRI Analysis
 1. Run CAST Highlight Analysis
