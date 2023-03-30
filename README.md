@@ -1,42 +1,37 @@
-CAST OneClick
-
 # What is OneClick
-
 OneClick is an automation tool designed to perform a due diligence assessment from beginning to end for one or more applications in a project. This includes:
 
-1.  Code discovery
-2.  Run CAST MRI Analysis
-3.  Run CAST Highlight Analysis
-4.  Generate Due Diligence Assessment Report
+1. Code discovery
+1. Run CAST MRI Analysis
+1. Run CAST Highlight Analysis
+1. Generate Due Diligence Assessment Report
 
-# OneClick Prerequisites
+# OneClick Installation
+## Prerequisites
 
 Running OneClick requires access to:
-
--   AIP Console – version 1.28 or higher
--   Highlight – version 5.4.70 or higher
--   AIP Dashboard REST API – version 2.9.1 or higher
--   Cast Storage System (CSS) – version 4 or higher
--   Python – version 3.10
+* AIP Console – version 1.28 or higher
+* Highlight – version 5.4.70 or higher
+* AIP Dashboard REST API – version 2.9.1 or higher
+* Cast Storage System (CSS) – version 4 or higher
+* Python – version 3.10
 
 In addition, it requires the installation and location of CAST Imaging Console and Highlight automation tools. These tools are available either on the CAST Extend website or Highlight portal.
 
-# OneClick Installation
+## Installation
+1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already installed).
+    * The tool was tested using python version 3.10
+    * When installing python be sure to check the “Add Python to Path option”
 
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
-    1.  The tool was tested using python version 3.10
-
-        ![Graphical user interface, text, application Description automatically generated](media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
-
-2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
-3.  Create an empty base folder (name as desired) on your local machine.
-    1.  This folder will hold all the automatically created files by OneClick.
-4.  Expand the nugget file into a folder, using zip.
-5.  Open a command prompt, hold down windows key and press r, then type cmd enter.
-6.  Using command prompt go to the folder containing the expanded nugget file.Type: install \<base folder location\>
-    1.  The base folder location will hold all files used and/or created by the OneClick tool.
-    2.  For more on this see the Environment section below.
-
+        ![Expected folder structure](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/bc9c224100a437083c551e4bfb2da76d.png)
+        
+2.  Download the OneClick extension from the CAST Extend web site.
+3.  Expand the nugget file into a folder, using zip.
+4.  Open a command prompt, hold down windows key and press r, then type cmd enter.
+5.  Go to the folder containing the expanded nugget file.
+6.  Type: install \<base folder location\>
+    * The base folder location will hold all files used and/or created by the OneClick tool.
+    * For more on this see the Environment section below.
 # Command Line Arguments
 
 OneClick has two types of arguments, config and run. The first is used to configure the global and/or project configuration files. The second to run discovery, analyses, and reporting.
@@ -67,14 +62,14 @@ oneClick config -b <base location> [-p <project name>] --consoleURL=http:\\<serv
 | Parameter                    | Description                                                                                      | Default Value                                                                                                                                        |
 |------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | --consoleURL                 | The URL of AIP Console                                                                           |                                                                                                                                                      |
-| --consoleKey                 | The console key provides access to the AIP Console and is retrieved from the user profile.       | ![Graphical user interface, text, application, chat or text message Description automatically generated](media/f9d987571d6ba95cc1be2dce08915052.png) |
+| --consoleKey                 | The console key provides access to the AIP Console and is retrieved from the user profile.       | ![Graphical user interface, text, application, chat or text message Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/f9d987571d6ba95cc1be2dce08915052.png) |
 | --consoleCLI                 | The absolute location of the “aip-console-cli.jar” included with *AIP Console integration tools* |                                                                                                                                                      |
 | --enable-security-assessment | This is a Boolean parameter, if set to true the analysis will be run with security turned on.    | True                                                                                                                                                 |
 | --blueprint                  | This is a Boolean parameter, if set to true the analysis will be run in full blueprint mode.     | True                                                                                                                                                 |
 
 ## Highlight
 
-To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](media/655e6bf3ea23051dcde0c76e0df1410b.png)
+To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](m[edia](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/655e6bf3ea23051dcde0c76e0df1410b.png)
 
 ```
 oneClick config -b <base location> [-p <project name>] --hlURL=<portal-url> --hlUser=<username> --hlPassword=<password> --hlInstance=<Instance-ID> --hlCLI=<CLI-location> --HLPerlInstallDir=<agent-location>/strawberry/perl> --HLAnalyzerDir=<agent-location>/perl
@@ -121,7 +116,7 @@ oneClick config -b <code location> [-p <project name>] [--java_home <java>] --re
 
 The first step in creating a new project is to create a folder in the DELIVER folder. The folder name is used to identify the project, it is recommended that the name be self-descriptive. Under the project folder, one or more application folders should be created. As with the project, the application folder names are used to identify each application going forward. OneClick uses this folder structure to create the application project file and tracks all projects using this folder structure.
 
-![Graphical user interface, application Description automatically generated](media/a8a164e65148353b0e8f8253f432fd80.png)
+![Graphical user interface, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/a8a164e65148353b0e8f8253f432fd80.png)
 
 ### Project Configuration
 
@@ -142,3 +137,26 @@ When running a project two pieces of information are required, the base location
 | --consoleNode | Use the specified to run the MRI analysis.                |               |
 | --start       | Start at the specified phase. (Analysis, Report)          |               |
 | --end         | End at the specified phase. (Discovery, Analysis, Report) | Report        |
+
+<a name="AIPcompatibility"></a>
+# CAST AIP versions compatibility
+
+This extension is compatible with **all AIP versions from 8.3.3** and above, and will be also in future versions.
+
+<a name="expect"></a>
+# What results can you expect?
+
+AIP analysis and HL analysis will be kicked-off for the scope specified.
+What else to add ? any specific report generated ?
+
+<a name="KnownIssues"></a>
+# Known issues
+
+- None
+
+<a name="Limitations"></a>
+# Limitations and potential enhancements
+
+- None
+
+
