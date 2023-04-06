@@ -15,7 +15,7 @@ class HLAnalysis(Analysis):
     def run(cls, config:Config):
         if not config.is_hl_active:
             cls._log.warning(f'Highlight is not configured, analysis will not run')
-            return 
+            return -1
         
         rest = HLRestCall(config.hl_url,config.hl_user,config.hl_password,config.hl_instance)
 

@@ -35,6 +35,11 @@ Call :UnZipFile "%CODE_FOLDER%" "scripts.zip"
 
 call %CODE_FOLDER%\.venv\scripts\deactivate.bat
 
+echo OneClick installation completed successfuly 
+echo .
+echo To use the tool, it must first be configured for more on this please
+echo refer to the documentation at https://github.com/CAST-Extend/com.castsoftware.uc.oneclick/wiki#global-configuration
+
 exit /b 
 
 :UnZipFile <ExtractTo> <newzipfile>
