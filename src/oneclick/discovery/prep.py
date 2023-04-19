@@ -33,41 +33,18 @@ class Prepare(SourceValidation):
         #scan delivery folder for application folders
         dir=[]
         for (dirpath,dirnames,filenames) in walk(config.deliver,topdown=False):
-            dir.extend(dirnames)
+            p = abspath(dirpath).replace(abspath(config.deliver),'')
+            dir.append(p)
+#            dir.extend(dirpath)
         config.application=dirnames
 
-        """create the application folders under 'work'
-            base
-            |-DELIVER
-            |-STAGE
-            | |-project
-            |   +-application 1
-            |   |  +-AIP
-            |   |  +-HL
-            |   |  +-HL-WORK
-            |   +-application 2
-            |      +-AIP
-            |      +-HL
-            |      +-HL-WORK
-            |-REPORT
-            |     +-application 1
-            |     | +-CLOC
-            |     | +-ARG
-            |     +-application 2
-            |       +CLOC
-            |       +-ARG
-            |-LOGS
-            | +-project
-            |   +-application 1
-            |   +-application 2
-        """
         #Finally copy the contents of deliver to work
         cls._log.info('Copying deliver to work')
 
         for folder in dir:
-            src_name = f'{config.deliver}\\{folder}'
-            dst_aip_name = f'{config.work}\\AIP'
-            dst_hl_name = f'{config.work}\\HL'
+            src_name = abspath(f'{config.deliver}{folder}')
+            dst_aip_name = abspath(f'{config.work}\\AIP')
+            dst_hl_name = abspath(f'{config.work}\\HL')
             create_folder(dst_aip_name)
             create_folder(dst_hl_name)
 

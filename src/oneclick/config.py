@@ -448,7 +448,7 @@ class Config():
             self._config['project']['name']=value
             self._config['project']['application']={}
 
-        elif value != self.project_name:
+        elif value.upper() != self.project_name.upper():
             raise ValueError("Can't rename a project")
 
     @property

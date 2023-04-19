@@ -5,6 +5,7 @@ from shutil import unpack_archive
 
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
+from pyunpack import Archive
 
 class Unzip(SourceValidation):
 
@@ -28,32 +29,47 @@ class Unzip(SourceValidation):
             app_folder_aip = f'{config.work}\\AIP\\{config.project_name}\\{app}'
             for root, dirs, files in walk(app_folder_aip):
                for file in files:
+                  # if file.endswith(".zip") or \
+                  #    file.endswith(".tar") or \
+                  #    file.endswith(".gztar") or \
+                  #    file.endswith(".bztar"):
+                  #    found = True
+                     
+                  #    full_name = f'{root}\\{file}'
+                  #    cls._log.info(f'Unzipping {full_name}')
+                  #    unpack_archive(full_name,root)
+                  #    remove(full_name)
+
                   if file.endswith(".zip") or \
-                     file.endswith(".7z") or \
                      file.endswith(".tar") or \
                      file.endswith(".gztar") or \
-                     file.endswith(".bztar"):
-                     found = True
-                     
-                     full_name = f'{root}\\{file}'
+                     file.endswith(".bztar") or \
+                     file.endswith(".7z"):
+
+                     root = abspath(root)
+                     full_name = abspath(f'{root}\\{file}')
                      cls._log.info(f'Unzipping {full_name}')
-                     unpack_archive(full_name,root)
+                     found = True
+                     Archive(full_name).extractall(root)
                      remove(full_name)
 
             app_folder_hl = f'{config.work}\\HL\\{config.project_name}\\{app}'
             for root, dirs, files in walk(app_folder_hl):
                for file in files:
                   if file.endswith(".zip") or \
-                     file.endswith(".7z") or \
                      file.endswith(".tar") or \
                      file.endswith(".gztar") or \
-                     file.endswith(".bztar"):
-                     found = True
-                     
-                     full_name = f'{root}\\{file}'
+                     file.endswith(".bztar") or \
+                     file.endswith(".7z"):
+
+                     root = abspath(root)
+                     full_name = abspath(f'{root}\\{file}')
                      cls._log.info(f'Unzipping {full_name}')
-                     unpack_archive(full_name,root)
+                     found = True
+                     Archive(full_name).extractall(root)
                      remove(full_name)
+
+
 
       cls._log.info('Unzip step complete')
                                 
