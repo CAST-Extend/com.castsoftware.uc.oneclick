@@ -1,2 +1,9 @@
 src/__pycache__/*
 test/*
+**/.venv/**
+*egg-info*
+*/dist/*
+**/__pycache__/**
+.vscode/*
+**/build/**
+pip_final.bat
