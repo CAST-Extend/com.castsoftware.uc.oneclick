@@ -28,8 +28,13 @@ class HLAnalysis(Analysis):
                     cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
                     app_id = rest.get_app_id(appl)
                     if app_id is None:
-                        cls._log.error(f'Application {appl} not found in Highlight')
-                        continue
+                        cls._log.info(f'Application {appl} not found in Highlight, Creating Application {appl}...')
+                        resp_code = rest.create_an_app(config.hl_url, config.hl_instance, appl)
+                        if resp_code == 200:
+                            cls._log.info(f'Application {appl} created inside Highlight.')
+                            app_id = rest.get_app_id(appl)
+                        else:
+                            cls._log.info(f'Not able to Application {appl} inside Highlight due to some error!')                       
 
                     hl_sourceDir = f'{config.base}\\STAGED\\HL\\{config.project_name}\\{appl}'
                     hl_workingDir = f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT\\{appl}'
