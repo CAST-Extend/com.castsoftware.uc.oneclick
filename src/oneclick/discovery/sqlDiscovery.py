@@ -129,9 +129,19 @@ class SQLDiscovery(SourceValidation):
             proc_list=findall(proc_pattern,content)
             cls.procedure_list.extend(proc_list)
 
+            #regular expressions for PL/SQL
+            proc_pattern_2='[P|p][R|r][O|o][C|c][E|e][D|d][U|u][R|r][E|e]\s{1,}([^\n|^\s|^\(]+)'
+            proc_list_2=findall(proc_pattern_2,content)
+            cls.procedure_list.extend(proc_list_2)
+
             func_pattern='[C|c][R|r][E|e][A|a][T|t][E|e]\s{1,}[F|f][U|u][N|n][C|c][T|t][I|i][O|o][N|n]\s{1,}([^\n|^\s|^\(]+)'
             func_list=findall(func_pattern,content)
             cls.function_list.extend(func_list)
+
+            #regular expressions for PL/SQL
+            func_pattern_2='[F|f][U|u][N|n][C|c][T|t][I|i][O|o][N|n]\s{1,}([^\n|^\s|^\(]+)'
+            func_list_2=findall(func_pattern_2,content)
+            cls.function_list.extend(func_list_2)
 
             view_pattern='[C|c][R|r][E|e][A|a][T|t][E|e]\s{1,}[V|v][I|i][E|e][W|w]\s{1,}([^\n|^\s|^\(]+)'
             vi_list=findall(view_pattern,content)
@@ -140,5 +150,10 @@ class SQLDiscovery(SourceValidation):
             trig_pattern='[C|c][R|r][E|e][A|a][T|t][E|e]\s{1,}[T|t][R|r][I|i][G|g][G|g][E|e][R|r]\s{1,}([^\n|^\s|^\(]+)'
             trig_list=findall(trig_pattern,content)
             cls.trigger_list.extend(trig_list)
+
+            #regular expressions for PL/SQL
+            trig_pattern_2='[C|c][R|r][E|e][A|a][T|t][E|e]\s{1,}[T|t][R|r][I|i][G|g][G|g][E|e][R|r]\s{1,}([^\n|^\s|^\(]+)'
+            trig_list_2=findall(trig_pattern_2,content)
+            cls.trigger_list.extend(trig_list_2)
             
             f.close()
