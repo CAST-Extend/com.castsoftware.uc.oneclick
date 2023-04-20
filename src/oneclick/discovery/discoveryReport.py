@@ -5,6 +5,7 @@ from os.path import abspath
 import docx
 from oneclick.config import Config
 from cast_common.util import convert_LOC
+from docx.enum.table import WD_TABLE_ALIGNMENT
 
 #todo: add totals to the cloc report (d1)
 #todo: if SQL problems, add bullet under SQL Delivery to describe (d1)
@@ -57,9 +58,9 @@ class DiscoveryReport(SourceValidation):
             l=before_df.loc[filt,['LANGUAGE','CODE']].sort_values(by=['CODE'], ascending=False) 
             non_code=''
             if len(l) == 1:
-                non_code= str(l.iloc[0]['CODE']//1000) +' KLOC of '+ l.iloc[0]['LANGUAGE']
+                non_code= str(l.iloc[0]['CODE']//1000) +' KLoc of '+ l.iloc[0]['LANGUAGE']
             elif len(l) > 1:
-                non_code= str(l.iloc[0]['CODE']//1000) +' KLOC of '+ l.iloc[0]['LANGUAGE'] +' non code files and ~'+ str(l.iloc[1]['CODE']//1000) +' KLOC of '+ l.iloc[1]['LANGUAGE']
+                non_code= str(l.iloc[0]['CODE']//1000) +' KLoc of '+ l.iloc[0]['LANGUAGE'] +' non code files and ~'+ str(l.iloc[1]['CODE']//1000) +' KLOC of '+ l.iloc[1]['LANGUAGE']
 
             # read by 'Stats After Code CleanUP' sheet of an Cloc_Output excel file
             after_df = cls.cloc_report(cloc_report,f'After({appl})')
@@ -129,11 +130,11 @@ class DiscoveryReport(SourceValidation):
             #     if row['Catagory'] == 'SQL files':
             #         line[-1]=f'in {line[-1]}'
             #doc.add_paragraph(f"The delivery also inclues, {', '.join(line)}.",style='List Bullet')
-            removed_code=before_df['CODE'].sum()-after_df['CODE'].sum()
-            doc.add_paragraph(f'We removed {removed_code} KLOC of sample, test and other non-production code from the source code.',style='List Bullet')
+            removed_code=(before_df['CODE'].sum()-after_df['CODE'].sum())//1000
+            doc.add_paragraph(f'We removed {removed_code} KLoc of sample, test and other non-production code from the source code.',style='List Bullet')
             after_df=after_df.drop(after_df[after_df['APPLICABLE']==0.0].index)
             total = after_df['CODE'].sum()//1000
-            doc.add_paragraph(f"Here is a high-level summary of the source code that will be analyzed by CAST, totaling {total} KLOC.",style='List Bullet')
+            doc.add_paragraph(f"Here is a high-level summary of the source code that will be analyzed by CAST, totaling {total} KLoc.",style='List Bullet')
 
             after_df = after_df[['LANGUAGE','FILES','CODE']]
             after_df = after_df[:-1]
@@ -141,19 +142,28 @@ class DiscoveryReport(SourceValidation):
             code_count=after_df['CODE'].sum()
             new_row = pandas.DataFrame({'LANGUAGE':'Totals', 'FILES':[files_count], 'CODE':[code_count]})
             after_df = pandas.concat([after_df,new_row])
-            
+
             t = doc.add_table(after_df.shape[0]+1, after_df.shape[1])
             # add the header rows.
             for j in range(after_df.shape[-1]):
                 t.cell(0,j).text = after_df.columns[j]
+                if j==0:
+                    t.cell(0,j).paragraphs[0].paragraph_format.alignment = WD_TABLE_ALIGNMENT.LEFT
+                else:
+                    t.cell(0,j).paragraphs[0].paragraph_format.alignment = WD_TABLE_ALIGNMENT.RIGHT
 
             # add the rest of the data frame
             for i in range(after_df.shape[0]):
                 for j in range(after_df.shape[-1]):
                     number = after_df.values[i,j]
                     if type(number) is int:
-                        number = "{}".format(number)
-                    t.cell(i+1,j).text = number
+                        number = "{:,}".format(number)
+                    if j==0:
+                        t.cell(i+1,j).text = str(number)
+                        t.cell(i+1,j).paragraphs[0].paragraph_format.alignment = WD_TABLE_ALIGNMENT.LEFT
+                    else:
+                        t.cell(i+1,j).text = str(number)
+                        t.cell(i+1,j).paragraphs[0].paragraph_format.alignment = WD_TABLE_ALIGNMENT.RIGHT
             
             # Adding style to a table
             t.style = 'Medium Shading 1 Accent 1'
