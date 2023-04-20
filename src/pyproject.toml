@@ -1,9 +1,9 @@
 [project]
 name='com.castsoftware.uc.oneclick'
 description="Assessment Generator"
-version='0.1.12' #prod version
+version='0.2.2.1' #prod version
 dependencies = [
-    'pandas','python-pptx==0.6.18','python-docx',
+    'pandas==1.4.0','python-pptx==0.6.18','python-docx','argparse_formatter',
     'com.castsoftware.uc.python.common>=0.1.6',
     'com.castsoftware.uc.action-plan',
     'com.castsoftware.uc.arg'
@@ -19,4 +19,3 @@ readme = "README.md"
 [project.urls]
 "Homepage" = "https://github.com/CAST-Extend/com.castsoftware.uc.arg"
 "Bug Tracker" = "https://github.com/CAST-Extend/com.castsoftware.uc.arg/issues"
-
