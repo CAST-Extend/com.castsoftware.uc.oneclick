@@ -1,78 +1,108 @@
 @echo off
-::validate input parameters
-set CODE_FOLDER=%1
-if "%CODE_FOLDER%x" == "x" GOTO missingCodeParam
-if not exist %CODE_FOLDER% goto missingCodeFolder
+setlocal EnableDelayedExpansion
 
-echo Configure for installation
-:: Check for Python Installation
+:: Check for administrative permissions
+  echo Administrative permissions required. Detecting permissions...
+  net session >nul 2>&1
+  if %errorLevel% == 0 (
+    echo Success: Administrative permissions confirmed.
+    goto :app1
+  ) else (
+    echo Failure: Current permissions inadequate.
+    echo Please run the script as an Administrator.
+    pause
+    exit
+  )
 
-python --version 2>NUL
-if errorlevel 1 (
-	py --version
-	if errorlevel 1 goto noPython
-	set EXEC=py
-) else set EXEC=python
+:: Set Python version
+:app1
+set "python_version=3.10.0
 
-:: Check for Python Installation
-call pip --version 2>NUL
-if errorlevel 1 goto noPip
+:: Define the URL and file name of the Python installer
+set "url=https://www.python.org/ftp/python/%python_version%/python-%python_version%-amd64.exe"
+set "installer=python-%python_version%-amd64.exe"
 
-echo creating virutal enviroment 
-IF NOT EXIST "%CODE_FOLDER%\DELIVER" MKDIR "%CODE_FOLDER%\DELIVER"
-IF NOT EXIST "%CODE_FOLDER%\.oneClick" MKDIR "%CODE_FOLDER%\.oneClick"
-IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS"
-%EXEC% -m pip install --user --upgrade pip > NUL
+:: Define the installation directory
+set "targetdir1=C:\Python%python_version%"
+set "targetdir2=C:\Python%python_version%\Scripts"
 
-if not exist "%CODE_FOLDER%\.venv" %EXEC% -m venv "%CODE_FOLDER%\.venv"
-if errorlevel 1 goto venvFail
-call %CODE_FOLDER%\.venv\scripts\activate.bat
 
-echo adding Onclick package from PyPi
-pip install com.castsoftware.uc.oneClick
-Call :UnZipFile "%CODE_FOLDER%" "scripts.zip"
+:: Download the Python installer
+powershell -Command "(New-Object Net.WebClient).DownloadFile('%url%', '%~dp0%installer%')"
 
-call %CODE_FOLDER%\.venv\scripts\deactivate.bat
+:: Install Python
+echo Installing Python Version %latest_py_version%
+start /wait "" "%~dp0%installer%" /quiet /passive TargetDir="%targetdir1%" Include_test=0 ^
+&& (echo Done.) || (echo Failed!)
+echo.
 
-exit /b 
 
-:UnZipFile <ExtractTo> <newzipfile>
-set vbs="%temp%\_.vbs"
-if exist %vbs% del /f /q %vbs%
->%vbs%  echo Set fso = CreateObject("Scripting.FileSystemObject")
->>%vbs% echo If NOT fso.FolderExists(%1) Then
->>%vbs% echo fso.CreateFolder(%1)
->>%vbs% echo End If
->>%vbs% echo set objShell = CreateObject("Shell.Application")
->>%vbs% echo set FilesInZip=objShell.NameSpace(%2).items
->>%vbs% echo objShell.NameSpace(%1).CopyHere(FilesInZip)
->>%vbs% echo Set fso = Nothing
->>%vbs% echo Set objShell = Nothing
-cscript //nologo %vbs%
-if exist %vbs% del /f /q %vbs%
-exit /b
+:: Add Python to the system PATH
+echo Adding Python to the system PATH...
+setx PATH "%targetdir1%;%targetdir2%;%PATH%" /m
+if %errorlevel% EQU 1 (
+  echo Python has been successfully installed to your system BUT failed to set system PATH. Try running the script as administrator.
+  pause
+  exit
+)
+echo Python %python_version% has been successfully installed and added to the system PATH.
 
-:missingCodeParam
-echo Missing Code Folder Location parameter
-goto usage
+:: Cleanup
+echo Cleaning up...
+echo .
+echo .
+echo .
+del "%~dp0%installer%"
 
-:missingCodeFolder
-echo Destination folder "%CODE_FOLDER%" must already exist
-goto usage
+:: OneClick base folder creation
+if exist "T:\CAST\CODE" (
+  echo OneClick base folder already exists in T:\
+  goto :OC1
+) else if exist "D:\CAST\CODE" (
+  echo OneClick base folder already exists in D:\
+  goto :OC2
+) else if exist "C:\CAST\CODE" (
+  echo OneClick base folder already exists in C:\
+  goto :OC3
+) else (
+  goto create_Path
+)
 
-:noPython
-echo Python version 10.x must be installed to use OneClick
-goto usage
+:create_Path
+if exist "T:\" (
+  mkdir "T:\CAST\CODE"
+  echo Success: Created the OneClick base folder T:\CAST\CODE
+  goto :OC1
+) else if exist "D:\" (
+  mkdir "D:\CAST\CODE"
+  echo Success: Created the OneClick base folder D:\CAST\CODE
+  goto :OC2
+) else if exist "C:\" (
+  mkdir "C:\CAST\CODE"
+  echo Success: Created the OneClick base folder C:\CAST\CODE
+  goto :OC3
+) else (
+  echo Error: None of the required drives exist.
+  pause
+  exit
+)
 
-:noPip
-echo PIP not found
-goto usage
+:: OneClick installation
+:OC1
+cd /d "T:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
+:OC2
+cd /d "D:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
+:OC3
+cd /d "C:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
 
-:venvFail
-echo Unable to install virtual environment
-goto usage
 
-:usage
-echo install ^<Code Folder Location^>
-popd
-exit /b
+:start
+cls
+start cmd /k "%~dp0_.bat"
+exit
