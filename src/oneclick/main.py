@@ -86,14 +86,14 @@ if __name__ == '__main__':
                             default='c:/Program Files/CAST/Highlight-Automation-Command/HighlightAutomation.jar', 
                             help='Highlight CLI Location',
                             metavar='LOCATION')
-    highlight.add_argument('--HLPerlInstallDir',
+    highlight.add_argument('--hlAgent',
                             default='c:/Program Files/CAST/HighlightAgent',
                             help='Highlight Perl Installation Location (HighlightAgent/strawberry/perl)',
                             metavar='LOCATION')
-    highlight.add_argument('--HLAnalyzerDir', 
-                           default='c:/Program Files/CAST/HighlightAgent/perl',
-                           help='Highlight Perl Installation Location (HighlightAgent/perl)',
-                           metavar='LOCATION')
+    # highlight.add_argument('--HLAnalyzerDir', 
+    #                        default='c:/Program Files/CAST/HighlightAgent/perl',
+    #                        help='Highlight Perl Installation Location (HighlightAgent/perl)',
+    #                        metavar='LOCATION')
 
     console=config_parser.add_argument_group('CAST AIP Console')
     console.add_argument('--consoleURL',  help='AIP Console URL',metavar='URL')
@@ -160,9 +160,9 @@ if __name__ == '__main__':
             cfg = '--cloc_version <cloc.exe>'
 
         log.info('To update the default configuraiton file use')
-        log.info(f'     python -m oneclick.main config -b {config.base} {cfg}')
+        log.info(f'     OneClick config {cfg}')
         log.info('To update the application configuraiton file use:')
-        log.info(f'     python -m oneclick.main config -b {config.base} -p {config.project_name} {cfg}')
+        log.info(f'     OneClick config -p {config.project_name} {cfg}')
         exit()
 
 

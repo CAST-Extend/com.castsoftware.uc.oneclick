@@ -27,7 +27,7 @@ class SQLDiscovery(SourceValidation):
         for app in apps:
             cls._log.info(f'Running {cls.__class__.__name__} for {app}')
 
-            app_folder = f'{config.work}\\{app}\\AIP'
+            app_folder = abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}')
             for root, dirs, files in walk(app_folder):
                 for file in files:
                     if file.endswith(".sql") or file.endswith(".dtd") :

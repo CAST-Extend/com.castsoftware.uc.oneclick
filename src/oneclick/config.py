@@ -66,10 +66,9 @@ class Config():
             if args.hlInstance is not None: self.hl_instance = args.hlInstance
             if self.check_default(args.hlCLI,self.hl_cli,default_args['hlCLI']):
                 self.hl_cli = args.hlCLI
-            if self.check_default(args.HLPerlInstallDir,self.perl_install_dir,default_args['HLPerlInstallDir']):
-                self.perl_install_dir = args.HLPerlInstallDir
-            if self.check_default(args.HLAnalyzerDir,self.analyzer_dir,default_args['HLAnalyzerDir']):
-                self.analyzer_dir = args.HLAnalyzerDir
+
+            self.perl_install_dir = abspath(f'{args.hlAgent}/strawberry/perl')
+            self.analyzer_dir = abspath(f'{args.hlAgent}/perl')
 
             #AIPConsole
             if args.consoleURL is not None: self.console_url = args.consoleURL
@@ -451,7 +450,7 @@ class Config():
             self._config['project']['name']=value
             self._config['project']['application']={}
 
-        elif value != self.project_name:
+        elif value.lower() != self.project_name.lower():
             raise ValueError("Can't rename a project")
 
     @property
