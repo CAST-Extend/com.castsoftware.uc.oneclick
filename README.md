@@ -23,15 +23,20 @@ In addition, it requires the installation and location of CAST Imaging Console a
     * The tool was tested using python version 3.10
     * When installing python be sure to check the “Add Python to Path option”
 
-        ![Expected folder structure](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/bc9c224100a437083c551e4bfb2da76d.png)
-        
-2.  Download the OneClick extension from the CAST Extend web site.
-3.  Expand the nugget file into a folder, using zip.
-4.  Open a command prompt, hold down windows key and press r, then type cmd enter.
-5.  Go to the folder containing the expanded nugget file.
-6.  Type: install \<base folder location\>
-    * The base folder location will hold all files used and/or created by the OneClick tool.
-    * For more on this see the Environment section below.
+1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
+    1.  The tool was tested using python version 3.10
+
+        ![Graphical user interface, text, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
+
+2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
+3.  Create an empty base folder (name as desired) on your local machine.
+    1.  This folder will hold all the automatically created files by OneClick.
+4.  Expand the nugget file into a folder, using zip.
+5.  Open a command prompt, hold down windows key and press r, then type cmd enter.
+6.  Using command prompt go to the folder containing the expanded nugget file.Type: install \<base folder location\>
+    1.  The base folder location will hold all files used and/or created by the OneClick tool.
+    2.  For more on this see the Environment section below.
+
 # Command Line Arguments
 
 OneClick has two types of arguments, config and run. The first is used to configure the global and/or project configuration files. The second to run discovery, analyses, and reporting.
@@ -69,7 +74,7 @@ oneClick config -b <base location> [-p <project name>] --consoleURL=http:\\<serv
 
 ## Highlight
 
-To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](m[edia](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/655e6bf3ea23051dcde0c76e0df1410b.png)
+To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/655e6bf3ea23051dcde0c76e0df1410b.png)
 
 ```
 oneClick config -b <base location> [-p <project name>] --hlURL=<portal-url> --hlUser=<username> --hlPassword=<password> --hlInstance=<Instance-ID> --hlCLI=<CLI-location> --HLPerlInstallDir=<agent-location>/strawberry/perl> --HLAnalyzerDir=<agent-location>/perl
