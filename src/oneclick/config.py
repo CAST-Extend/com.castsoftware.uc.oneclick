@@ -20,9 +20,8 @@ class Config():
     log = None
     log_translate = {} 
 
-    def __init__(self,parser:ArgumentParser,default_args,log_level: int=INFO):
+    def __init__(self,parser:ArgumentParser,default_args={},log_level: int=INFO):
         self.log = Logger(self.__class__.__name__,log_level)
-
 
         args = parser.parse_args()
 
@@ -46,51 +45,54 @@ class Config():
 
                 with open(abspath(self._config_file), 'rb') as config_file:
                     self._config = load(config_file)
-            if args.java_home is None:
-                self.java_home = ''
-            else:
-                self.java_home = args.java_home
+            try:       
+                if args.java_home is None:
+                    self.java_home = ''
+                else:
+                    self.java_home = args.java_home
 
-            if args.cloc_version is not None: self.cloc_version = args.cloc_version
+                if args.cloc_version is not None: self.cloc_version = args.cloc_version
 
-            #Dashboard
-            if args.aipURL is not None: self.aip_url = args.aipURL
-            if args.aipPassword is not None: self.aip_password = args.aipPassword
-            if args.aipUser is not None: self.aip_user = args.aipUser
+                #Dashboard
+                if args.aipURL is not None: self.aip_url = args.aipURL
+                if args.aipPassword is not None: self.aip_password = args.aipPassword
+                if args.aipUser is not None: self.aip_user = args.aipUser
 
-            #Highlight
-            if self.check_default(args.hlURL,self.hl_url,default_args['hlURL']):
-                self.hl_url = f'{args.hlURL}/WS2'
-            if args.hlUser is not None: self.hl_user = args.hlUser
-            if args.hlPassword is not None: self.hl_password = args.hlPassword
-            if args.hlInstance is not None: self.hl_instance = args.hlInstance
-            if self.check_default(args.hlCLI,self.hl_cli,default_args['hlCLI']):
-                self.hl_cli = args.hlCLI
+                #Highlight
+                if self.check_default(args.hlURL,self.hl_url,default_args['hlURL']):
+                    self.hl_url = f'{args.hlURL}/WS2'
+                if args.hlUser is not None: self.hl_user = args.hlUser
+                if args.hlPassword is not None: self.hl_password = args.hlPassword
+                if args.hlInstance is not None: self.hl_instance = args.hlInstance
+                if self.check_default(args.hlCLI,self.hl_cli,default_args['hlCLI']):
+                    self.hl_cli = args.hlCLI
 
-            self.perl_install_dir = abspath(f'{args.hlAgent}/strawberry/perl')
-            self.analyzer_dir = abspath(f'{args.hlAgent}/perl')
+                self.perl_install_dir = abspath(f'{args.hlAgent}/strawberry/perl')
+                self.analyzer_dir = abspath(f'{args.hlAgent}/perl')
 
-            #AIPConsole
-            if args.consoleURL is not None: self.console_url = args.consoleURL
-            if args.consoleKey is not None: self.console_key = args.consoleKey
-            if args.consoleCLI is not None: self.console_cli = args.consoleCLI
-            if args.enable_security_assessment is not None: self.enable_security_assessment = args.enable_security_assessment
-            if args.blueprint is not None: self.blueprint = args.blueprint
+                #AIPConsole
+                if args.consoleURL is not None: self.console_url = args.consoleURL
+                if args.consoleKey is not None: self.console_key = args.consoleKey
+                if args.consoleCLI is not None: self.console_cli = args.consoleCLI
+                if args.enable_security_assessment is not None: self.enable_security_assessment = args.enable_security_assessment
+                if args.blueprint is not None: self.blueprint = args.blueprint
 
-            #Database
-            if args.dbHost is not None: self.db_host = args.dbHost
-            if args.dbPort is not None: self.db_port = args.dbPort
-            if self.check_default(args.dbUser,self.db_user,default_args['dbUser']):
-                self.db_user = args.dbUser
-            if self.check_default(args.dbPassword,self.db_password,default_args['dbPassword']):
-                self.db_password = args.dbPassword
-            if self.check_default(args.dbDatabase,self.db_database,default_args['dbDatabase']):
-                self.db_database = args.dbDatabase
+                #Database
+                if args.dbHost is not None: self.db_host = args.dbHost
+                if args.dbPort is not None: self.db_port = args.dbPort
+                if self.check_default(args.dbUser,self.db_user,default_args['dbUser']):
+                    self.db_user = args.dbUser
+                if self.check_default(args.dbPassword,self.db_password,default_args['dbPassword']):
+                    self.db_password = args.dbPassword
+                if self.check_default(args.dbDatabase,self.db_database,default_args['dbDatabase']):
+                    self.db_database = args.dbDatabase
 
-            #settings
-            if self.check_default(args.cloc_version,self.cloc_version,default_args['cloc_version']):
-                self.cloc_version = args.cloc_version
-
+                #settings
+                if self.check_default(args.cloc_version,self.cloc_version,default_args['cloc_version']):
+                    self.cloc_version = args.cloc_version
+        
+            except AttributeError as e:
+                self.log.debug(str(e))
             return
 
         #do all required fields contain data
@@ -336,7 +338,7 @@ class Config():
 
     @property
     def is_console_active(self)->bool:
-        return self.console['Active']
+        return self._get(self.console,'Active',False)
 
     @property
     def console(self):
@@ -573,7 +575,7 @@ class Config():
 
     @property
     def java_home(self):
-        return self.setting['java-home']
+        return self._get(self.setting,'java-home')
     @java_home.setter
     def java_home(self,value):
         if self._set_value(self.setting,'java-home',value,''):
