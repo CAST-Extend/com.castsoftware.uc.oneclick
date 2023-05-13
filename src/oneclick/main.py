@@ -40,19 +40,7 @@ def get_argparse_defaults(parser):
             defaults[action.dest] = action.default
     return defaults
 
-
-#TODO: d2-Ability to install onclick with all its components via PIP (d2)
-#TODO: d1-send emails (d1-SHP)
-if __name__ == '__main__':
-
-    #printing some inital messages to the user
-    log_level = INFO
-    log = Logger("main")
-
-    print('\nCAST One Click')
-    print('Copyright (c) 2023 CAST Software Inc.\n')
-    print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
-
+def command_line() -> ArgumentParser:
     parser = ArgumentParser(prog='OneClick',  formatter_class=lambda prog: FlexiFormatter(prog, width=99999, max_help_position=60))
     subparsers = parser.add_subparsers(title='command',dest='command')
 
@@ -123,6 +111,22 @@ if __name__ == '__main__':
 
     run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
+    return parser
+
+#TODO: d2-Ability to install onclick with all its components via PIP (d2)
+#TODO: d1-send emails (d1-SHP)
+if __name__ == '__main__':
+
+    #printing some inital messages to the user
+    log_level = INFO
+    log = Logger("main",file_name=)
+
+    print('\nCAST One Click')
+    print('Copyright (c) 2023 CAST Software Inc.\n')
+    print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
+
+
+    parser,default_args = command_line()
     default_args = get_argparse_defaults(config_parser)
     args = parser.parse_args()
 
