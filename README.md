@@ -1,5 +1,7 @@
 # What is OneClick
-OneClick is an automation tool designed to perform a due diligence assessment from beginning to end for one or more applications in a project. This includes:
+OneClick is a powerful automation tool for running a full due diligence assessment for multiple applications. Its range of capabilities includes locating the code, performing CAST MRI and Highlight Analyses, and generating a comprehensive Due Diligence Assessment Report.
+
+This includes:
 
 1. Code discovery
 1. Run CAST MRI Analysis
@@ -19,23 +21,11 @@ Running OneClick requires access to:
 In addition, it requires the installation and location of CAST Imaging Console and Highlight automation tools. These tools are available either on the CAST Extend website or Highlight portal.
 
 ## Installation
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already installed).
-    * The tool was tested using python version 3.10
-    * When installing python be sure to check the “Add Python to Path option”
-
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
-    1.  The tool was tested using python version 3.10
-
-        ![Graphical user interface, text, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
-
-2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
-3.  Create an empty base folder (name as desired) on your local machine.
-    1.  This folder will hold all the automatically created files by OneClick.
-4.  Expand the nugget file into a folder, using zip.
-5.  Open a command prompt, hold down windows key and press r, then type cmd enter.
-6.  Using command prompt go to the folder containing the expanded nugget file.Type: install \<base folder location\>
-    1.  The base folder location will hold all files used and/or created by the OneClick tool.
-    2.  For more on this see the Environment section below.
+1.  Download the OneClick extension from the CAST Extend website.
+2.  Extract the contents of the nugget file into a folder using a zip extraction tool.
+3.  Right-click on the **install.bat** file and select "Run as administrator".
+    * The base folder location will hold all files used and/or created by the OneClick tool.
+    * For more on this see the Environment section below.
 
 # Command Line Arguments
 
