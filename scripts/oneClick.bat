@@ -1,6 +1,6 @@
 @@echo off
 
-set base=%cd%
+set base=d:\code
 set option=%1
 
 if "%option%x" == "x" goto error

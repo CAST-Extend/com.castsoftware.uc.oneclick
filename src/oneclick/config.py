@@ -32,6 +32,7 @@ class Config():
         if not exists(base_config) and args.command == 'run':
             raise NoConfigFound('Base configuration file found, please run with the "config" option')
 
+
         if args.command == 'config':
             if not exists(base_config):
                 self._config={}
@@ -98,6 +99,7 @@ class Config():
         #do all required fields contain data
         if args.command == 'run':
             try:
+                self._config={}
                 self._config_file = abspath(f'{args.baseFolder}/.oneclick/{args.projectName}.json')
                 if exists(self._config_file):
                     with open(abspath(self._config_file), 'rb') as config_file:
@@ -105,7 +107,6 @@ class Config():
                 else:
                     with open(base_config) as config_file:
                         self._config = load(config_file)
-                    self._save()
 
                 self.base=args.baseFolder
                 self.project = args.projectName
@@ -129,7 +130,7 @@ class Config():
     def validate_for_run(self):
         if self.cloc_version == '':
             raise InvalidConfiguration('Missing CLOC executable name')
-        exec = f'{getcwd()}\\scripts\\{self.cloc_version}'
+        exec = abspath(f'{self.base}\\scripts\\{self.cloc_version}')
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
         if not self.is_console_active and not self.is_hl_active:
@@ -537,9 +538,7 @@ class Config():
     """ **************** Setting related entries ************************ """
     @property 
     def setting(self):
-        if 'setting' not in self._config:
-            self._config['setting']={}
-        return self._config['setting']
+        return self._get(self._config,'setting',{})        
 
     @property
     def arg_template(self):
@@ -547,7 +546,7 @@ class Config():
 
     @property
     def base(self):
-        return self.setting['base']
+        return self._get(self.setting,'base','')
     @base.setter
     def base(self,value):
         if value is not None:

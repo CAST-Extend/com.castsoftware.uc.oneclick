@@ -26,7 +26,7 @@ class cleanUpAIP(SourceValidation):
         output_path = f'{config.oneclick_work}/{config.project_name}/LOGS'    
         #create_folder(output_path)
 
-        dir = getcwd()
+        dir = config.base
         dateTimeObj=datetime.now()
         file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
         

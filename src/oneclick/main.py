@@ -111,25 +111,31 @@ def command_line() -> ArgumentParser:
 
     run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
-    return parser
+    return parser,config_parser
 
 #TODO: d2-Ability to install onclick with all its components via PIP (d2)
 #TODO: d1-send emails (d1-SHP)
 if __name__ == '__main__':
 
-    #printing some inital messages to the user
-    log_level = INFO
-    log = Logger("main",file_name=)
 
     print('\nCAST One Click')
     print('Copyright (c) 2023 CAST Software Inc.\n')
     print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
 
 
-    parser,default_args = command_line()
+    parser,config_parser = command_line()
     default_args = get_argparse_defaults(config_parser)
     args = parser.parse_args()
 
+    #printing some inital messages to the user
+    file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK')
+    create_folder(file_name)
+    file_name=abspath(f'{file_name}/LOGS')
+    create_folder(file_name)
+    file_name=abspath(f'{file_name}/general.log')
+    
+    log_level = INFO
+    log = Logger("main",file_name=file_name)
     log.info(f'Running {args.command}')
 
     config = NotImplemented
@@ -169,18 +175,6 @@ if __name__ == '__main__':
         log.info(f'     OneClick config -p {config.project_name} {cfg}')
         exit()
 
-
-    # parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
-    # parser.add_argument('--JavaHome',  help='Location of the JRE')
-    # parser.add_argument('--from-email',  help='Email sending from')
-    # parser.add_argument('--from-to',  help='Email sending from')
-    # parser.add_argument('--from-email',  help='Email sending from')
-    # parser.add_argument('--from-email',  help='Email sending from')
-
-    # TODO: add args for aip and console rest setup (d2)
-    # TODO: add arg to reset analysis status for specific application (d2)
-
-    #args = parser.parse_args()
     if args.debug:
         log_level=DEBUG
 

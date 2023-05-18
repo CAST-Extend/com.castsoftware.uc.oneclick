@@ -43,8 +43,7 @@ class ClocPreCleanup(SourceValidation):
         return cls._df
 
     def _run_cloc(cls,work_folder:str,cloc_output:str,cloc_output_ignored:str):
-        cloc_path=abspath(f'{getcwd()}\\scripts\\{cls.config.cloc_version}')
-        args = [cloc_path,work_folder,"--report-file",cloc_output,"--ignored",cloc_output_ignored,"--quiet"]
+        args = [cls.cloc_path,work_folder,"--report-file",cloc_output,"--ignored",cloc_output_ignored,"--quiet"]
         proc = run_process(args,False)
 
         sleep(10)
@@ -58,8 +57,8 @@ class ClocPreCleanup(SourceValidation):
 
     def run(cls,config:Config):
         cls.open_excel_writer(config)
-
-        list_of_tech_file=abspath(f'{getcwd()}\\scripts\\ListOfTechnologies.csv')
+        cls.cloc_path=abspath(f'{config.base}\\scripts\\{cls.config.cloc_version}')
+        list_of_tech_file=abspath(f'{config.base}\\scripts\\ListOfTechnologies.csv')
         with open(list_of_tech_file) as f:
             tech_list = f.read().splitlines()
             f.close()

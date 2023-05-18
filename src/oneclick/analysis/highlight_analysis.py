@@ -3,6 +3,7 @@ from subprocess import Popen,PIPE
 from oneclick.config import Config
 from cast_common.hlRestCall import HLRestCall
 from cast_common.util import run_process,create_folder
+from os.path import abspath
 
 import sys
 
@@ -44,7 +45,7 @@ class HLAnalysis(Analysis):
                     if len(java_home) > 0:
                         java_home = f'{java_home}/bin/'
 
-                    args = [f'{config.java_home}java.exe',
+                    args = [abspath(f'{config.java_home}/java.exe'),
                             '-jar',config.hl_cli,
                             '--sourceDir', hl_sourceDir,
                             '--workingDir' , hl_workingDir,

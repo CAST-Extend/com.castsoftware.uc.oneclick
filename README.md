@@ -1,11 +1,6 @@
 CAST OneClick
 
-A set of automation tools designed to analyze applications on a portfolio level. Providing the ability to perform
-
--   Complete application discovery
--   MRI Analysis
--   Highlight Analysis
--   Portfolio level reporting
+OneClick is a powerful automation tool for running a full due diligence assessment for multiple applications. Its range of capabilities includes locating the code, performing CAST MRI and Highlight Analyses, and generating a comprehensive Due Diligence Assessment Report.
 
 # Installation
 

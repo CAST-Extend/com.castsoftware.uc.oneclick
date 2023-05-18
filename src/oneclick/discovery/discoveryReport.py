@@ -74,9 +74,9 @@ class DiscoveryReport(SourceValidation):
             # out of scope code base
             total = int(before_df['CODE'].sum())
             total, unit = convert_LOC(total)
-            doc.add_paragraph(f"This delivery contains a total of {len(before_df)-1} technologies/extensions discovered with a total of {total} {unit}.",style='List Bullet')
+            doc.add_paragraph(f"This delivery contains a total of {len(after_df)-1} technologies/extensions discovered with a total of {total} {unit}.",style='List Bullet')
 
-            bsuport = before_df[before_df['APPLICABLE']==True]
+            bsuport = after_df[after_df['APPLICABLE']==True]
             total = int(bsuport['CODE'].sum())
             total, unit = convert_LOC(total)
 
@@ -85,7 +85,7 @@ class DiscoveryReport(SourceValidation):
             bsup_lang = ', '.join(lang_list)
             doc.add_paragraph(f"{len(bsuport)} technologies/extensions are relevant for the CAST analysis, which include {bsup_lang}.",style='List Bullet')
 
-            nsuport = before_df[before_df['APPLICABLE']==False]
+            nsuport = after_df[after_df['APPLICABLE']==False]
             total = int(bsuport['CODE'].sum())
             total, unit = convert_LOC(total)
 

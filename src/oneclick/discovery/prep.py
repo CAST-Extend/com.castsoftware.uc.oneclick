@@ -34,7 +34,7 @@ class Prepare(SourceValidation):
         dir=[]
         for (dirpath,dirnames,filenames) in walk(config.deliver,topdown=False):
             dir.extend(dirnames)
-        config.application.clear()
+        #config.application.clear()
         config.application=dirnames
 
         """create the application folders under 'work'

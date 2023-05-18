@@ -1,7 +1,8 @@
 from os import walk,remove
 from os.path import abspath
 
-from shutil import unpack_archive
+#from shutil import unpack_archive
+from pyunpack import Archive
 
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
@@ -35,9 +36,12 @@ class Unzip(SourceValidation):
                      file.endswith(".bztar"):
                      found = True
                      
-                     full_name = f'{root}\\{file}'
+                     full_name = abspath(f'{root}\\{file}')
+                     dest = full_name.replace(f".{full_name.split('.')[-1]}",'')
                      cls._log.info(f'Unzipping {full_name}')
-                     unpack_archive(full_name,root)
+
+                     Archive(full_name).extractall(dest,auto_create_dir=True)
+                     
                      remove(full_name)
 
             app_folder_hl = f'{config.work}\\HL\\{config.project_name}\\{app}'
@@ -50,9 +54,12 @@ class Unzip(SourceValidation):
                      file.endswith(".bztar"):
                      found = True
                      
-                     full_name = f'{root}\\{file}'
+                     full_name = abspath(f'{root}\\{file}')
+                     dest = full_name.replace(f".{full_name.split('.')[-1]}",'')
                      cls._log.info(f'Unzipping {full_name}')
-                     unpack_archive(full_name,root)
+
+                     Archive(full_name).extractall(dest,auto_create_dir=True)
+                     
                      remove(full_name)
 
       cls._log.info('Unzip step complete')
