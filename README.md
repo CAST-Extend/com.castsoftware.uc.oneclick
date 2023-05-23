@@ -18,24 +18,33 @@ Running OneClick requires access to:
 
 In addition, it requires the installation and location of CAST Imaging Console and Highlight automation tools. These tools are available either on the CAST Extend website or Highlight portal.
 
-## Installation
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already installed).
-    * The tool was tested using python version 3.10
-    * When installing python be sure to check the “Add Python to Path option”
+# OneClick Installation Guide
+This guide will walk you through the installation process for the OneClick extension from the CAST Extend website. The steps below will help you set up the OneClick tool on your system.
 
-1.  [Download Python \| Python.org](https://www.python.org/downloads/) (if not already done).
-    1.  The tool was tested using python version 3.10
+## Prerequisites
+Before you begin, please make sure you have the following:
+* Downloaded the OneClick extension from the CAST Extend website.
+* A zip extraction tool installed on your system.
 
-        ![Graphical user interface, text, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/b8ad973e4f11df71884ec26a3b5f6722.png)When installing python be sure to check the “Add Python to Path option”
+## Installation Step
 
-2.  Place the OneClick zipped nugget file on your local machine (C Drive preferably).
-3.  Create an empty base folder (name as desired) on your local machine.
-    1.  This folder will hold all the automatically created files by OneClick.
-4.  Expand the nugget file into a folder, using zip.
-5.  Open a command prompt, hold down windows key and press r, then type cmd enter.
-6.  Using command prompt go to the folder containing the expanded nugget file.Type: install \<base folder location\>
-    1.  The base folder location will hold all files used and/or created by the OneClick tool.
-    2.  For more on this see the Environment section below.
+### 1. Download and Extract
+Download the OneClick extension from the CAST Extend website. Once downloaded, extract the contents of the nugget file into a folder using a zip extraction tool.
+
+### 2. Run pre_install.bat as Administrator
+Right-click on the pre_install.bat file and select "Run as administrator". This script will take care of the required Python installation and adding the Python command to the system path.
+
+### 3. Run install.bat
+Run the install.bat file. This script will handle the following tasks:
+* Create the necessary base folders needed for the OneClick tool. The base folder location will hold all files used and/or created by the OneClick tool.
+* Set up a virtual environment for the OneClick tool.
+* Launch the global configuration prompt.
+The global configuration prompt will guide you through the configuration process of the OneClick tool.
+
+### 4. Complete the Configuration
+Follow the prompts in the global configuration to set up the OneClick tool according to your preferences. This configuration step is important to ensure the tool works correctly.
+
+Once you have completed these steps, the OneClick extension will be installed and ready to use on your system.
 
 # Command Line Arguments
 
