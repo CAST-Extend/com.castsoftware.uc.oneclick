@@ -45,7 +45,7 @@ class HLAnalysis(Analysis):
                     if len(java_home) > 0:
                         java_home = f'{java_home}/bin/'
 
-                    args = [abspath(f'{config.java_home}/java.exe'),
+                    args = [abspath(f'{config.java_home}/bin/java.exe'),
                             '-jar',config.hl_cli,
                             '--sourceDir', hl_sourceDir,
                             '--workingDir' , hl_workingDir,
@@ -53,6 +53,7 @@ class HLAnalysis(Analysis):
                             '--analyzerDir',config.analyzer_dir,
                             '--perlInstallDir',config.perl_install_dir,
                             '--applicationId', str(app_id),
+                            '--serverUrl', config.hl_url,
                             '--login',config.hl_user,
                             '--password',config.hl_password]
                     try:

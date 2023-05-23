@@ -128,7 +128,8 @@ if __name__ == '__main__':
             print ('\nConfiguring for Highlight')
             if len(config.hl_url)==0:
                 config.hl_url = "https://rpa.casthighlight.com/"
-            config.hl_url = f"url_input('\tHighlight URL',config.hl_url)/WS2"
+            config.hl_url = url_input('\tHighlight URL',config.hl_url)
+            config.hl_url = f"{config.hl_url}/WS2"
             config.hl_user = string_input('\tHighlight user name',config.hl_user)
             config.hl_password = string_input('\tHighlight password',config.hl_password)
             config.hl_instance = string_input('\tHighlight instance id',config.hl_instance)
