@@ -1,11 +1,10 @@
 [project]
 name='com.castsoftware.uc.oneclick'
 description="Assessment Generator"
-version='0.2.2.10' #prod version
+version='0.2.2.12' #prod version
 dependencies = [
-    'pandas==1.4.0','python-pptx==0.6.18','python-docx','argparse_formatter',
-    'django',pyunpack,
-    'com.castsoftware.uc.python.common==1.0.4',
+    'pandas','python-pptx==0.6.18','python-docx','argparse_formatter','django','pyunpack',
+    'com.castsoftware.uc.python.common',
     'com.castsoftware.uc.action-plan',
     'com.castsoftware.uc.arg'
 ]
