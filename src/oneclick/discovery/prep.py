@@ -34,18 +34,18 @@ class Prepare(SourceValidation):
         #scan delivery folder for application folders
         dir=[]
         deliver = abspath(config.deliver)
-        dir = listdir(deliver) 
+        dirnames = listdir(deliver) 
 
         # for (dirpath,dirnames,filenames) in walk(deliver,topdown=False):
         #     level = dirpath.replace(deliver,'')
         #     dir.extend(dirnames)
-        #config.application.clear()
-        #config.application=dirnames
+        config.application.clear()
+        config.application=dirnames
 
         #Finally copy the contents of deliver to work
         cls._log.info('Copying deliver to work')
 
-        for folder in dir:
+        for folder in dirnames:
             src_name = abspath(f'{config.deliver}\\{folder}')
             dst_aip_name = abspath(f'{config.work}\\AIP')
             dst_hl_name = abspath(f'{config.work}\\HL')
@@ -64,8 +64,6 @@ class Prepare(SourceValidation):
 
             dst_aip_app=f'{dst_aip_project}\\{folder}'
             dst_hl_app=f'{dst_hl_project}\\{folder}'
-
-            #create_folder(f'{dst_name}\\SQLReport')
 
             if not exists(dst_aip_app):
                 cls._log.info(f'Copy from {src_name} to {dst_aip_app}')
