@@ -42,7 +42,7 @@ class AIPAnalysis(Analysis):
                 if config.blueprint:
                     blueprint='--blueprint'
 
-                args = [abspath(f'{java_home}/java.exe'),
+                args = [abspath(f'{java_home}/bin/java.exe'),
                         '-jar',config.console_cli,
                         'add',
                         '-n',appl,
