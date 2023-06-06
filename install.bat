@@ -1,59 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Check for administrative permissions
-  echo Administrative permissions required. Detecting permissions...
-  net session >nul 2>&1
-  if %errorLevel% == 0 (
-    echo Success: Administrative permissions confirmed.
-    goto :app1
-  ) else (
-    echo Failure: Current permissions inadequate.
-    echo Please run the script as an Administrator.
-    pause
-    exit
-  )
-
-:: Set Python version
-:app1
-set "python_version=3.10.0
-
-:: Define the URL and file name of the Python installer
-set "url=https://www.python.org/ftp/python/%python_version%/python-%python_version%-amd64.exe"
-set "installer=python-%python_version%-amd64.exe"
-
-:: Define the installation directory
-set "targetdir1=C:\Python%python_version%"
-set "targetdir2=C:\Python%python_version%\Scripts"
-
-
-:: Download the Python installer
-powershell -Command "(New-Object Net.WebClient).DownloadFile('%url%', '%~dp0%installer%')"
-
-:: Install Python
-echo Installing Python Version %latest_py_version%
-start /wait "" "%~dp0%installer%" /quiet /passive TargetDir="%targetdir1%" Include_test=0 ^
-&& (echo Done.) || (echo Failed!)
-echo.
-
-
-:: Add Python to the system PATH
-echo Adding Python to the system PATH...
-setx PATH "%targetdir1%;%targetdir2%;%PATH%" /m
-if %errorlevel% EQU 1 (
-  echo Python has been successfully installed to your system BUT failed to set system PATH. Try running the script as administrator.
-  pause
-  exit
-)
-echo Python %python_version% has been successfully installed and added to the system PATH.
-
-:: Cleanup
-echo Cleaning up...
-echo .
-echo .
-echo .
-del "%~dp0%installer%"
-
 :: OneClick base folder creation
 if exist "T:\CAST\CODE" (
   echo OneClick base folder already exists in T:\
@@ -90,6 +37,71 @@ if exist "T:\" (
 :: OneClick installation
 :OC1
 cd /d "T:\CAST\CODE"
+goto :start
+:OC2
+cd /d "D:\CAST\CODE"
+goto :start
+:OC3
+cd /d "C:\CAST\CODE"
+goto :start
+
+:: OneClick File Creation
+:: Validate input parameters
+:start
+set CODE_FOLDER=%1\CAST\CODE
+if "%CODE_FOLDER%x" == "x" goto missingCodeParam
+if not exist %CODE_FOLDER% goto missingCodeFolder
+echo Configure for installation
+
+:: Check for Python Installation
+python -m ensurepip --default-pip
+call pip --version 2>NUL
+echo pip --version
+echo .
+echo .
+echo .
+echo .
+if errorlevel 1 goto noPip
+
+echo creating virutal enviroment 
+IF NOT EXIST "%CODE_FOLDER%\DELIVER" MKDIR "%CODE_FOLDER%\DELIVER"
+IF NOT EXIST "%CODE_FOLDER%\.oneClick" MKDIR "%CODE_FOLDER%\.oneClick"
+IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS
+python -m pip install --user --upgrade pip > NUL
+
+if not exist "%CODE_FOLDER%\.venv" python -m venv "%CODE_FOLDER%\.venv"
+if errorlevel 1 goto venvFail
+call %CODE_FOLDER%\.venv\scripts\activate.bat
+
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+xcopy "%~dp0scripts" "%CODE_FOLDER%\SCRIPTS\" /E /H /C /I /Y  
+
+echo adding Onclick package from PyPi
+pip install com.castsoftware.uc.oneclick==0.2.2.9
+
+echo .
+echo .
+echo .
+echo Success: OneClick installation is setup!
+echo .
+echo .
+echo .
+goto config_setup
+
+:: Cleanup
+echo Cleaning up...
+echo .
+echo .
+echo .
+del "%~dp0%installer%"
+
+:missingCodeFolder
+echo Destination folder "%CODE_FOLDER%" must already exist
+goto usage
+
+:: OneClick installation
+:OC1
+cd /d "T:\CAST\CODE"
 copy "%~dp0oneClick.bat" %CODE_FOLDER%
 goto :start
 :OC2
@@ -102,7 +114,16 @@ copy "%~dp0oneClick.bat" %CODE_FOLDER%
 goto :start
 
 
-:start
-cls
-start cmd /k "%~dp0_.bat"
-exit
+:usage
+echo install ^<Code Folder Location^>
+
+:config_setup
+echo OneClick global configuration setup...
+
+cd /d "%CODE_FOLDER%"
+python -m oneclick.setup config -b %CODE_FOLDER%
+
+call %CODE_FOLDER%\.venv\scripts\deactivate.bat
+
+pause
+exit /b
