@@ -28,7 +28,7 @@ class AIPAnalysis(Analysis):
 
                 java_home = config.java_home
                 if len(java_home) > 0:
-                    java_home = f'{java_home}/bin/'
+                    java_home = f'{java_home}'
 
                 node_name = ""
                 if len(config.console_node) > 0:
