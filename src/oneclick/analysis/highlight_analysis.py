@@ -43,7 +43,7 @@ class HLAnalysis(Analysis):
                     create_folder(hl_workingDir)
                     java_home = config.java_home
                     if len(java_home) > 0:
-                        java_home = f'{java_home}/bin/'
+                        java_home = f'{java_home}'
 
                     args = [abspath(f'{config.java_home}/bin/java.exe'),
                             '-jar',config.hl_cli,
@@ -53,7 +53,7 @@ class HLAnalysis(Analysis):
                             '--analyzerDir',config.analyzer_dir,
                             '--perlInstallDir',config.perl_install_dir,
                             '--applicationId', str(app_id),
-                            '--serverUrl', config.hl_url,
+                            '--serverUrl', config.hl_url.rsplit('/',1)[0],
                             '--login',config.hl_user,
                             '--password',config.hl_password]
                     try:
