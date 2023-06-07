@@ -1,8 +1,3 @@
-Welcome to the com.castsoftware.uc.oneclick wiki!
-
->Warning: The Extension described in this document is delivered as-is. This Extension is made available by CAST User Community and governed by Open Source License. Please consider all necessary steps to validate and to test the Extension in your environment before using it in production.        
-The extension is published under GNU LGPL v3 open source license
-
 # What is OneClick
 OneClick is a powerful automation tool for running a full due diligence assessment for multiple applications. Its range of capabilities includes locating the code, performing CAST MRI and Highlight Analyses, and generating a comprehensive Due Diligence Assessment Report.
 
