@@ -29,7 +29,7 @@ For additional details on OneClick, please visit the  [OneClick Wiki](https://gi
 <a name="KnownIssues"></a>
 # Known issues
 
-- Alterations to AIP Council Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
+- Alterations to the Imaging Console Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
 
 <a name="Limitations"></a>
 # Limitations and potential enhancements
