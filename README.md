@@ -24,6 +24,8 @@ This extension is compatible with **all AIP versions from 8.3.3** and above, and
 1. Run CAST Highlight Analysis
 1. Generate Due Diligence Assessment Report
 
+For additional details on OneClick, please visit the  [OneClick Wiki](https://github.com/CAST-Extend/com.castsoftware.uc.oneclick/wiki).
+
 <a name="KnownIssues"></a>
 # Known issues
 
