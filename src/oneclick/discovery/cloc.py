@@ -117,7 +117,8 @@ class ClocPreCleanup(SourceValidation):
                 #print(summary_list)
 
             #extracting required data from content of cloc_output.txt using python regex
-            pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
+#            pattern='(\S{1,}|\w{1,}[:])\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
+            pattern='([\w #]{30})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
             statistics_list=findall(pattern,content)
             statistics_list= statistics_list[:-1]
             
@@ -128,27 +129,23 @@ class ClocPreCleanup(SourceValidation):
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
 
             #making technolgy check as case sensitive
-            def all_lower(my_list):
-                return list(map(lambda x: x.lower(), my_list))
-            tech_list = all_lower(tech_list)
-            df['APPLICABLE']=df['LANGUAGE'].str.lower().isin(tech_list)
+            # def all_lower(my_list):
+            #     return list(map(lambda x: x.lower(), my_list))
+            
+            tech_list = list(map(lambda x: x.lower().strip(), tech_list))
+            df['APPLICABLE']=df['LANGUAGE'].str.lower().str.strip().isin(tech_list)
 
             #converting column values into int from string
-            df['FILES'] = df['FILES'].astype('int')
-            df['BLANK'] = df['BLANK'].astype('int')
-            df['COMMENT'] = df['COMMENT'].astype('int')
-            df['CODE'] = df['CODE'].astype('int')
-
-            #converting total line to formulas
-            # total_files='=SUBTOTAL(109,[FILES])'
-            # total_blank='=SUBTOTAL(109,[BLANK])'
-            # total_comment='=SUBTOTAL(109,[COMMENT])'
-            # total_code='=SUBTOTAL(9,E2:E'+str(len(df['FILES'])+1)+')'
+            numbers=['FILES','BLANK','COMMENT','CODE']
+            total_line=['']
+            for name in numbers:
+                df[name] = df[name].astype('int')
+            workbook = format_table(ClocPreCleanup.writer,df,f'{cls.phase}({appl})',total_line=True)
             
-            #converting total line to formulas
-#            df.loc[len(df.index)] = [' ', total_files, total_blank, total_comment, total_code, ' ']
 
-            format_table(ClocPreCleanup.writer,df,f'{cls.phase}({appl})')
+
+            
+
         return True
 
 
