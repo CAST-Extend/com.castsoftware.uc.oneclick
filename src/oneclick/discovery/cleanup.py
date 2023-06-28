@@ -1,7 +1,8 @@
 from datetime import datetime
-from os import mkdir,getcwd,walk,remove
+from os import mkdir,getcwd,walk,remove,chmod,rmdir
+from stat import S_IWUSR
 from os.path import abspath,join
-from shutil import rmtree
+#from shutil import rmtree
 from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
 from cast_common.logger import INFO
@@ -34,12 +35,12 @@ class cleanUpAIP(SourceValidation):
         dateTimeObj=datetime.now()
         file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
         
-        exclusionFileList= f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFileList.txt'
+        exclusionFileList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFileList.txt')
         with open(exclusionFileList) as f:
             files_list = f.read().splitlines()
             f.close()
 
-        exclusionFolderList= f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFolderList.txt'
+        exclusionFolderList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFolderList.txt')
         with open(exclusionFolderList) as f:
             folder_list = f.read().splitlines()
             f.close()
@@ -59,20 +60,19 @@ class cleanUpAIP(SourceValidation):
                 cls._log.info(f'Reviewing {app} ({app_folder})')
                 with open (clean_up_log_file, 'a+') as file1: 
                     with open (clean_up_log_folder, 'a+') as file2: 
-                        s=''
-                            
+                        s=''                            
                         folder_cnt=0
                         file_cnt=0
                         for subdir, dirs, files in walk(app_folder):
                                 for dir in dirs:
-                                    if find_with_list(dir,folder_list):
+                                    if cls.find_with_list(dir,folder_list):
                                         folder=join(subdir, dir)
                                         rmtree(folder)
                                         folder_cnt+=1
                                         log_it('folder',folder,file2)
 
                                 for file in files:
-                                    if find_with_list(file,files_list):
+                                    if cls.find_with_list(file,files_list):
                                         file=join(subdir, file)
                                         remove(file)
                                         file_cnt+=1
@@ -85,18 +85,35 @@ class cleanUpAIP(SourceValidation):
 
         cls._log.debug('Source Code cleanup done')
 
+    def find_with_list(cls,find_in:str,pattern:list):
+        rslt = False
+        for p in pattern:
+            try:
+                if re.match(p,find_in):
+                    rslt = True
+                    break
+            except re.error as ex:
+                cls._log.warning(f'{ex.msg} for pattern {ex.pattern}')
+            
+        return rslt
+
+
 def log_it(typ,nm,fno):
     s=f'Removed {typ} -> {nm})'
     fno.write(s)
     fno.write('\n') 
 
-def find_with_list(find_in:str,pattern:list):
-    rslt = False
-    for p in pattern:
-        if re.match(p,find_in):
-            rslt = True
-            break
-    return rslt
+
+
+def rmtree(top):
+    for root, dirs, files in walk(top, topdown=False):
+        for name in files:
+            filename = join(root, name)
+            chmod(filename, S_IWUSR)
+            remove(filename)
+        for name in dirs:
+            rmdir(join(root, name))
+    rmdir(top)    
 
 class cleanUpHL(cleanUpAIP):
     def __init__(cls,config:Config, log_level:int):
