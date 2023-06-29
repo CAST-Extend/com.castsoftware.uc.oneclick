@@ -22,13 +22,6 @@ class DiscoveryReport(SourceValidation):
         
         # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
         df = read_excel(file,sheet_name=sheet)
-        #df = df[df['LANGUAGE']!='SUM:'] # remove the total row
-
-        # #extract total cout of applicable code from 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
-        # filt=(df['APPLICABLE']==True)
-        # pre_LOC=(df.loc[filt,'CODE'].sum())
-        # pre_LOC=pre_LOC//1000
-        #df=df.sum(axis = 0, skipna = True)
         return df
 
 
@@ -53,7 +46,7 @@ class DiscoveryReport(SourceValidation):
             sql_report = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-SQLReport.xlsx')
 
             # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
-            before_df = cls.cloc_report(cloc_report,f'Before({appl})')
+            before_df = cls.cloc_report(cloc_report,f'{appl}-Before')
             before_df=before_df[before_df['LANGUAGE'] != 'Totals']
             before_df[before_df.columns]=before_df.apply(lambda x: x.str.strip() if isinstance(x, str) else x)
             #print(before_df)
@@ -67,7 +60,7 @@ class DiscoveryReport(SourceValidation):
                 non_code= str(l.iloc[0]['CODE']//1000) +' KLOC of '+ l.iloc[0]['LANGUAGE'].strip() +' non code files and ~'+ str(l.iloc[1]['CODE']//1000) +' KLOC of '+ l.iloc[1]['LANGUAGE']
 
             # read by 'Stats After Code CleanUP' sheet of an Cloc_Output excel file
-            after_df = cls.cloc_report(cloc_report,f'After({appl})')
+            after_df = cls.cloc_report(cloc_report,f'{appl}-After')
             #print(after_df)
 
             # read by 'Summary' sheet of an SQL_Output excel file
