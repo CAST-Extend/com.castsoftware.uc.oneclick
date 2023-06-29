@@ -61,8 +61,7 @@ class ClocPreCleanup(SourceValidation):
         list_of_tech_file=abspath(f'{config.base}\\scripts\\ListOfTechnologies.csv')
         with open(list_of_tech_file) as f:
             tech_list = f.read().splitlines()
-            f.close()
-
+            
         process = {}
         cloc_run=False
         for appl in config.application:
@@ -124,14 +123,11 @@ class ClocPreCleanup(SourceValidation):
             
             with open(cloc_output_ignored, 'r') as fp:
                 lines = len(fp.readlines())
-            statistics_list.append(('Unknown Files',lines,'0','0','0'))
+            statistics_list.append(('Unknown Files','0','0','0',str(lines)))
 
             df = DataFrame(statistics_list,columns=['LANGUAGE','FILES','BLANK','COMMENT','CODE'])
 
-            #making technolgy check as case sensitive
-            # def all_lower(my_list):
-            #     return list(map(lambda x: x.lower(), my_list))
-            
+            #making technolgy case insensitive
             tech_list = list(map(lambda x: x.lower().strip(), tech_list))
             df['APPLICABLE']=df['LANGUAGE'].str.lower().str.strip().isin(tech_list)
 
@@ -140,12 +136,9 @@ class ClocPreCleanup(SourceValidation):
             total_line=['']
             for name in numbers:
                 df[name] = df[name].astype('int')
-            workbook = format_table(ClocPreCleanup.writer,df,f'{cls.phase}({appl})',total_line=True)
-            
-
-
-            
-
+            tab_name = f'{appl}-{cls.phase}'
+            tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
+            workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
         return True
 
 
@@ -164,6 +157,7 @@ class ClocPostCleanup(ClocPreCleanup):
 
     def run(cls,config:Config):
         super().run(config)
+        sheet_names = ClocPreCleanup.writer.book.worksheets_objs.sort(key=lambda x: x.name)
         ClocPreCleanup.writer.close()
         pass
 
