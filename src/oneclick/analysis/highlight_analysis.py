@@ -18,7 +18,7 @@ class HLAnalysis(Analysis):
             cls._log.warning('Highlight configuration is incomplete, analysis will not run')
             return 0
         
-        rest = HLRestCall(config.hl_url,config.hl_user,config.hl_password,config.hl_instance)
+        rest = HLRestCall(hl_base_url=config.hl_url,hl_user=config.hl_user,hl_pswd=config.hl_password,hl_instance=config.hl_instance)
 
         try:
             process = {}
