@@ -4,6 +4,7 @@ sample
 example
 backup
 vendor
+plugin
 lib
 dist
 test
