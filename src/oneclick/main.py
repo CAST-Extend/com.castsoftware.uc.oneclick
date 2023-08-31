@@ -127,20 +127,18 @@ if __name__ == '__main__':
     default_args = get_argparse_defaults(config_parser)
     args = parser.parse_args()
 
-    #printing some inital messages to the user
-    file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK')
-    create_folder(file_name)
-    file_name=abspath(f'{file_name}/LOGS')
-    create_folder(file_name)
-    file_name=abspath(f'{file_name}/general.log')
-    
-    log_level = INFO
-    log = Logger("main",file_name=file_name)
-    log.info(f'Running {args.command}')
-
     config = NotImplemented
     try:
         config=Config(parser,default_args)
+        #printing some inital messages to the user
+        file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK/LOGS/{config.project_name}')
+        create_folder(file_name)
+        config.log_filename=abspath(f'{file_name}/general.log')
+        
+        log_level = INFO
+        log = Logger("main",file_name=config.log_filename)
+        log.info(f'Running {args.command}')
+
         if args.command == 'config':
             file = ''
             if args.projectName is None:
