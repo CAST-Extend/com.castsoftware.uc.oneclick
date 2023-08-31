@@ -39,7 +39,7 @@ class Prepare(SourceValidation):
         # for (dirpath,dirnames,filenames) in walk(deliver,topdown=False):
         #     level = dirpath.replace(deliver,'')
         #     dir.extend(dirnames)
-        config.application.clear()
+        #config.application.clear()
         config.application=dirnames
 
         #Finally copy the contents of deliver to work
