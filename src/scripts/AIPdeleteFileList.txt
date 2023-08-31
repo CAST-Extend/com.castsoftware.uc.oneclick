@@ -11,3 +11,7 @@
 *\.tif
 *\.png
 *bootstrap*
+*mocha*
+*karma*
+*k6*
+*-e2e*
