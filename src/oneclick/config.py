@@ -116,7 +116,7 @@ class Config():
                 self.company_name = args.companyName
 
                 self.start=args.start
-                self.start=args.end
+                self.end=args.end
 
                 # Run for MRI
                 if self.is_console_active == False:
@@ -530,12 +530,18 @@ class Config():
             raise ValueError(f'Expecting a list of application names, got {type(value)}')
 
         update = False
+        for app in list(self.application):
+            if app not in value:
+                del self.application[app]
+                update = True
+
         for appl_name in value:
             if appl_name in self.application.keys():
                 pass
             else:
                 self.project['application'][appl_name]={'aip':'','hl':''}
                 update = True
+        
 
 
         # self._config['application']=value
