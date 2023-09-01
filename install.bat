@@ -88,21 +88,31 @@ echo .
 echo .
 goto config_setup
 
-:missingCodeParam
-echo Missing Code Folder Location parameter
-goto usage
+:: Cleanup
+echo Cleaning up...
+echo .
+echo .
+echo .
+del "%~dp0%installer%"
 
 :missingCodeFolder
 echo Destination folder "%CODE_FOLDER%" must already exist
 goto usage
 
-:noPip
-echo PIP not found
-goto usage
+:: OneClick installation
+:OC1
+cd /d "T:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
+:OC2
+cd /d "D:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
+:OC3
+cd /d "C:\CAST\CODE"
+copy "%~dp0oneClick.bat" %CODE_FOLDER%
+goto :start
 
-:venvFail
-echo Unable to install virtual environment
-goto usage
 
 :usage
 echo install ^<Code Folder Location^>

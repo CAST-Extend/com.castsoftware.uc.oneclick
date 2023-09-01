@@ -1,10 +1,6 @@
-src/__pycache__/*
-test/*
-**/.venv/**
-*egg-info*
-*/dist/*
 **/__pycache__/**
-.vscode/*
+**/.venv/**
 **/build/**
+**/com.castsoftware.uc.oneclick.egg-info/**
+**/.vscode/**
 pip_final.bat
-scripts/

@@ -13,12 +13,6 @@ class SQLDiscovery(SourceValidation):
     def __init__(cls, config:Config, log_level:int):
         super().__init__(config,cls.__class__.__name__,log_level)
 
-        cls.table_list=[]
-        cls.procedure_list=[]
-        cls.function_list=[]
-        cls.view_list=[]
-        cls.trigger_list=[]
-        cls.file_list=[]
 
     def run(cls,config:Config):
         
@@ -27,9 +21,31 @@ class SQLDiscovery(SourceValidation):
         for app in apps:
             cls._log.info(f'Running {cls.__class__.__name__} for {app}')
 
+            cls.table_list=[]
+            cls.procedure_list=[]
+            cls.function_list=[]
+            cls.view_list=[]
+            cls.trigger_list=[]
+            cls.file_list=[]
+            cls.alt_ext_lst=[]
+
+            alt_ext_wrn = False
+
             app_folder = abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}')
             for root, dirs, files in walk(app_folder):
                 for file in files:
+                    if file.endswith(".bod") or \
+                       file.endswith(".fnc") or \
+                       file.endswith(".prc") or \
+                       file.endswith(".trg") or \
+                       file.endswith(".bdy") or \
+                       file.endswith(".spc") :
+                        fn = abspath(f'{root}/{file}')
+                        cls.alt_ext_lst.append(fn)  
+                        if not alt_ext_wrn:                      
+                            cls._log.warning(f'Potential SQL files with another alternate extension found in {app} review SQLReport and rename if appropriate')
+                            alt_ext_wrn=True
+
                     if file.endswith(".sql") or file.endswith(".dtd") :
                         found = True
                         cls.read_sql_file(root,file)
@@ -94,6 +110,10 @@ class SQLDiscovery(SourceValidation):
                 tabs.append(format_table(writer,cls.detail_data(view_dict),'Views'))            
             if len(file_dict):
                 tabs.append(format_table(writer,cls.detail_data(file_dict),'Files'))            
+
+            if len(cls.alt_ext_lst):
+                tabs.append(format_table(writer,DataFrame(cls.alt_ext_lst,columns=['Filename']),'AltSQLExten'))            
+
 
             writer.close()
 

@@ -28,7 +28,7 @@ class AIPAnalysis(Analysis):
 
                 java_home = config.java_home
                 if len(java_home) > 0:
-                    java_home = f'{java_home}/bin/'
+                    java_home = f'{java_home}'
 
                 node_name = ""
                 if len(config.console_node) > 0:
@@ -42,7 +42,7 @@ class AIPAnalysis(Analysis):
                 if config.blueprint:
                     blueprint='--blueprint'
 
-                args = [f'{java_home}java.exe',
+                args = [abspath(f'{java_home}/bin/java.exe'),
                         '-jar',config.console_cli,
                         'add',
                         '-n',appl,

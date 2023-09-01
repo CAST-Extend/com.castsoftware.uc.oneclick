@@ -3,6 +3,7 @@ from subprocess import Popen,PIPE
 from oneclick.config import Config
 from cast_common.hlRestCall import HLRestCall
 from cast_common.util import run_process,create_folder
+from os.path import abspath
 
 import sys
 
@@ -17,7 +18,7 @@ class HLAnalysis(Analysis):
             cls._log.warning('Highlight configuration is incomplete, analysis will not run')
             return 0
         
-        rest = HLRestCall(config.hl_url,config.hl_user,config.hl_password,config.hl_instance)
+        rest = HLRestCall(hl_base_url=config.hl_url,hl_user=config.hl_user,hl_pswd=config.hl_password,hl_instance=config.hl_instance)
 
         try:
             process = {}
@@ -42,9 +43,9 @@ class HLAnalysis(Analysis):
                     create_folder(hl_workingDir)
                     java_home = config.java_home
                     if len(java_home) > 0:
-                        java_home = f'{java_home}/bin/'
+                        java_home = f'{java_home}'
 
-                    args = [f'{config.java_home}java.exe',
+                    args = [abspath(f'{config.java_home}/bin/java.exe'),
                             '-jar',config.hl_cli,
                             '--sourceDir', hl_sourceDir,
                             '--workingDir' , hl_workingDir,
@@ -52,6 +53,7 @@ class HLAnalysis(Analysis):
                             '--analyzerDir',config.analyzer_dir,
                             '--perlInstallDir',config.perl_install_dir,
                             '--applicationId', str(app_id),
+                            '--serverUrl', config.hl_url.rsplit('/',1)[0],
                             '--login',config.hl_user,
                             '--password',config.hl_password]
                     try:

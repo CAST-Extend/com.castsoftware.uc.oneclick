@@ -40,19 +40,7 @@ def get_argparse_defaults(parser):
             defaults[action.dest] = action.default
     return defaults
 
-
-#TODO: d2-Ability to install onclick with all its components via PIP (d2)
-#TODO: d1-send emails (d1-SHP)
-if __name__ == '__main__':
-
-    #printing some inital messages to the user
-    log_level = INFO
-    log = Logger("main")
-
-    print('\nCAST One Click')
-    print('Copyright (c) 2023 CAST Software Inc.\n')
-    print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
-
+def command_line() -> ArgumentParser:
     parser = ArgumentParser(prog='OneClick',  formatter_class=lambda prog: FlexiFormatter(prog, width=99999, max_help_position=60))
     subparsers = parser.add_subparsers(title='command',dest='command')
 
@@ -123,14 +111,34 @@ if __name__ == '__main__':
 
     run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
+    return parser,config_parser
+
+#TODO: d2-Ability to install onclick with all its components via PIP (d2)
+#TODO: d1-send emails (d1-SHP)
+if __name__ == '__main__':
+
+
+    print('\nCAST One Click')
+    print('Copyright (c) 2023 CAST Software Inc.\n')
+    print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
+
+
+    parser,config_parser = command_line()
     default_args = get_argparse_defaults(config_parser)
     args = parser.parse_args()
-
-    log.info(f'Running {args.command}')
 
     config = NotImplemented
     try:
         config=Config(parser,default_args)
+        #printing some inital messages to the user
+        file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK/LOGS/{config.project_name}')
+        create_folder(file_name)
+        config.log_filename=abspath(f'{file_name}/general.log')
+        
+        log_level = INFO
+        log = Logger("main",file_name=config.log_filename)
+        log.info(f'Running {args.command}')
+
         if args.command == 'config':
             file = ''
             if args.projectName is None:
@@ -165,18 +173,6 @@ if __name__ == '__main__':
         log.info(f'     OneClick config -p {config.project_name} {cfg}')
         exit()
 
-
-    # parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
-    # parser.add_argument('--JavaHome',  help='Location of the JRE')
-    # parser.add_argument('--from-email',  help='Email sending from')
-    # parser.add_argument('--from-to',  help='Email sending from')
-    # parser.add_argument('--from-email',  help='Email sending from')
-    # parser.add_argument('--from-email',  help='Email sending from')
-
-    # TODO: add args for aip and console rest setup (d2)
-    # TODO: add arg to reset analysis status for specific application (d2)
-
-    #args = parser.parse_args()
     if args.debug:
         log_level=DEBUG
 
