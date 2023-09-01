@@ -9,6 +9,7 @@ This includes:
 4.  Generate Action Plan
 5.  Generate Due Diligence Assessment Report
 
+
 To work properly the tool will need access to CAST AIP Console, CAST Highlight Rest API, Highlight Agent, Highlight CLI, and CAST MRI Rest API. The tool expects the working folder structure to be:
 
 ![Graphical user interface, application Description automatically generated](media/6b19822d60bebff38eb6236cbc6b572a.png)
@@ -106,3 +107,31 @@ oneClick config -b <code location> [-p <project name>] [--java_home <java>] --re
 | java_home       | Location of the java installation. This parameter can be omitted if the java bin folder is already part the system path.                                        |
 | report_template | The absolute location of the assessment report template.                                                                                                        |
 | cloc_version    | The cloc executable is located in the scripts folder and is set by default to cloc-1.96.exe. A new executable name can be added here to override this version.  |
+=======
+Note:
+> Alterations to AIP Council Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
+
+<a name="AIPcompatibility"></a>
+# CAST AIP versions compatibility
+
+This extension is compatible with **all AIP versions from 8.3.3** and above, and will be also in future versions.
+
+<a name="expect"></a>
+# Expected results
+
+1. Code discovery
+1. Run CAST MRI Analysis
+1. Run CAST Highlight Analysis
+1. Generate Due Diligence Assessment Report
+
+For additional details on OneClick, please visit the  [OneClick Wiki](https://github.com/CAST-Extend/com.castsoftware.uc.oneclick/wiki).
+
+<a name="KnownIssues"></a>
+# Known issues
+
+- Alterations to the Imaging Console Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
+
+<a name="Limitations"></a>
+# Limitations and potential enhancements
+
+- None
