@@ -63,56 +63,61 @@ echo .
 echo .
 if errorlevel 1 goto noPip
 
-echo creating virutal enviroment 
+echo creating virtual environment
 IF NOT EXIST "%CODE_FOLDER%\DELIVER" MKDIR "%CODE_FOLDER%\DELIVER"
 IF NOT EXIST "%CODE_FOLDER%\.oneClick" MKDIR "%CODE_FOLDER%\.oneClick"
-IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS
+IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS"
 python -m pip install --user --upgrade pip > NUL
 
-if not exist "%CODE_FOLDER%\.venv" python -m venv "%CODE_FOLDER%\.venv"
-if errorlevel 1 goto venvFail
+:: Rename .venv if it exists
+if exist "%CODE_FOLDER%\.venv" (
+    for /f "delims=" %%a in ('wmic os get LocalDateTime ^| find "."') do (
+            set datetime=%%a
+        )
+        set datetime=!datetime:~0,14!
+        set datetime=!datetime:~0,4!!datetime:~4,2!!datetime:~6,2!_!datetime:~8,2!!datetime:~10,2!!datetime:~12,2!
+        rename "%CODE_FOLDER%\.venv" "venv_!datetime!"
+    
+)
+
+:: Create a new .venv folder
+if not exist "%CODE_FOLDER%\.venv" (
+    python -m venv "%CODE_FOLDER%\.venv"
+    if errorlevel 1 goto venvFail
+)
+
 call %CODE_FOLDER%\.venv\scripts\activate.bat
 
 copy "%~dp0oneClick.bat" %CODE_FOLDER%
 xcopy "%~dp0scripts" "%CODE_FOLDER%\SCRIPTS\" /E /H /C /I /Y  
 
 echo adding Onclick package from PyPi
-pip install com.castsoftware.uc.oneclick==0.2.2.14
+pip install com.castsoftware.uc.oneclick==0.2.3
 
 echo .
 echo .
 echo .
-echo Success: OneClick installation is setup!
+echo Success: OneClick installation is set up!
 echo .
 echo .
 echo .
 goto config_setup
 
-:: Cleanup
-echo Cleaning up...
-echo .
-echo .
-echo .
-del "%~dp0%installer%"
+:missingCodeParam
+echo Missing Code Folder Location parameter
+goto usage
 
 :missingCodeFolder
 echo Destination folder "%CODE_FOLDER%" must already exist
 goto usage
 
-:: OneClick installation
-:OC1
-cd /d "T:\CAST\CODE"
-copy "%~dp0oneClick.bat" %CODE_FOLDER%
-goto :start
-:OC2
-cd /d "D:\CAST\CODE"
-copy "%~dp0oneClick.bat" %CODE_FOLDER%
-goto :start
-:OC3
-cd /d "C:\CAST\CODE"
-copy "%~dp0oneClick.bat" %CODE_FOLDER%
-goto :start
+:noPip
+echo PIP not found
+goto usage
 
+:venvFail
+echo Unable to install virtual environment
+goto usage
 
 :usage
 echo install ^<Code Folder Location^>

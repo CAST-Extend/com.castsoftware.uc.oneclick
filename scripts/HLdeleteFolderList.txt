@@ -1,0 +1,14 @@
+.git
+.svn
+.mvn
+.circleci
+.scannerwork
+.azure
+.vscode
+.yaml
+target
+sample
+example
+backup
+test
+tests
