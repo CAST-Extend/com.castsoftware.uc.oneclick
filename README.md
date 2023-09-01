@@ -1,22 +1,16 @@
 # What is OneClick
-OneClick is an automation tool designed to perform a due diligence assessment from beginning to end for one or more applications in a project. This includes:
+OneClick is a powerful automation tool for running a full due diligence assessment for multiple applications. Its range of capabilities includes locating the code, performing CAST MRI and Highlight Analyses, and generating a comprehensive Due Diligence Assessment Report.
 
-1. Code discovery
-1. Run CAST MRI Analysis
-1. Run CAST Highlight Analysis
-1. Generate Due Diligence Assessment Report
+This includes:
 
-# OneClick Installation
-## Prerequisites
+1.  Code discovery
+2.  Run CAST MRI Analysis
+3.  Run CAST Highlight Analysis
+4.  Generate Action Plan
+5.  Generate Due Diligence Assessment Report
 
-Running OneClick requires access to:
-* AIP Console – version 1.28 or higher
-* Highlight – version 5.4.70 or higher
-* AIP Dashboard REST API – version 2.9.1 or higher
-* Cast Storage System (CSS) – version 4 or higher
-* Python – version 3.10
 
-In addition, it requires the installation and location of CAST Imaging Console and Highlight automation tools. These tools are available either on the CAST Extend website or Highlight portal.
+To work properly the tool will need access to CAST AIP Console, CAST Highlight Rest API, Highlight Agent, Highlight CLI, and CAST MRI Rest API. The tool expects the working folder structure to be:
 
 # OneClick Installation Guide
 This guide will walk you through the installation process for the OneClick extension from the CAST Extend website. The steps below will help you set up the OneClick tool on your system.
@@ -48,7 +42,7 @@ Once you have completed these steps, the OneClick extension will be installed an
 
 # Command Line Arguments
 
-OneClick has two types of arguments, config and run. The first is used to configure the global and/or project configuration files. The second to run discovery, analyses, and reporting.
+OneClick has two types of arguments, the first is used for both project and global configuration. Once the configuration is complete the second argument type is used to run the application analysis and generate the assessment report.
 
 ```
 oneClick config -b <base location> [-p <project name>] 
@@ -56,32 +50,36 @@ oneClick config -b <base location> [-p <project name>]
 oneClick run -b <base location> -p <project name>
 ```
 
-# Global Configuration
+## Project Configuration Files
 
-Running oneClick requires access to the CAST Imaging Console tools, Highlight portal toolset, and Imaging Dashboard REST API. This information is stored in the OneClick global configuration file, *\<base folder location\>/.oneclick/config.json*. When a new project is created, the global configuration is included in the project configuration file. The following sections describes how to configure the global configuration file.
+Configuration files are stored in the **\<base folder location\>/.oneclick** folder, created during installation. There are two types, global and project. The common configuration file, config.json, contains information common to all applications. When a new project is created the tool incorporates all global configuration items into the project specification configuration.
 
-## Imaging Console
+## Configuration Settings
 
-OneClick has been tested using both 1.x and 2.x Enterprise version of AIP Console. The AIP Console integration tools is used to access the Console which can be downloaded:
+### AIP Console
+
+Oneclick has been tested using both 1.x and 2.x Enterprise version of AIP Console. The *AIP Console integration tools* is used to access the Console which can be downloaded:
 
 -   [Console Enterprise Edition](https://extend.castsoftware.com/#/extension?id=com.castsoftware.aip.console&version=1.28.2-funcrel)
 -   [AIP Console integration tools](https://extend.castsoftware.com/#/extension?id=com.castsoftware.uc.aip.console.tools&version=1.0.1)
 
-Make sure the integration tools and AIP Console version matches. After both are installed update the common configuration file:
+Make sure the **integration tools** and **AIP Console** version matches. After both are installed update the common configuration file:
 
 ```
 oneClick config -b <base location> [-p <project name>] --consoleURL=http:\\<server>\ --consoleKey=<console-key> --consoleCLI=<console-integration-tool-location> --enable-security-assessment <true> --blueprint <true>
 ```
 
-| Parameter                    | Description                                                                                      | Default Value                                                                                                                                        |
-|------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --consoleURL                 | The URL of AIP Console                                                                           |                                                                                                                                                      |
-| --consoleKey                 | The console key provides access to the AIP Console and is retrieved from the user profile.       | ![Graphical user interface, text, application, chat or text message Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/f9d987571d6ba95cc1be2dce08915052.png) |
-| --consoleCLI                 | The absolute location of the “aip-console-cli.jar” included with *AIP Console integration tools* |                                                                                                                                                      |
-| --enable-security-assessment | This is a Boolean parameter, if set to true the analysis will be run with security turned on.    | True                                                                                                                                                 |
-| --blueprint                  | This is a Boolean parameter, if set to true the analysis will be run in full blueprint mode.     | True                                                                                                                                                 |
+| Parameter                  | Description                                                                                                                                    |                                                                                                                                |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| consoleURL                 | The URL of AIP Console                                                                                                                         |                                                                                                                                |
+| consoleKEY                 | The console key provides access to the AIP Console and is retrieved from the user profile.                                                     | ![Graphical user interface, text, application Description automatically generated](media/f9d987571d6ba95cc1be2dce08915052.png) |
+| consoleCLI                 | The absolute location of the “aip-console-cli.jar” included with *AIP Console integration tools*                                               |                                                                                                                                |
+| enable-security-assessment | This is a Boolean parameter, if set to true the analysis will be run with security turned on. The default setting for this parameter is True.  |                                                                                                                                |
+| blueprint                  | This is a Boolean parameter, if set to true the analysis will be run in full blueprint mode. The default setting for this parameter is True.   |                                                                                                                                |
 
-## Highlight
+### Highlight
+
+To run Highlight scans both the Agent and CLI tool must be installed. The can be downloaded from the **Application Scans** page in the Highlight portal.
 
 To run Highlight scans and upload them to the portal, both the Agent and CLI tool must be installed. They can be downloaded from the Application Scans page in the Highlight portal. ![Graphical user interface, text, application, email Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/655e6bf3ea23051dcde0c76e0df1410b.png)
 
@@ -89,68 +87,42 @@ To run Highlight scans and upload them to the portal, both the Agent and CLI too
 oneClick config -b <base location> [-p <project name>] --hlURL=<portal-url> --hlUser=<username> --hlPassword=<password> --hlInstance=<Instance-ID> --hlCLI=<CLI-location> --HLPerlInstallDir=<agent-location>/strawberry/perl> --HLAnalyzerDir=<agent-location>/perl
 ```
 
-| Parameter        | Description                                              | Default Value |
-|------------------|----------------------------------------------------------|---------------|
-| --hlURL          | The Highlight portal URL hlUser User Id                  |               |
-| --hlPassword     | Password                                                 |               |
-| --hlCLI Absolute | folder location for the Highlight command line interface |               |
-| --HLAgent        | Absolute folder location for the Highlight agent         |               |
+| Parameter   | Description                                                       |
+|-------------|-------------------------------------------------------------------|
+| hlURL       | The Highlight portal URL                                          |
+| hlUser      | User Id                                                           |
+| hlPassword  | Password                                                          |
+| hlCLI       | Absolute folder location for the Highlight command line interface |
+| HLAgent     | Absolute folder location for the Highlight agent                  |
 
-## Dashboard Rest API
+### Imaging Rest API
 
-The AIP Rest API is part of the Health and Engineering Portal (HDED) installation and is used to generate the assessment report. There are two distinct portal versions Standalone and Integrated and OneClick will work with both. The OneClick configuration is as follows:
+The AIP Rest API is part of the Health and Engineering Portal (HDED) installation and is used to generate the assessment report. There are two distinct portal versions Standalone and Integrated and OneClick will work with both. The REST API configuration is as follows:
 
 ```
 oneClick config -b <code location> [-p <project name>] --aipURL <URL> --aipUser <username> --aipPassword <password>
 ```
 
-| Parameter     | Description               | Default Value |
-|---------------|---------------------------|---------------|
-| --aipURL      | The Imaging dashboard URL |               |
-| --aipUser     | User Id                   | admin         |
-| --aipPassword | Password                  | admin         |
+| Parameter    | Description            |
+|--------------|------------------------|
+| aipURL       | The Imaging portal URL |
+| aipUser      | User Id                |
+| aipPassword  | Password               |
 
-## Other
+### Other
 
 ```
 oneClick config -b <code location> [-p <project name>] [--java_home <java>] --report_template <template> [cloc_version <cloc-1.96.exe>]
 ```
 
-| Parameter       | Description                                                                                                                                                    | Default Value |
-|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| java_home       | Location of the java installation. This parameter can be omitted if the java bin folder is already part the system path.                                       |               |
-| report_template | The absolute location of the assessment report template.                                                                                                       |               |
-| cloc_version    | The cloc executable is located in the scripts folder and is set by default to cloc-1.96.exe. A new executable name can be added here to override this version. |               |
-
-# Running the tool
-
-## Creating a New Project
-
-### Environment
-
-The first step in creating a new project is to create a folder in the DELIVER folder. The folder name is used to identify the project, it is recommended that the name be self-descriptive. Under the project folder, one or more application folders should be created. As with the project, the application folder names are used to identify each application going forward. OneClick uses this folder structure to create the application project file and tracks all projects using this folder structure.
-
-![Graphical user interface, application Description automatically generated](https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.oneclick/main/media/a8a164e65148353b0e8f8253f432fd80.png)
-
-### Project Configuration
-
-Projects are maintained using the DELIVER folder and a json file, found in the “.oneClick” folder. The project configuration file has the same name as the project and is maintained by OneClick. It is maintained by OneClick and should not be directly updated by the user.
-
-### The Command Line
-
-```
-oneClick run -b <base location> -p <project name>
-```
-
-When running a project two pieces of information are required, the base location and the project name. When a project is run for the first time, OneClick, generates the project configuration file, then incorporates all global configuration items. Next, the DELIVER/project folder is scanned for applications and added to the configuration. Going forward a combination of the project configuration file and DELIVER contents are used to maintain the project integrity.
-
-### Other Parameters
-
-| Parameter     | Description                                               | Default Value |
-|---------------|-----------------------------------------------------------|---------------|
-| --consoleNode | Use the specified to run the MRI analysis.                |               |
-| --start       | Start at the specified phase. (Analysis, Report)          |               |
-| --end         | End at the specified phase. (Discovery, Analysis, Report) | Report        |
+| Parameter       | Description                                                                                                                                                     |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| java_home       | Location of the java installation. This parameter can be omitted if the java bin folder is already part the system path.                                        |
+| report_template | The absolute location of the assessment report template.                                                                                                        |
+| cloc_version    | The cloc executable is located in the scripts folder and is set by default to cloc-1.96.exe. A new executable name can be added here to override this version.  |
+=======
+Note:
+> Alterations to AIP Council Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
 
 <a name="AIPcompatibility"></a>
 # CAST AIP versions compatibility
@@ -159,19 +131,20 @@ This extension is compatible with **all AIP versions from 8.3.3** and above, and
 
 <a name="expect"></a>
 # Expected results
+
 1. Code discovery
 1. Run CAST MRI Analysis
 1. Run CAST Highlight Analysis
 1. Generate Due Diligence Assessment Report
 
+For additional details on OneClick, please visit the  [OneClick Wiki](https://github.com/CAST-Extend/com.castsoftware.uc.oneclick/wiki).
+
 <a name="KnownIssues"></a>
 # Known issues
 
-- None
+- Alterations to the Imaging Console Version 2 have caused the Assessment Report Generator to no longer operate with the Integrated Dashboard. To bypass this issue, you should switch to the Standalone Dashboard.
 
 <a name="Limitations"></a>
 # Limitations and potential enhancements
 
 - None
-
-

@@ -6,11 +6,14 @@ from cast_common.util import create_folder
 from json import load
 from argparse import ArgumentParser
 from json import JSONDecodeError,dump
-from os.path import abspath,exists
+from os.path import abspath,exists,dirname
 from os import getcwd
 
 from argparse import ArgumentParser
 from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
+
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -31,6 +34,7 @@ class Config():
         base_config=abspath(f'{args.baseFolder}/.oneclick/config.json')
         if not exists(base_config) and args.command == 'run':
             raise NoConfigFound('Base configuration file found, please run with the "config" option')
+
 
         if args.command == 'config':
             if not exists(base_config):
@@ -98,6 +102,7 @@ class Config():
         #do all required fields contain data
         if args.command == 'run':
             try:
+                self._config={}
                 self._config_file = abspath(f'{args.baseFolder}/.oneclick/{args.projectName}.json')
                 if exists(self._config_file):
                     with open(abspath(self._config_file), 'rb') as config_file:
@@ -105,15 +110,45 @@ class Config():
                 else:
                     with open(base_config) as config_file:
                         self._config = load(config_file)
-                    self._save()
 
                 self.base=args.baseFolder
                 self.project = args.projectName
                 self.company_name = args.companyName
 
                 self.start=args.start
-                self.start=args.end
+                self.end=args.end
 
+                # Run for MRI
+                if self.is_console_active == False:
+                    if yes_no_input('Run MRI analysis for all applications?'):
+                        while not self.is_console_active:
+                            if len(self.console_url) == 0:
+                                self.console_url=url_input('Missing console URL:',self.console_url)
+                            else:
+                                self.console_url=self.console_url
+                            if len(self.console_key) == 0:
+                                self.console_key=secret_input('Missing console KEY:',self.console_key)
+                            if len(self.console_cli) == 0:
+                                folder_input('\t"AIP Console automation tools" location',dirname(self.console_cli),"aip-console-tools-cli.jar",True)
+                    else:
+                        self._set_console_active=False                                
+
+                if self.is_hl_active == False:                
+                    if yes_no_input('Run Highlight analysis for all applications?'):
+                        while not self.is_hl_active:
+                            if len(self.hl_url) == 0:
+                                self.hl_url=url_input('Missing Highlight URL',self.hl_url)
+                            if len(self.hl_user) == 0:
+                                self.hl_user=string_input('Missing Highlight User ID',self.hl_user)
+                            if len(self.hl_password) == 0:
+                                self.hl_password=secret_input('Missing Highlight Password',self.hl_password)
+                            if len(self.hl_instance) == 0:
+                                self.hl_instance=string_input('Missing Highlight Instance ID',self.hl_instance)
+                            else:
+                                self.hl_instance=self.hl_instance
+
+                self.log.info(f'Run MRI analysis: {self.is_aip_active}')
+                self.log.info(f'Run Highlight analysis: {self.is_hl_active}')
                 self._save()
 
             except JSONDecodeError as e:
@@ -129,7 +164,7 @@ class Config():
     def validate_for_run(self):
         if self.cloc_version == '':
             raise InvalidConfiguration('Missing CLOC executable name')
-        exec = f'{getcwd()}\\scripts\\{self.cloc_version}'
+        exec = abspath(f'{self.base}\\scripts\\{self.cloc_version}')
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
         if not self.is_console_active and not self.is_hl_active:
@@ -203,7 +238,7 @@ class Config():
         return self.highlight['Active']
 
     def _set_hl_active(self):
-        self._set_active(self.highlight,['URL','user','password','instance','cli','perlInstallDir','analyzerDir'])
+        self._set_active(self.highlight,['URL','cli','perlInstallDir','analyzerDir','user','password','instance'])
 
     @property
     def hl_url(self):
@@ -282,12 +317,7 @@ class Config():
             msg.append('perlInstallDir')
         if len(self.analyzerDir) == 0:
             msg.append('analyzerDir')
-        # if len(self.java_home) == 0:
-        #     msg.append('java_home')
-        # if len(self.cloc_version) == 0:
-        #     msg.append('cloc_version')
-
-        
+       
         if len(msg) > 0:
             fmt_msg=', '.join(msg)
             self.log.error(f'Invalid Highlight configuration, missing {fmt_msg} fields')
@@ -386,6 +416,28 @@ class Config():
     def blueprint(self,value):
         self._set_console_active('blueprint',value,'')
 
+    @property
+    def is_console_config_valid(self)->bool:
+        if not self.is_console_active:
+            self.log.warning('MRI analysis is inactive')            
+            return True
+        is_ok=True
+        msg=[]
+        if len(self.console_url) == 0:
+            msg.append('URL')
+        if len(self.console_key) == 0:
+            msg.append('API_Key')
+        if len(self.console_cli) == 0:
+            msg.append('Console CLI')
+       
+        if len(msg) > 0:
+            fmt_msg=', '.join(msg)
+            self.log.error(f'Invalid MRI configuration, missing {fmt_msg} fields')
+            is_ok=False
+
+        return is_ok
+
+
     """ **************** Action Plan related entries ************************ """
     def _set_database_active(self,key,value,default=''):
         if self._set_value(self.db,key,value,default):
@@ -478,12 +530,18 @@ class Config():
             raise ValueError(f'Expecting a list of application names, got {type(value)}')
 
         update = False
+        for app in list(self.application):
+            if app not in value:
+                del self.application[app]
+                update = True
+
         for appl_name in value:
             if appl_name in self.application.keys():
                 pass
             else:
                 self.project['application'][appl_name]={'aip':'','hl':''}
                 update = True
+        
 
 
         # self._config['application']=value
@@ -537,9 +595,7 @@ class Config():
     """ **************** Setting related entries ************************ """
     @property 
     def setting(self):
-        if 'setting' not in self._config:
-            self._config['setting']={}
-        return self._config['setting']
+        return self._get(self._config,'setting',{})        
 
     @property
     def arg_template(self):
@@ -547,7 +603,7 @@ class Config():
 
     @property
     def base(self):
-        return self.setting['base']
+        return self._get(self.setting,'base','')
     @base.setter
     def base(self,value):
         if value is not None:
@@ -580,6 +636,91 @@ class Config():
     def java_home(self,value):
         if self._set_value(self.setting,'java-home',value,''):
             self._save()
+
+
+def yes_no_input(prompt:str,default_value=True) -> bool:
+    while True:
+        if default_value:
+            default_value='Y'
+        else:
+            default_value='N'
+
+        val = input(f'{prompt} [{default_value}]?').upper()
+        if len(val) == 0: val = default_value
+
+        if val in ['Y','YES']:
+            return True
+        elif val in ['N','NO']:
+            return False
+        else:
+            print ('Expecting a Y[es] or N[o] response. ',end='')
+
+def folder_input(prompt:str,folder:str='',file:str=None,combine:bool=False) -> str:
+    if combine:
+        folder=folder.replace(file,'')
+
+    while True:
+        i = input(f'{prompt} [{abspath(folder)}]: ')
+        if len(i)==0:
+            folder = abspath(folder)
+        else:
+            folder = abspath(i)
+        if exists(folder):
+            if file is not None:
+                if exists(abspath(f'{folder}/{file}')):
+                    break
+                else:
+                    print (f'{folder} folder does not contain {file}, please try again')
+                    continue
+            else:
+                break
+        print (f'{folder} not found, please try again')
+
+    if combine:
+        folder = abspath(f'{folder}/{file}')
+    return folder
+
+def string_input(prompt:str,default_value=""):
+    while True:
+        if len(default_value)>0:
+            i = input(f'{prompt} [{default_value}]: ')
+        else:
+            i = input(f'{prompt}: ')
+
+        if len(i)==0:
+            if len(default_value) == 0:
+                print('Input required, please try again')
+                continue
+            else:
+                i = default_value
+        return i            
+
+def secret_input(prompt:str,default_value=""):
+    while True:
+        if len(default_value)>0:
+            i = input(f'{prompt} ***********: ')
+        else:
+            i = input(f'{prompt}: ')
+
+        if len(i)==0:
+            if len(default_value) == 0:
+                print('Input required, please try again')
+                continue
+            else:
+                i = default_value
+        return i            
+
+def url_input(prompt:str,url):
+    val = URLValidator()
+    while True:
+        i = input(f'{prompt} [{url}]: ')
+        if len(i)>0:
+            url = i
+        try:
+            val(url)
+            return url
+        except ValidationError as e:
+            print ("Bad URL, please try again")      
 
 
 #        def _set_value(self,base,key,value,default=''):
