@@ -5,7 +5,7 @@ from os.path import abspath,join
 #from shutil import rmtree
 from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
-from cast_common.logger import INFO
+from cast_common.logger import Logger,INFO
 from cast_common.util import create_folder
 
 from pandas import Series,DataFrame
@@ -51,44 +51,45 @@ class cleanUpAIP(SourceValidation):
         while found:
             found = False
             for app in apps:
-                create_folder(f'{output_path}\\{app}')
-                base = f'{output_path}\\{app}\\{cls.cleanup_file_prefix}{config.project_name}_{app}'
-                clean_up_log_file= f"{base}_deletedFiles_{file_suffix}.txt"
-                clean_up_log_folder= f"{base}_deletedFolders_{file_suffix}.txt"
+                log_folder=f'{output_path}\\{app}'
+                create_folder(log_folder)
+                base = f'{log_folder}\\{cls.cleanup_file_prefix}'
+                cleanup_log_file= f"{base}_deletedFiles_{file_suffix}.log"
+                cls.cleanup_log = Logger('File',level=cls._log_level,file_name=cleanup_log_file,console_output=False)
+                cls._log.info(f'Cleanup file log: {cleanup_log_file}')
 
                 app_folder = abspath(f'{config.work}\\{cls.cleanup_file_prefix}\\{config.project_name}\\{app}')
-                cls._log.info(f'Reviewing {app} ({app_folder})')
-                with open (clean_up_log_file, 'a+') as file1: 
-                    with open (clean_up_log_folder, 'a+') as file2: 
-                        s=''                            
-                        folder_cnt=0
-                        file_cnt=0
-                        for subdir, dirs, files in walk(app_folder):
-                                for dir in dirs:
-                                    if cls.find_with_list(dir,folder_list):
-                                        folder=join(subdir, dir)
-                                        rmtree(folder)
-                                        folder_cnt+=1
-                                        log_it('folder',folder,file2)
 
-                                for file in files:
-                                    if cls.find_with_list(file,files_list):
-                                        file=join(subdir, file)
-                                        remove(file)
-                                        file_cnt+=1
-                                        log_it('file',file,file1)
+                # cls._log.info(f'Reviewing {app} ({app_folder})')
+                # with open (clean_up_log_file, 'a+') as file1: 
+                #     with open (clean_up_log_folder, 'a+') as file2: 
+
+                s=''                            
+                folder_cnt=0
+                file_cnt=0
+                for subdir, dirs, files in walk(app_folder):
+                        for dir in dirs:
+                            if cls.find_with_list(dir,folder_list):
+                                folder=join(subdir, dir)
+                                rmtree(folder)
+                                folder_cnt+=1
+                                cls.cleanup_log.info(f'Folder: {folder}')
+
+                        for file in files:
+                            if cls.find_with_list(file,files_list):
+                                file=join(subdir, file)
+                                remove(file)
+                                file_cnt+=1
+                                cls.cleanup_log.info(f'Folder: {file}')
 
                 cls._log.info(f'Removed {file_cnt} files and {folder_cnt} folders from {app_folder}')
-                # if count > 0:
-                #     config.application[app]['aip']=""
-                #     config._save()
-
         cls._log.debug('Source Code cleanup done')
 
     def find_with_list(cls,find_in:str,pattern:list):
         rslt = False
         for p in pattern:
             try:
+                cls.cleanup_log.debug(f'matching: {p} in: {find_in}')
                 if re.match(p,find_in):
                     rslt = True
                     break
@@ -96,14 +97,6 @@ class cleanUpAIP(SourceValidation):
                 cls._log.warning(f'{ex.msg} for pattern {ex.pattern}')
             
         return rslt
-
-
-def log_it(typ,nm,fno):
-    s=f'Removed {typ} -> {nm})'
-    fno.write(s)
-    fno.write('\n') 
-
-
 
 def rmtree(top):
     for root, dirs, files in walk(top, topdown=False):
