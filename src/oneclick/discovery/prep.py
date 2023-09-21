@@ -6,6 +6,8 @@ from shutil import copytree,rmtree
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
 
+from tqdm import tqdm
+
 class Prepare(SourceValidation):
 
     def __init__(cls, config:Config, log_level:int):
@@ -45,7 +47,7 @@ class Prepare(SourceValidation):
         #Finally copy the contents of deliver to work
         cls._log.info('Copying deliver to work')
 
-        for folder in dirnames:
+        for folder in tqdm(dirnames,desc='Preparing applications'):
             src_name = abspath(f'{config.deliver}\\{folder}')
             dst_aip_name = abspath(f'{config.work}\\AIP')
             dst_hl_name = abspath(f'{config.work}\\HL')
@@ -66,10 +68,10 @@ class Prepare(SourceValidation):
             dst_hl_app=f'{dst_hl_project}\\{folder}'
 
             if not exists(dst_aip_app):
-                cls._log.info(f'Copy from {src_name} to {dst_aip_app}')
+                #cls._log.info(f'Copy from {src_name} to {dst_aip_app}')
                 copytree(src_name,dst_aip_app)
             if not exists(dst_hl_app):
-                cls._log.info(f'Copy from {src_name} to {dst_hl_app}')
+                #cls._log.info(f'Copy from {src_name} to {dst_hl_app}')
                 copytree(src_name,dst_hl_app)
 
         cls._log.info('Environment preparation step complete')
