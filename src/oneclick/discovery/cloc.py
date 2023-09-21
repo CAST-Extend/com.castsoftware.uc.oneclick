@@ -8,6 +8,7 @@ from platform import system
 from os.path import exists,abspath,getsize
 from re import findall
 from pandas import DataFrame,ExcelWriter
+from tqdm import tqdm
 
 from string import ascii_uppercase
 from win32api import GetLogicalDriveStrings
@@ -101,7 +102,7 @@ class ClocPreCleanup(SourceValidation):
             if DefineDosDevice(0, drive, project_folder ) == 0:
                 raise RuntimeError("Subst failed")
 
-        for appl in config.application:
+        for appl in tqdm(config.application, desc='Processing Applications'):
             cls._log.info(f'Running {config.project_name}/{appl}')
             create_folder(f'{config.report}/{config.project_name}/{appl}')
             cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
@@ -119,12 +120,15 @@ class ClocPreCleanup(SourceValidation):
             process[appl] = cls._run_cloc(work_folder,cloc_output,cloc_output_ignored)
 
         #has all cloc processing completed
-        all_done=False
-        while (not all_done):
-            all_done=True
-            for p in process:
-                if process[p]=='DONE':
+        with tqdm(total=len(process), desc="Checking cloc completion", leave=False, dynamic_ncols=True) as pbar:
+            all_done=False
+            while (not all_done):
+                all_done=True
+                for p in process:
+                    if process[p]=='DONE':
+                        pbar.update(1)
                     continue
+
                 all_done=False
                 cloc_output = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-{cls.phase}.txt')
                 cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-ignored-{cls.phase}.txt')
@@ -140,14 +144,21 @@ class ClocPreCleanup(SourceValidation):
 
                 if exists(cloc_output):
                     process[p]='DONE'
+                    pbar.update(1)  # Update progress after each process
+            pbar.set_postfix_str(f"Current: {p}", refresh=True)
+
+        if cloc_run:
             if cloc_run:
                 sleep(60)
+
+        pbar.update(1)
+
 
         # Delete the subst.
         if platform == 'Windows' and DefineDosDevice(2, drive, project_folder ) == 0:
             raise RuntimeError("Subst failed")
 
-        for appl in config.application:
+        for appl in tqdm(config.application, desc='Processing cloc outputs'):
             #reading cloc_output.txt file
             cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
             cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt') 
