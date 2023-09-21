@@ -96,7 +96,8 @@ class SQLDiscovery(SourceValidation):
             summary_list.append(cls.summary_data('Triggers',trigger_dict,cls.trigger_list))    
             summary_list.append(cls.summary_data('Views',view_dict,cls.view_list))    
             summary_list.append(cls.summary_data('SQL files',file_dict,cls.file_list)) 
-            tabs.append(format_table(writer,DataFrame(summary_list),'Summary'))  
+                        
+            tabs.append(format_table(writer,DataFrame(summary_list),'Summary',total_line=True))  
 
             if len(table_dict):
                 tabs.append(format_table(writer,cls.detail_data(table_dict),'Tables')) 
