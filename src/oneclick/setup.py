@@ -42,7 +42,7 @@ if __name__ == '__main__':
             print ('\nConfiguring for AIP Console')
             config.console_url = url_input('\t"AIP Console Enterprise Edition" URL',config.console_url)
             config.console_cli = folder_input('\t"AIP Console automation tools" location',dirname(config.console_cli),"aip-console-tools-cli.jar",True)
-            config.console_key = string_input('\t"AIP Console Enterprise Edition" Key',config.console_key)
+            config.console_key = string_input('\t"AIP Console Enterprise Edition" API Key',config.console_key)
             config.enable_security_assessment = yes_no_input('\tEnable security analysis',config.enable_security_assessment)
             config.blueprint = yes_no_input('\tEnable Blueprint analysis',config.blueprint)
 
