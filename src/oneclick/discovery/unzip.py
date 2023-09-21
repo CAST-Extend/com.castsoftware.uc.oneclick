@@ -22,6 +22,7 @@ class Unzip(SourceValidation):
       error = False
       found = True
       while found:
+         found = False
          for root, dirs, files in walk(src_fldr):
             try:
                if '__MACOSX' in root or '.DS_Store' in files:
