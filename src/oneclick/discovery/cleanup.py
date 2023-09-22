@@ -7,6 +7,7 @@ from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
 from cast_common.logger import INFO
 from cast_common.util import create_folder
+from tqdm import tqdm
 
 from pandas import Series,DataFrame
 
@@ -50,7 +51,7 @@ class cleanUpAIP(SourceValidation):
         found = True
         while found:
             found = False
-            for app in apps:
+            for app in tqdm(apps, desc='Processing apps'):
                 create_folder(f'{output_path}\\{app}')
                 base = f'{output_path}\\{app}\\{cls.cleanup_file_prefix}{config.project_name}_{app}'
                 clean_up_log_file= f"{base}_deletedFiles_{file_suffix}.txt"
@@ -63,7 +64,7 @@ class cleanUpAIP(SourceValidation):
                         s=''                            
                         folder_cnt=0
                         file_cnt=0
-                        for subdir, dirs, files in walk(app_folder):
+                        for subdir, dirs, files in tqdm(walk(app_folder), desc=f'Processing {app} files and folders'):
                                 for dir in dirs:
                                     if cls.find_with_list(dir,folder_list):
                                         folder=join(subdir, dir)
