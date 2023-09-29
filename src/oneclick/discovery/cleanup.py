@@ -7,7 +7,6 @@ from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
 from cast_common.logger import Logger,INFO
 from cast_common.util import create_folder
-from tqdm import tqdm
 
 from pandas import Series,DataFrame
 
@@ -39,45 +38,25 @@ class cleanUpAIP(SourceValidation):
         exclusionFileList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFileList.txt')
         with open(exclusionFileList) as f:
             files_list = f.read().splitlines()
-            f.close()
 
         exclusionFolderList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFolderList.txt')
         with open(exclusionFolderList) as f:
             folder_list = f.read().splitlines()
-            f.close()
 
         apps= config.application
         cls._log.info(f'Running {cls.__class__.__name__} for all applications')
         found = True
         while found:
             found = False
-            for app in tqdm(apps, desc='Processing apps'):
-                create_folder(f'{output_path}\\{app}')
-                base = f'{output_path}\\{app}\\{cls.cleanup_file_prefix}{config.project_name}_{app}'
-                clean_up_log_file= f"{base}_deletedFiles_{file_suffix}.txt"
-                clean_up_log_folder= f"{base}_deletedFolders_{file_suffix}.txt"
+            for app in apps:
+                log_folder=f'{output_path}\\{app}'
+                create_folder(log_folder)
+                base = f'{log_folder}\\{cls.cleanup_file_prefix}'
+                cleanup_log_file= f"{base}_deletedFiles_{file_suffix}.log"
+                cls.cleanup_log = Logger('File',level=cls._log_level,file_name=cleanup_log_file,console_output=False)
+                cls._log.info(f'Cleanup file log: {cleanup_log_file}')
 
                 app_folder = abspath(f'{config.work}\\{cls.cleanup_file_prefix}\\{config.project_name}\\{app}')
-                cls._log.info(f'Reviewing {app} ({app_folder})')
-                with open (clean_up_log_file, 'a+') as file1: 
-                    with open (clean_up_log_folder, 'a+') as file2: 
-                        s=''                            
-                        folder_cnt=0
-                        file_cnt=0
-                        for subdir, dirs, files in tqdm(walk(app_folder), desc=f'Processing {app} files and folders'):
-                                for dir in dirs:
-                                    if cls.find_with_list(dir,folder_list):
-                                        folder=join(subdir, dir)
-                                        rmtree(folder)
-                                        folder_cnt+=1
-                                        log_it('folder',folder,file2)
-
-                                for file in files:
-                                    if cls.find_with_list(file,files_list):
-                                        file=join(subdir, file)
-                                        remove(file)
-                                        file_cnt+=1
-                                        log_it('file',file,file1)
 
                 # cls._log.info(f'Reviewing {app} ({app_folder})')
                 # with open (clean_up_log_file, 'a+') as file1: 
