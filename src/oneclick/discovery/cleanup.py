@@ -38,12 +38,10 @@ class cleanUpAIP(SourceValidation):
         exclusionFileList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFileList.txt')
         with open(exclusionFileList) as f:
             files_list = f.read().splitlines()
-            f.close()
 
         exclusionFolderList= abspath(f'{dir}\\scripts\\{cls.cleanup_file_prefix}deleteFolderList.txt')
         with open(exclusionFolderList) as f:
             folder_list = f.read().splitlines()
-            f.close()
 
         apps= config.application
         cls._log.info(f'Running {cls.__class__.__name__} for all applications')
