@@ -133,6 +133,11 @@ class ClocPreCleanup(SourceValidation):
                 while (not all_done):
                     all_done=True
                     for p in process:
+                        t.update(t.total)
+                        t.total += 1
+                        t.refresh() 
+                        sleep(.1)
+
                         if process[p]=='DONE':
                             continue
                         all_done=False
@@ -154,12 +159,6 @@ class ClocPreCleanup(SourceValidation):
 
                         if exists(cloc_output):
                             process[p]='DONE'
-                    if cloc_run:
-                        sleep(5)
-                        t.total += 1
-                        t.refresh() 
-                        pass
-                t.update(t.total)
 
         # Delete the subst.
         if platform == 'Windows' and DefineDosDevice(2, drive, project_folder ) == 0:
