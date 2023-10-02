@@ -6,11 +6,12 @@ from pyunpack import Archive
 from gzip import open as gz
 from tarfile import open as tar, TarError
 from shutil import copyfileobj
-
+from tqdm import tqdm
 from cast_common.util import create_folder
 
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
+
 
 class Unzip(SourceValidation):
    skip = ['__MACOSX','.DS_Store']
@@ -23,7 +24,7 @@ class Unzip(SourceValidation):
       found = True
       while found:
          found = False
-         for root, dirs, files in walk(src_fldr):
+         for root, dirs, files in tqdm(walk(src_fldr), desc="Unzipping files", leave=False):
             try:
                if '__MACOSX' in root or '.DS_Store' in files:
                   continue
@@ -80,7 +81,7 @@ class Unzip(SourceValidation):
       found = True
       while found:
          found = False
-         for app in apps:
+         for app in tqdm(apps, desc="Unzipping files", leave=False):
             found = cls.unzip(abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}'))
             found = cls.unzip(abspath(f'{config.work}\\HL\\{config.project_name}\\{app}'))
                      
