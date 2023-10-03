@@ -182,7 +182,7 @@ class ClocPreCleanup(SourceValidation):
             #reading cloc_output.txt file
             cloc_output = cls.cloc_output_path(config,appl)
             cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
-            if process[appl] == 'DONE':
+            if process[appl] == 'DONE' or process[appl] is None:
                 cls._log.debug(f'Processing {cloc_output}')
                 with open(cloc_output, 'r') as f:
                     content = f.read()
