@@ -1,7 +1,7 @@
 import pandas
 from oneclick.discovery.sourceValidation import SourceValidation 
 from pandas import DataFrame,read_excel
-from os.path import abspath
+from os.path import abspath,exists
 from oneclick.config import Config
 from cast_common.util import convert_LOC
 
@@ -64,7 +64,10 @@ class DiscoveryReport(SourceValidation):
             #print(after_df)
 
             # read by 'Summary' sheet of an SQL_Output excel file
-            sql_df = read_excel(sql_report,sheet_name='Summary')
+            if exists(sql_report):
+                sql_df = read_excel(sql_report,sheet_name='Summary')
+            else:
+                cls._log.warning('No SQL found')
             #sql_df = sql_df[sql_df['Total']>0]
 
             doc.add_heading(f'Application {appl} :', 2)
