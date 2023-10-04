@@ -6,11 +6,14 @@ from pyunpack import Archive
 from gzip import open as gz
 from tarfile import open as tar, TarError
 from shutil import copyfileobj
-
+from tqdm.auto import tqdm
 from cast_common.util import create_folder
+from cast_common.logger import Logger
+from datetime import datetime
 
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
+
 
 class Unzip(SourceValidation):
    skip = ['__MACOSX','.DS_Store']
@@ -22,7 +25,8 @@ class Unzip(SourceValidation):
       error = False
       found = True
       while found:
-         for root, dirs, files in walk(src_fldr):
+         found = False
+         for root, dirs, files in tqdm(walk(src_fldr), leave=False):
             try:
                if '__MACOSX' in root or '.DS_Store' in files:
                   continue
@@ -53,7 +57,7 @@ class Unzip(SourceValidation):
                      Archive(full_name).extractall(dest,auto_create_dir=True)
 
                   if found:     
-                     cls._log.info(f'Unpacked: {full_name}')  
+                     cls.zip_log.info(f'Unpacked: {full_name}')  
                      remove(full_name)
 
             except (TarError, ValueError, Exception) as ex:
@@ -75,14 +79,27 @@ class Unzip(SourceValidation):
       apps= config.application
       # for (dirpath,dirnames,filenames) in walk(work_folder):
       #    apps.extend(dirnames)
+      
 
       found = True
       while found:
          found = False
-         for app in apps:
+         for app in tqdm(apps, desc="Unzipping files", leave=True, position=0):
+            log_folder=abspath(f'{config.oneclick_work}/LOGS/{config.project_name}/{app}')
+            create_folder(log_folder)
+
+            dateTimeObj=datetime.now()
+            file_suffix=dateTimeObj.strftime("%d-%b-%Y(%H.%M.%S.%f)")
+
+            zip_log_file= abspath(f"{log_folder}/unzip_{file_suffix}.log")
+            log_name = 'Unzip-files'
+            cls.zip_log = Logger(log_name,level=cls._log_level,file_name=zip_log_file,console_output=False)
+
             found = cls.unzip(abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}'))
             found = cls.unzip(abspath(f'{config.work}\\HL\\{config.project_name}\\{app}'))
-                     
+
+            Logger.loggers.remove(log_name)
+
             #          full_name = abspath(f'{root.strip()}\\{file}')
             #          dest = full_name.replace(f".{full_name.split('.')[-1]}",'')
             #          cls._log.info(f'Unzipping {full_name}')
