@@ -12,8 +12,7 @@ from os import getcwd
 from argparse import ArgumentParser
 from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
 
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+from urllib.parse import urlparse
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -56,6 +55,7 @@ class Config():
                     self.java_home = args.java_home
 
                 if args.cloc_version is not None: self.cloc_version = args.cloc_version
+                if args.profiler is not None: self.profiler = args.profiler
 
                 #Dashboard
                 if args.aipURL is not None: self.aip_url = args.aipURL
@@ -94,9 +94,11 @@ class Config():
                 #settings
                 if self.check_default(args.cloc_version,self.cloc_version,default_args['cloc_version']):
                     self.cloc_version = args.cloc_version
+                if self.check_default(args.profiler,self.profiler,default_args['profiler']):
+                    self.profiler = args.profiler
         
             except AttributeError as e:
-                self.log.debug(str(e))
+                self.log.error(str(e))
             return
 
         #do all required fields contain data
@@ -129,7 +131,7 @@ class Config():
                             if len(self.console_key) == 0:
                                 self.console_key=secret_input('Missing console KEY:',self.console_key)
                             if len(self.console_cli) == 0:
-                                folder_input('\t"AIP Console automation tools" location',dirname(self.console_cli),"aip-console-tools-cli.jar",True)
+                                self.console_cli=folder_input('\t"AIP Console automation tools" location',dirname(self.console_cli),"aip-console-tools-cli.jar",True)
                     else:
                         self._set_console_active=False                                
 
@@ -162,8 +164,17 @@ class Config():
                 exit()
 
     def validate_for_run(self):
+        if self.java_home == '':
+            raise InvalidConfiguration('Missing JAVA HOME location')
+
+        if self.profiler == '':
+            raise InvalidConfiguration('Missing profiler executable location')
+        exec = abspath(self.profiler)
+        if not exists(exec):
+            raise InvalidConfiguration(f'Profiler executable not found: {exec}')
+
         if self.cloc_version == '':
-            raise InvalidConfiguration('Missing CLOC executable name')
+            raise InvalidConfiguration('Missing CLOC executable location')
         exec = abspath(f'{self.base}\\scripts\\{self.cloc_version}')
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
@@ -611,6 +622,14 @@ class Config():
             self._save()
 
     @property
+    def profiler(self):
+        return self._get(self.setting,'profiler')
+    @profiler.setter
+    def profiler(self,value):
+        if self._set_value(self.setting,'profiler',abspath(value)):
+            self._save()
+
+    @property
     def cloc_version(self):
         return self._get(self.setting,'cloc_version')
     @cloc_version.setter
@@ -631,7 +650,7 @@ class Config():
 
     @property
     def java_home(self):
-        return self._get(self.setting,'java-home')
+        return self.setting['java-home']
     @java_home.setter
     def java_home(self,value):
         if self._set_value(self.setting,'java-home',value,''):
@@ -710,17 +729,23 @@ def secret_input(prompt:str,default_value=""):
                 i = default_value
         return i            
 
-def url_input(prompt:str,url):
-    val = URLValidator()
+def url_input(prompt:str,default:str):
     while True:
-        i = input(f'{prompt} [{url}]: ')
-        if len(i)>0:
-            url = i
-        try:
-            val(url)
-            return url
-        except ValidationError as e:
+        i = input(f'{prompt} [{default}]: ')
+        if len(i)>0 and uri_validator(i):
+            default = i
+        if uri_validator(default):
+            return default
+        else:
             print ("Bad URL, please try again")      
+
+
+def uri_validator(x):
+    try:
+        result = urlparse(x)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
 
 
 #        def _set_value(self,base,key,value,default=''):
