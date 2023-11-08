@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     print('\nCAST One Click')
     print('Copyright (c) 2023 CAST Software Inc.\n')
-    print('If you need assistance, please contact Technical Due Diligence @team.ddassessment@castsoftware.com\n')
+    print('If you need assistance, please contact us at oneclick@castsoftware.com\n')
 
 
     parser,config_parser = command_line()
