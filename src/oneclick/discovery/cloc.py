@@ -5,9 +5,12 @@ from oneclick.discovery.sourceValidation import SourceValidation
 from time import sleep
 
 from platform import system
+from os import remove
 from os.path import exists,abspath,getsize
 from re import findall
 from pandas import DataFrame,ExcelWriter
+from tqdm import tqdm
+from subprocess import Popen
 
 from string import ascii_uppercase
 from win32api import GetLogicalDriveStrings
@@ -48,6 +51,12 @@ class ClocPreCleanup(SourceValidation):
     def cloc_results(cls):
         return cls._df
 
+    def cloc_output_path(cls,config:Config,appl:str):
+        return abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
+
+    def cloc_output_ignore_path(cls,config:Config,appl:str):
+        return abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt')
+
     def _get_free_drive(cls):
         drives = set(ascii_uppercase[2:])
         for d in GetLogicalDriveStrings().split(':\\\x00'):
@@ -67,10 +76,8 @@ class ClocPreCleanup(SourceValidation):
 
     def _run_cloc(cls,work_folder:str,cloc_output:str,cloc_output_ignored:str):
         args = [cls.cloc_path,work_folder,"--report-file",cloc_output,"--ignored",cloc_output_ignored,"--quiet"]
-        cls._log.info(' '.join(args))
+        cls._log.debug(' '.join(args))
         proc = run_process(args,False)
-
-        sleep(10)
         if proc.poll() is not None and exists(cloc_output):
             return 'DONE'
         else:
@@ -87,8 +94,10 @@ class ClocPreCleanup(SourceValidation):
             tech_list = f.read().splitlines()
             
         process = {}
+        output = {}
         cloc_run=False
 
+        # create a subst drive
         DefineDosDevice = windll.kernel32.DefineDosDeviceW
         DefineDosDevice.argtypes = [ c_int, c_wchar_p, c_wchar_p ]
 
@@ -98,14 +107,14 @@ class ClocPreCleanup(SourceValidation):
         platform = system()
         if platform == 'Windows':
             drive = cls._get_free_drive()
-            if DefineDosDevice(0, drive, project_folder ) == 0:
+            if drive is None or DefineDosDevice(0, drive, project_folder ) == 0:
                 raise RuntimeError("Subst failed")
 
-        for appl in config.application:
-            cls._log.info(f'Running {config.project_name}/{appl}')
+        for appl in tqdm(config.application,desc='Launching CLOC'):
+            #cls._log.info(f'Running {config.project_name}/{appl}')
             create_folder(f'{config.report}/{config.project_name}/{appl}')
-            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
-            cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt')
+            cloc_output = cls.cloc_output_path(config,appl)
+            cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
             if platform == 'Windows':            
                 work_folder = abspath(f'{drive}/{appl}')
             else:
@@ -119,67 +128,92 @@ class ClocPreCleanup(SourceValidation):
             process[appl] = cls._run_cloc(work_folder,cloc_output,cloc_output_ignored)
 
         #has all cloc processing completed
-        all_done=False
-        while (not all_done):
-            all_done=True
-            for p in process:
-                if process[p]=='DONE':
-                    continue
-                all_done=False
-                cloc_output = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-{cls.phase}.txt')
-                cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{p}/{p}-cloc-ignored-{cls.phase}.txt')
-                if not process[p] is None:
-                    cls._log.info(f'Checking results for {config.project_name}/{p}')
-                    try:
-                        ret,output = check_process(process[p],False)
-                        if ret != 0 and not exists(cloc_output) and getsize(cloc_output) == 0:
-                            cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
-                    except IOError:
-                        if not exists(cloc_output) and getsize(cloc_output) == 0:
-                            cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+        if cloc_run:
+            all_done=False
+            with tqdm(total=0,desc='CLOC Running') as t:
+                while (not all_done):
+                    all_done=len([x for x in process.values() if x != 'DONE' and x!='ERROR' and x!=None]) == 0
+                    if all_done:
+                        t.total=0
+                        t.refresh() 
+                        break
+                    else:
+                        t.update(1)
+                        t.refresh() 
+                        sleep(.5)
 
-                if exists(cloc_output):
-                    process[p]='DONE'
-            if cloc_run:
-                sleep(60)
+                    for p in process:
+
+                        if process[p]=='DONE':
+                            continue
+                        all_done=False
+
+                        cloc_output = cls.cloc_output_path(config,p)
+                        cloc_output_ignored = cls.cloc_output_ignore_path(config,p)
+
+                        # cls._log.debug(f'Checking results for {config.project_name}/{p}')
+                        #process completed
+                        if type(process[p])==Popen and process[p].poll() is not None:
+                            try:
+                                #get the results
+                                ret,output[p] = check_process(process[p],False)
+                                if ret != 0 or (exists(cloc_output) and getsize(cloc_output) == 0):
+                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                            except IOError:
+                                if not exists(cloc_output) and getsize(cloc_output) == 0:
+                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                            except ValueError as ex:
+                                if str(ex) == 'read of closed file':
+                                    cls._log.debug(f'Process already closed {p}')
+                            except Exception as ex:
+                                cls._log.warning(f'{type(ex)} Error: {str(ex)}')
+                                pass
+
+                            if exists(cloc_output):
+                                process[p]='DONE'
+                            else:
+                                process[p]='ERROR'
 
         # Delete the subst.
         if platform == 'Windows' and DefineDosDevice(2, drive, project_folder ) == 0:
             raise RuntimeError("Subst failed")
 
-        for appl in config.application:
+        for appl in tqdm(config.application,desc='Checking Results'):
             #reading cloc_output.txt file
-            cloc_output = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-{cls.phase}.txt')
-            cloc_output_ignored = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-cloc-ignored-{cls.phase}.txt') 
-            cls._log.info(f'Processing {cloc_output}')
-            with open(cloc_output, 'r') as f:
-                content = f.read()
+            cloc_output = cls.cloc_output_path(config,appl)
+            cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
+            if process[appl] == 'DONE' or process[appl] is None:
+                cls._log.debug(f'Processing {cloc_output}')
+                with open(cloc_output, 'r') as f:
+                    content = f.read()
 
-            #extracting required data from content of cloc_output.txt using python regex
-            header=content.split('\n')[2]
-            header_list=findall('\w+',header.upper())
+                #extracting required data from content of cloc_output.txt using python regex
+                header=content.split('\n')[2]
+                header_list=findall('\w+',header.upper())
 
-            summary='\n'.join(content.split('\n')[4:-4])
-            pattern='(.{25})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
-            statistics_list=findall(pattern,summary)
-            
-            with open(cloc_output_ignored, 'r') as fp:
-                lines = len(fp.readlines())
-            statistics_list.append(('Unknown Files','0','0','0',str(lines)))
-            df = DataFrame(statistics_list,columns=header_list)
+                summary='\n'.join(content.split('\n')[4:-4])
+                pattern='(.{25})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
+                statistics_list=findall(pattern,summary)
+                
+                with open(cloc_output_ignored, 'r') as fp:
+                    lines = len(fp.readlines())
+                statistics_list.append(('Unknown Files','0','0','0',str(lines)))
+                df = DataFrame(statistics_list,columns=header_list)
 
-            #making technolgy case insensitive
-            tech_list = list(map(lambda x: x.lower().strip(), tech_list))
-            df['APPLICABLE']=df['LANGUAGE'].str.lower().str.strip().isin(tech_list)
+                #making technolgy case insensitive
+                tech_list = list(map(lambda x: x.lower().strip(), tech_list))
+                df['APPLICABLE']=df['LANGUAGE'].str.lower().str.strip().isin(tech_list)
 
-            #converting column values into int from string
-            numbers=['FILES','BLANK','COMMENT','CODE']
-            total_line=['']
-            for name in numbers:
-                df[name] = df[name].astype('int')
-            tab_name = f'{appl}-{cls.phase}'
-            tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
-            workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
+                #converting column values into int from string
+                numbers=['FILES','BLANK','COMMENT','CODE']
+                total_line=['']
+                for name in numbers:
+                    df[name] = df[name].astype('int')
+                tab_name = f'{appl}-{cls.phase}'
+                tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
+                workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
+            else:
+                cls._log.error(f'Error running CLOC for {appl} {output[appl]}')
         return True
 
 
@@ -197,11 +231,20 @@ class ClocPostCleanup(ClocPreCleanup):
         return 'After'
 
     def run(cls,config:Config):
+
+        # always regenerate the after cloc report
+        for appl in config.application:
+            cls.if_exist_remove (cls.cloc_output_path(config,appl))
+            cls.if_exist_remove (cls.cloc_output_ignore_path(config,appl))
+
         super().run(config)
+
         sheet_names = ClocPreCleanup.writer.book.worksheets_objs.sort(key=lambda x: x.name)
         ClocPreCleanup.writer.close()
         pass
 
-
+    def if_exist_remove(cls,name:str):
+        if exists(name):
+            remove(name)
 
         

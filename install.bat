@@ -91,8 +91,7 @@ call %CODE_FOLDER%\.venv\scripts\activate.bat
 copy "%~dp0oneClick.bat" %CODE_FOLDER%
 xcopy "%~dp0scripts" "%CODE_FOLDER%\SCRIPTS\" /E /H /C /I /Y  
 
-echo adding Onclick package from PyPi
-pip install com.castsoftware.uc.oneclick==0.2.3
+pip install com.castsoftware.uc.oneclick==0.2.4.1
 
 echo .
 echo .

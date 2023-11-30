@@ -8,6 +8,7 @@ class SourceValidation:
     def __init__(cls,config:Config,log_name:str,log_level:int):
 #        log_file = abspath(f'{config.oneclick_work}/{config.project_name}/LOGS/source-code-discovery.log')       
         cls._log = Logger(name=log_name,level=log_level,file_name=config.log_filename)
+        cls._log_level=log_level
         pass
 
     @property
