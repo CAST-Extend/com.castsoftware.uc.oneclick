@@ -92,7 +92,7 @@ copy "%~dp0oneClick.bat" %CODE_FOLDER%
 xcopy "%~dp0scripts" "%CODE_FOLDER%\SCRIPTS\" /E /H /C /I /Y  
 
 echo adding Onclick package from PyPi
-pip install com.castsoftware.uc.oneclick==0.2.3
+pip install com.castsoftware.uc.oneclick==1.0.0
 
 echo .
 echo .
