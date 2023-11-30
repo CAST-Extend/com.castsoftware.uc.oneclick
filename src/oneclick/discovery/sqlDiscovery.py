@@ -2,11 +2,12 @@ from oneclick.discovery.sourceValidation import SourceValidation
 from oneclick.config import Config
 from os import walk
 from os.path import abspath
-from re import findall,IGNORECASE
+from re import findall,IGNORECASE,sub
 
 from cast_common.util import  format_table
 from pandas import DataFrame,ExcelWriter,Series,json_normalize
 from tqdm import tqdm
+
 
 #TODO: Add filename and location for each item (d1)
 class SQLDiscovery(SourceValidation):
@@ -15,21 +16,19 @@ class SQLDiscovery(SourceValidation):
         super().__init__(config,cls.__class__.__name__,log_level)
 
     _pattern={
-#        'Create Table'   :r'create\s{1,}table\s{1,}([^\n|^\s|^\(]+)[^\(]',
-#        'Create Table'   :r'create\s{1,}table\s[^#]{1,}([^\n|^\s|^\(]+)[^\(]',
-        'Create Table'   :r'create\s{1,}table\s([^\n|^\s|^\(]+)[^\(]',
-        'Alter Table'   :r'alter\s{1,}table\s{1,}([^\n|^\s|^\(]+)',
-        'Create function':r'create\s{1,}function\s{1,}([^\n|^\s|^\(]+)[^\(]',
-        'Alter function'   :r'alter\s{1,}function\s{1,}([^\n|^\s|^\(]+)',
-        'Create procedure':r'create\s{1,}procedure\s{1,}([^\n|^\s|^\(]+)[^\(]',
-        'Alter procedure'   :r'alter\s{1,}procedure\s{1,}([^\n|^\s|^\(]+)',
-        'Create view':r'create\s{1,}view\s{1,}([^\n|^\s|^\(]+)[^\(]',
-        'Alter view'   :r'alter\s{1,}view\s{1,}([^\n|^\s|^\(]+)',
-        'Create trigger':r'create\s{1,}trigger\s{1,}([^\n|^\s|^\(]+)[^\(]',
-        'Alter trigger'   :r'alter\s{1,}trigger\s{1,}([^\n|^\s|^\(]+)',
+        'Create Tables'      :r'create\stable\s[^#]([^\n|^\s|^\(]+)[^\(]',
+        'Create Functions'   :r'create\sfunction\s([^\n|^\s|^\(]+)[^\(]',
+        'Create Procedures'  :r'create\sprocedure\s([^\n|^\s|^\(]+)[^\(]',
+        'Create Views'       :r'create\sview\s([^\n|^\s|^\(]+)[^\(]',
+        'Create Triggers'    :r'create\strigger\s([^\n|^\s|^\(]+)[^\(]',
+        'Alter Tables'       :r'alter\stable\s([^\n|^\s|^\(]+)',
+        'Alter Functions'    :r'alter\sfunction\s([^\n|^\s|^\(]+)',
+        'Alter Procedures'   :r'alter\sprocedure\s([^\n|^\s|^\(]+)',
+        'Alter Views'        :r'alter\sview\s([^\n|^\s|^\(]+)',
+        'Alter Triggers'     :r'alter\strigger\s([^\n|^\s|^\(]+)',
     }
 
-    def read_sql_file(cls,file):
+    def parse_sql(cls,file):
 
         rslt = {}
         rslt['file-name']=file
@@ -38,6 +37,7 @@ class SQLDiscovery(SourceValidation):
             for key in cls._pattern.keys():
                 pattern = cls._pattern[key]
                 rslt[key]=findall(pattern,content,IGNORECASE)
+                rslt[key]=list(map(lambda x: sub(r'\W+','',x), rslt[key]))
                 if len(rslt[key])==0:
                    rslt[key]=[] 
         cls._data.append(rslt)
@@ -78,7 +78,7 @@ class SQLDiscovery(SourceValidation):
 
             if len(sql_files):
                 for file in tqdm(sql_files,desc='SQLDiscovery'):
-                    cls.read_sql_file(file)
+                    cls.parse_sql(file)
 
                 summary_df = DataFrame(columns=['Name','Total','Unique','Dups'])
                 df = json_normalize(cls._data)
@@ -97,12 +97,18 @@ class SQLDiscovery(SourceValidation):
                             detail[key]=None
 
                 if not summary_df.empty:
+                    summary_df=summary_df.sort_values(['Name'],ascending=False)
                     filename = abspath(f'{config.report}/{config.project_name}/{app}/{app}-SQLReport.xlsx')
                     writer = ExcelWriter(filename, engine='xlsxwriter')
-                    format_table(writer,summary_df,'Summary')
+                    dups_format = writer.book.add_format({'bg_color': '#FFFF00', 'font_color': '#9C0006'})
+                    xls=format_table(writer,summary_df,'Summary',total_line=True)
+                    xls.conditional_format(f'D2:D{len(summary_df)}', {'type':'cell','criteria':'>','value':0,'format':dups_format})
+
                     for key in tqdm(cls._pattern.keys(),desc=f'Writing {filename}'):
                         if not detail[key] is None:
-                            format_table(writer,detail[key],key)
+                            xls = format_table(writer,detail[key],key)
+                            xls.conditional_format(f'A1:B{len(detail[key])}', {'type':'formula','criteria':'=COUNTIF($B:$B,$B1)>1','format':dups_format})
+
                     writer.close()
                     cls._log.info(f'SQL Discovery Report: {filename}')
             else:

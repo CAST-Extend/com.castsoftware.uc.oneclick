@@ -5,6 +5,7 @@ from oneclick.config import Config
 from oneclick.discovery.unzip import Unzip
 from oneclick.discovery.prep import Prepare
 from oneclick.discovery.cloc import ClocPreCleanup,ClocPostCleanup
+from oneclick.discovery.profiler import ProfilerPreCleanup
 from oneclick.discovery.cleanup import cleanUpAIP,cleanUpHL
 from oneclick.discovery.sqlDiscovery import SQLDiscovery
 from oneclick.discovery.discoveryReport import DiscoveryReport
@@ -57,6 +58,7 @@ def command_line() -> ArgumentParser:
     settings.add_argument('--java_home', help='Set if java is not part of the system path')
     settings.add_argument('--report_template', help='Set if java is not part of the system path')
     settings.add_argument('--cloc_version',default='cloc-1.96.exe', help='set the version of cloc exe')
+    settings.add_argument('--profiler', help='profiler executable location')
 
     #dashboard access
     dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
@@ -131,15 +133,11 @@ if __name__ == '__main__':
     try:
         config=Config(parser,default_args)
         #printing some inital messages to the user
-        file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK/LOGS/{config.project_name}')
-        create_folder(file_name)
-        config.log_filename=abspath(f'{file_name}/general.log')
-        
-        log_level = INFO
-        log = Logger("main",file_name=config.log_filename)
-        log.info(f'Running {args.command}')
 
         if args.command == 'config':
+            log_level = INFO
+            log = Logger("main")
+
             file = ''
             if args.projectName is None:
                 file='Default'
@@ -148,6 +146,13 @@ if __name__ == '__main__':
             log.info(f'{file} configuration file successfuly updated')
             exit ()
         elif args.command == 'run':
+            file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK/LOGS/{config.project_name}')
+            create_folder(file_name)
+            config.log_filename=abspath(f'{file_name}/general.log')
+            
+            log_level = INFO
+            log = Logger("main",file_name=config.log_filename)
+            log.info(f'Running {args.command}')
             config.validate_for_run()
 
     except NoConfigFound as ex:
@@ -203,6 +208,7 @@ if __name__ == '__main__':
         
         # source code preparation
         ClocPreCleanup(config,log_level),
+        ProfilerPreCleanup(config,log_level),
         cleanUpAIP(config,log_level),
         cleanUpHL(config,log_level),
         ClocPostCleanup(config,log_level),
