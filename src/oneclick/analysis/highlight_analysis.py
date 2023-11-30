@@ -30,7 +30,7 @@ class HLAnalysis(Analysis):
                     app_id = rest.get_app_id(appl)
                     if app_id is None:
                         cls._log.info(f'Application {appl} not found in Highlight, Creating Application {appl}...')
-                        resp_code = rest.create_an_app(config.hl_url, config.hl_instance, appl)
+                        resp_code = rest.create_an_app(config.hl_instance, appl)
                         if resp_code == 200:
                             cls._log.info(f'Application {appl} created inside Highlight.')
                             app_id = rest.get_app_id(appl)

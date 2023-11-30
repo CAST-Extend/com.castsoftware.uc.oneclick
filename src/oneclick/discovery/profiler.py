@@ -71,11 +71,14 @@ class ProfilerPreCleanup(SourceValidation):
 
             composition = json_normalize(prflr['composition'],max_level=1)
             omposition = json_normalize(prflr['composition'],max_level=1)
-            composition = composition.explode(column=['subExtensions']).fillna('')
+            if 'subExtensions' in composition.columns:
+                composition = composition.explode(column=['subExtensions']).fillna('')
 
             dependencies = json_normalize(prflr['dependencies'])
-            dependencies = dependencies.explode(column=['iconNames'])
-            dependencies = dependencies.explode(column=['versions'])
+            if 'iconNames' in dependencies.columns:
+                dependencies = dependencies.explode(column=['iconNames'])
+            if 'versions' in dependencies.columns:
+                dependencies = dependencies.explode(column=['versions'])
 
             frameworks = json_normalize(prflr['frameworks'])
             ext_list = json_normalize(prflr['extensions_list'],max_level=1).transpose().reset_index()
