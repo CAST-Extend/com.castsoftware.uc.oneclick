@@ -63,10 +63,10 @@ echo .
 echo .
 if errorlevel 1 goto noPip
 
-echo creating virutal enviroment 
+echo creating virtual environment
 IF NOT EXIST "%CODE_FOLDER%\DELIVER" MKDIR "%CODE_FOLDER%\DELIVER"
 IF NOT EXIST "%CODE_FOLDER%\.oneClick" MKDIR "%CODE_FOLDER%\.oneClick"
-IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS
+IF NOT EXIST "%CODE_FOLDER%\SCRIPTS" MKDIR "%CODE_FOLDER%\SCRIPTS"
 python -m pip install --user --upgrade pip > NUL
 
 :: Rename .venv if it exists
@@ -92,7 +92,7 @@ copy "%~dp0oneClick.bat" %CODE_FOLDER%
 xcopy "%~dp0scripts" "%CODE_FOLDER%\SCRIPTS\" /E /H /C /I /Y  
 
 echo adding Onclick package from PyPi
-pip install com.castsoftware.uc.oneclick==0.2.4.1
+pip install com.castsoftware.uc.oneclick==0.2.3
 
 echo .
 echo .
