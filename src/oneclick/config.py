@@ -34,8 +34,16 @@ class Config():
         if not exists(base_config) and args.command == 'run':
             raise NoConfigFound('Base configuration file found, please run with the "config" option')
 
-
-        if args.command == 'config':
+        if args.command == 'setup':
+            if not exists(base_config):
+                self._config={}
+                self._config_file=base_config
+                self.base = args.baseFolder
+            else:
+                self._config_file = abspath(f'{args.baseFolder}/.oneclick/config.json')
+                with open(abspath(self._config_file), 'rb') as config_file:
+                    self._config = load(config_file)
+        elif args.command == 'config':
             if not exists(base_config):
                 self._config={}
                 self._config_file=base_config
@@ -49,10 +57,11 @@ class Config():
                 with open(abspath(self._config_file), 'rb') as config_file:
                     self._config = load(config_file)
             try:       
-                if args.java_home is None:
+                if 'java_home' not in args or args.java_home is None:
                     self.java_home = ''
                 else:
                     self.java_home = args.java_home
+
 
                 if args.cloc_version is not None: self.cloc_version = args.cloc_version
                 if args.profiler is not None: self.profiler = args.profiler
@@ -380,7 +389,6 @@ class Config():
     @property
     def is_console_active(self)->bool:
         return self._get(self.console,'Active',False)
-
     @property
     def console(self):
         return self._get(self.rest,'AIPConsole',{})
@@ -650,12 +658,16 @@ class Config():
 
     @property
     def java_home(self):
-        return self.setting['java-home']
+        return self._get(self.setting,'java-home')
     @java_home.setter
     def java_home(self,value):
         if self._set_value(self.setting,'java-home',value,''):
             self._save()
 
+def set_value(value:str, default:str=''):
+    if len(value) == 0:
+        value=default
+    return value
 
 def yes_no_input(prompt:str,default_value=True) -> bool:
     while True:
@@ -729,7 +741,7 @@ def secret_input(prompt:str,default_value=""):
                 i = default_value
         return i            
 
-def url_input(prompt:str,default:str):
+def url_input(prompt:str, default:str):
     while True:
         i = input(f'{prompt} [{default}]: ')
         if len(i)>0 and uri_validator(i):
