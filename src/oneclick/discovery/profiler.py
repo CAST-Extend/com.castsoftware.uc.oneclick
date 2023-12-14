@@ -100,10 +100,14 @@ class ProfilerPreCleanup(SourceValidation):
         pass
 
     def run(cls,config:Config):
+        if len(config.profiler) == 0:
+            cls._log.warning('Profiler path is not set in the configuration. Profiling will not be run.')
+            return
+
         for appl in config.application:
             work_folder = abspath(f'{config.work}/AIP/{config.project_name}/{appl}')
             profiler_output=abspath(f'{config.report}/{config.project_name}/{appl}')
             
             create_folder(profiler_output)
             cls._run_profiler(app_name=appl,work_folder=work_folder,profiler_output=profiler_output)
-            
+
