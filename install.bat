@@ -126,7 +126,7 @@ echo install ^<Code Folder Location^>
 echo OneClick global configuration setup...
 
 cd /d "%CODE_FOLDER%"
-python -m oneclick.setup config -b %CODE_FOLDER%
+python -m oneclick.setup setup -b %CODE_FOLDER%
 
 call %CODE_FOLDER%\.venv\scripts\deactivate.bat
 

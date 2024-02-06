@@ -1,11 +1,12 @@
 @@echo off
 
-set option=%1
 set base=%cd%
+set option=%1
 
 if "%option%x" == "x" goto error
 if "%option%" == "run" goto ok
 if "%option%" == "config" goto ok
+if "%option%" == "setup" goto setup
 goto error
 :ok
 
@@ -16,3 +17,7 @@ python -m oneclick.main %option% -b %base% %ALL_BUT_FIRST%
 exit /b
 :error
 echo first parameter must be either "config" or "run"
+exit /base
+
+:setup
+python -m oneclick.setup %option% -b %base% %ALL_BUT_FIRST%

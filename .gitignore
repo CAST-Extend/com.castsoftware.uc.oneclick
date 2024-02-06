@@ -1,7 +1,12 @@
 **/__pycache__/**
 **/.venv/**
 **/build/**
+**/bin/**
+**/obj/**
 **/com.castsoftware.uc.oneclick.egg-info/**
 **/.vscode/**
 pip_final.bat
 **/test.ipynb
+*.csproj
+*.zip
+install_2.bat
