@@ -149,8 +149,8 @@ class Config():
                             else:
                                 self.hl_instance=self.hl_instance
 
-                self.log.info(f'Run MRI analysis: {self.is_aip_active}')
-                self.log.info(f'Run Highlight analysis: {self.is_hl_active}')
+                # self.log.info(f'Run MRI analysis: {self.is_aip_active}')
+                # self.log.info(f'Run Highlight analysis: {self.is_hl_active}')
                 self._save()
 
             except JSONDecodeError as e:
@@ -509,7 +509,7 @@ class Config():
         if type(value) is not str:
             raise ValueError(f'Expecting a the project name, got {type(value)}')
 
-        self.log.info(f'New project: {value}')
+        self.log.info(f'Starting executin of project {value}')
         if 'project' not in self._config:
             self._config['project']={}
             self._config['project']['name']=value

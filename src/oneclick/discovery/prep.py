@@ -15,7 +15,22 @@ class Prepare(SourceValidation):
         pass
 
     def run(cls,config:Config):
-        cls._log.info('')
+        cls._log.info('=> STEP 1: PREPARE')
+
+        no_of_apps = len(config.application)
+
+        cls._log.info(f'Found {no_of_apps} application(s).')
+        cls._log.info('OneClick will execute below steps -')
+
+        if config.start == 'Discovery':
+            discovery_flag = True
+        else:
+            discovery_flag = False
+
+        cls._log.info(f'\t\t\tSource Code Unzip, Cleanup and Discovery - {discovery_flag}')
+        cls._log.info(f'\t\t\tRun MRI analysis: {config.is_aip_active}')
+        cls._log.info(f'\t\t\tRun Highlight analysis: {config.is_hl_active}')
+        cls._log.info(f'\t\t\tOutput Report Generation - True')
         cls._log.info('****************** Source Code Validation Log *********************')
         cls._log.info(f'Running {cls.__class__.__name__} for all applications')
 
