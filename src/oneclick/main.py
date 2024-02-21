@@ -153,7 +153,6 @@ if __name__ == '__main__':
             log_level = INFO
             log = Logger("main",file_name=config.log_filename)
             # log.info(f'Running {args.command}')
-            log.info('=> REVIEW DELIVERY AND PREPARE')
             config.validate_for_run()
 
     except NoConfigFound as ex:
@@ -241,7 +240,7 @@ if __name__ == '__main__':
             break
 
 
-        # log.info(f'******************* Step {step} - {p.__class__.__name__} *******************************')
+        log.info(f'=> STEP {step} : {p.get_title()}')
         if args.start == 'Discovery':
             if issubclass(type(p), SourceValidation):
                 status = p.run(config)
