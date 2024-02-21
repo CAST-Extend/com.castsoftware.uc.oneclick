@@ -13,4 +13,7 @@ class SourceValidation:
     @property
     def required(cls):
         return True
+    
+    def get_title(cls) -> str:
+        return cls.__class__.__name__
 

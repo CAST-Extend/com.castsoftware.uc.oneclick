@@ -51,6 +51,9 @@ class RunARG():
         GeneratePPT(ARGConfig(arg_cfg_file)).save_ppt()
         pass
 
+    def get_title(cls) -> str:
+        return cls.__class__.__name__
+
 class  RunARGAIP(RunARG):
     def __init__(cls, config:Config, log_level:int) -> None:
         super().__init__(config,log_level,cls.__class__.__name__)

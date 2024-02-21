@@ -20,6 +20,9 @@ class Analysis():
         info = cls._pid[str(pid)]
         process = info['process']
         return process.poll()
+    
+    def get_title(cls) -> str:
+        return cls.__class__.__name__
 
 
 class Process():
