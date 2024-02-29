@@ -110,7 +110,8 @@ class ClocPreCleanup(SourceValidation):
             if drive is None or DefineDosDevice(0, drive, project_folder ) == 0:
                 raise RuntimeError("Subst failed")
 
-        for appl in tqdm(config.application,desc='Launching CLOC'):
+        # for appl in tqdm(config.application,desc='Launching CLOC'):
+        for appl in config.application:
             #cls._log.info(f'Running {config.project_name}/{appl}')
             create_folder(f'{config.report}/{config.project_name}/{appl}')
             cloc_output = cls.cloc_output_path(config,appl)
@@ -129,56 +130,58 @@ class ClocPreCleanup(SourceValidation):
 
         #has all cloc processing completed
         if cloc_run:
+            cls._log.info('=> Using CLOC')
             all_done=False
-            with tqdm(total=0,desc='CLOC Running') as t:
-                while (not all_done):
-                    all_done=len([x for x in process.values() if x != 'DONE' and x!='ERROR' and x!=None]) == 0
-                    if all_done:
-                        t.total=0
-                        t.refresh() 
-                        break
-                    else:
-                        t.update(1)
-                        t.refresh() 
-                        sleep(.5)
+            # with tqdm(total=0,desc='CLOC Running') as t:
+            while (not all_done):
+                all_done=len([x for x in process.values() if x != 'DONE' and x!='ERROR' and x!=None]) == 0
+                # if all_done:
+                #     t.total=0
+                #     t.refresh() 
+                #     break
+                # else:
+                #     t.update(1)
+                #     t.refresh() 
+                #     sleep(.5)
 
-                    for p in process:
+                for p in process:
 
-                        if process[p]=='DONE':
-                            continue
-                        all_done=False
+                    if process[p]=='DONE':
+                        continue
+                    all_done=False
 
-                        cloc_output = cls.cloc_output_path(config,p)
-                        cloc_output_ignored = cls.cloc_output_ignore_path(config,p)
+                    cloc_output = cls.cloc_output_path(config,p)
+                    cloc_output_ignored = cls.cloc_output_ignore_path(config,p)
 
-                        # cls._log.debug(f'Checking results for {config.project_name}/{p}')
-                        #process completed
-                        if type(process[p])==Popen and process[p].poll() is not None:
-                            try:
-                                #get the results
-                                ret,output[p] = check_process(process[p],False)
-                                if ret != 0 or (exists(cloc_output) and getsize(cloc_output) == 0):
-                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
-                            except IOError:
-                                if not exists(cloc_output) and getsize(cloc_output) == 0:
-                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
-                            except ValueError as ex:
-                                if str(ex) == 'read of closed file':
-                                    cls._log.debug(f'Process already closed {p}')
-                            except Exception as ex:
-                                cls._log.warning(f'{type(ex)} Error: {str(ex)}')
-                                pass
+                    # cls._log.debug(f'Checking results for {config.project_name}/{p}')
+                    #process completed
+                    if type(process[p])==Popen and process[p].poll() is not None:
+                        try:
+                            #get the results
+                            ret,output[p] = check_process(process[p],False)
+                            if ret != 0 or (exists(cloc_output) and getsize(cloc_output) == 0):
+                                cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                        except IOError:
+                            if not exists(cloc_output) and getsize(cloc_output) == 0:
+                                cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                        except ValueError as ex:
+                            if str(ex) == 'read of closed file':
+                                cls._log.debug(f'Process already closed {p}')
+                        except Exception as ex:
+                            cls._log.warning(f'{type(ex)} Error: {str(ex)}')
+                            pass
 
-                            if exists(cloc_output):
-                                process[p]='DONE'
-                            else:
-                                process[p]='ERROR'
+                        if exists(cloc_output):
+                            process[p]='DONE'
+                        else:
+                            process[p]='ERROR'
 
         # Delete the subst.
         if platform == 'Windows' and DefineDosDevice(2, drive, project_folder ) == 0:
             raise RuntimeError("Subst failed")
 
-        for appl in tqdm(config.application,desc='Checking Results'):
+        # for appl in tqdm(config.application,desc='Checking Results'):
+        for appl in config.application:
             #reading cloc_output.txt file
             cloc_output = cls.cloc_output_path(config,appl)
             cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
@@ -194,7 +197,6 @@ class ClocPreCleanup(SourceValidation):
                 summary='\n'.join(content.split('\n')[4:-4])
                 pattern='(.{25})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
                 statistics_list=findall(pattern,summary)
-                
                 with open(cloc_output_ignored, 'r') as fp:
                     lines = len(fp.readlines())
                 statistics_list.append(('Unknown Files','0','0','0',str(lines)))
@@ -211,11 +213,15 @@ class ClocPreCleanup(SourceValidation):
                     df[name] = df[name].astype('int')
                 tab_name = f'{appl}-{cls.phase}'
                 tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
+                loc = df['CODE'].sum()
+                cls._log.info(f'application {appl}, total loc {loc}')
                 workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
             else:
                 cls._log.error(f'Error running CLOC for {appl} {output[appl]}')
         return True
 
+    def get_title(cls) -> str:
+        return "DISCOVERY BEFORE CLEANUP"
 
 
 class ClocPostCleanup(ClocPreCleanup):
