@@ -22,7 +22,7 @@ class Unzip(SourceValidation):
    def __init__(cls, config:Config, log_level:int):
         super().__init__(config,cls.__class__.__name__,log_level)
 
-   def unzip(cls,src_fldr) -> bool:
+   def unzip(cls,src_fldr) -> tuple[bool,int,int]:
       unarchived_files = 0
       archived_files = 0
       error = False
@@ -62,8 +62,7 @@ class Unzip(SourceValidation):
                      full_name = abspath(f'{root.strip()}\\{file}')
                      create_folder(dest)
                      with ZipFile(full_name) as zf:
-                        # for member in tqdm(zf.infolist(), desc='Extracting ',position=0,leave=False):
-                        for member in zf.infolist():
+                        for member in tqdm(zf.infolist(), desc='Extracting ',position=0,leave=False):
                            zf.extract(member, dest)
                      #Archive(full_name).extractall(dest,auto_create_dir=True)
 
@@ -104,8 +103,7 @@ class Unzip(SourceValidation):
       found = True
       while found:
          found = False
-         # for app in tqdm(apps, desc="Unzipping files", leave=True):
-         for app in apps:
+         for app in tqdm(apps, desc="Unzipping files", leave=True):
             log_folder=abspath(f'{config.oneclick_work}/LOGS/{config.project_name}/{app}')
             create_folder(log_folder)
 
