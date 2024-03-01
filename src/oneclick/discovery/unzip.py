@@ -22,7 +22,7 @@ class Unzip(SourceValidation):
    def __init__(cls, config:Config, log_level:int):
         super().__init__(config,cls.__class__.__name__,log_level)
 
-   def unzip(cls,src_fldr) -> tuple[bool,int,int]:
+   def unzip(cls,src_fldr:str) -> tuple[bool,int,int]:
       unarchived_files = 0
       archived_files = 0
       error = False
