@@ -44,7 +44,7 @@ class cleanUpAIP(SourceValidation):
             folder_list = f.read().splitlines()
 
         apps= config.application
-        cls._log.info(f'Running {cls.__class__.__name__} for all applications')
+        # cls._log.info(f'Running {cls.__class__.__name__} for all applications')
         found = True
         while found:
             found = False
@@ -54,7 +54,7 @@ class cleanUpAIP(SourceValidation):
                 base = f'{log_folder}\\{cls.cleanup_file_prefix}'
                 cleanup_log_file= f"{base}_deletedFiles_{file_suffix}.log"
                 cls.cleanup_log = Logger('File',level=cls._log_level,file_name=cleanup_log_file,console_output=False)
-                cls._log.info(f'Cleanup file log: {cleanup_log_file}')
+                # cls._log.info(f'Cleanup file log: {cleanup_log_file}')
 
                 app_folder = abspath(f'{config.work}\\{cls.cleanup_file_prefix}\\{config.project_name}\\{app}')
 
@@ -80,7 +80,9 @@ class cleanUpAIP(SourceValidation):
                                 file_cnt+=1
                                 cls.cleanup_log.info(f'Folder: {file}')
 
-                cls._log.info(f'Removed {file_cnt} files and {folder_cnt} folders from {app_folder}')
+                # cls._log.info(f'Removed {file_cnt} files and {folder_cnt} folders from {app_folder}')
+                cls._log.info(f'Application {app}, removed {file_cnt} files and {folder_cnt} folders')               
+                cls._log.info(f'Cleanup log: {cleanup_log_file}\n')
         cls._log.debug('Source Code cleanup done')
 
     def find_with_list(cls,find_in:str,pattern:list):
@@ -95,6 +97,9 @@ class cleanUpAIP(SourceValidation):
                 cls._log.warning(f'{ex.msg} for pattern {ex.pattern}')
             
         return rslt
+
+    def get_title(cls) -> str:
+        return "CLEANUP FOR CAST AIP"
 
 def rmtree(top):
     for root, dirs, files in walk(top, topdown=False):
@@ -113,3 +118,6 @@ class cleanUpHL(cleanUpAIP):
     @property
     def cleanup_file_prefix(cls):
         return "HL"
+    
+    def get_title(cls) -> str:
+        return "CLEANUP FOR CAST HIGHLIGHT"
