@@ -129,6 +129,7 @@ class ClocPreCleanup(SourceValidation):
 
         #has all cloc processing completed
         if cloc_run:
+            cls._log.info('=> Using CLOC')
             all_done=False
             with tqdm(total=0,desc='CLOC Running') as t:
                 while (not all_done):
@@ -194,7 +195,6 @@ class ClocPreCleanup(SourceValidation):
                 summary='\n'.join(content.split('\n')[4:-4])
                 pattern='(.{25})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})\s{1,}(\d{1,})'
                 statistics_list=findall(pattern,summary)
-                
                 with open(cloc_output_ignored, 'r') as fp:
                     lines = len(fp.readlines())
                 statistics_list.append(('Unknown Files','0','0','0',str(lines)))
@@ -211,11 +211,20 @@ class ClocPreCleanup(SourceValidation):
                     df[name] = df[name].astype('int')
                 tab_name = f'{appl}-{cls.phase}'
                 tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
+                loc = df['CODE'].sum()
+                if cls.phase == 'Before':
+                    cls._log.info(f'application {appl}, total loc {loc}')
+                if cls.phase == 'After':
+                    cls._log.info(f'application {appl}')    
+                    position = content.find('\n')
+                    print(content[position+1:])
                 workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
             else:
                 cls._log.error(f'Error running CLOC for {appl} {output[appl]}')
         return True
 
+    def get_title(cls) -> str:
+        return "DISCOVERY BEFORE CLEANUP"
 
 
 class ClocPostCleanup(ClocPreCleanup):
@@ -246,5 +255,8 @@ class ClocPostCleanup(ClocPreCleanup):
     def if_exist_remove(cls,name:str):
         if exists(name):
             remove(name)
+
+    def get_title(cls) -> str:
+        return "DISCOVERY AFTER CLEANUP"
 
         
