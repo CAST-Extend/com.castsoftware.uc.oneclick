@@ -212,7 +212,12 @@ class ClocPreCleanup(SourceValidation):
                 tab_name = f'{appl}-{cls.phase}'
                 tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
                 loc = df['CODE'].sum()
-                cls._log.info(f'application {appl}, total loc {loc}')
+                if cls.phase == 'Before':
+                    cls._log.info(f'application {appl}, total loc {loc}')
+                if cls.phase == 'After':
+                    cls._log.info(f'application {appl}')    
+                    position = content.find('\n')
+                    print(content[position+1:])
                 workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
             else:
                 cls._log.error(f'Error running CLOC for {appl} {output[appl]}')
@@ -250,5 +255,8 @@ class ClocPostCleanup(ClocPreCleanup):
     def if_exist_remove(cls,name:str):
         if exists(name):
             remove(name)
+
+    def get_title(cls) -> str:
+        return "DISCOVERY AFTER CLEANUP"
 
         
