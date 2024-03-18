@@ -48,7 +48,7 @@ class DiscoveryReport(SourceValidation):
         doc.add_heading('Observation by Application', 1)
 
         for appl in tqdm(config.application,desc='Discovery',leave=True, position=1):
-            cls._log.info(f'Running {cls.__class__.__name__} for {appl}')
+            # cls._log.info(f'Running {cls.__class__.__name__} for {appl}')
 
             sql_report = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-SQLReport.xlsx')
 
@@ -165,8 +165,11 @@ class DiscoveryReport(SourceValidation):
 
         # now save the document to a location
         doc.save(discovery_report)
-        cls._log.info(f'Source Code Discovery report has been written to {discovery_report}')
+        # cls._log.info(f'Source Code Discovery report has been written to {discovery_report}')
+        cls._log.info(f'Source Code Discovery report generated at {discovery_report} (note: pls review report document before sharing)\n')
 
+    def get_title(cls) -> str:
+        return "DELIVERABLE DISCOVERY REPORT"
 
 def make_rows_bold(*rows):
     for row in rows:
