@@ -48,13 +48,14 @@ class SQLDiscovery(SourceValidation):
         apps= config.application
 
         for app in apps:
-            cls._log.info(f'Running {cls.__class__.__name__} for {app}')
+            # cls._log.info(f'Running {cls.__class__.__name__} for {app}')
+            cls._log.info(f'application {app}')
 
             cls._data=[]
             sql_files = []
             non_sql_files = []
             app_folder = abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}')
-            cls._log.info(f'Searching {app_folder}')
+            # cls._log.info(f'Searching {app_folder}')
             with tqdm(total=0) as pbar:
                 for root, dirs, files in walk(app_folder):
                     for file in files:
@@ -96,6 +97,24 @@ class SQLDiscovery(SourceValidation):
                             summary_df.loc[len(summary_df.index)] = [key,0,0,0]
                             detail[key]=None
 
+                total_tables = summary_df.loc[0]['Total']
+                total_functions = summary_df.loc[1]['Total']
+                total_procedures = summary_df.loc[2]['Total']
+                total_views = summary_df.loc[3]['Total']
+                total_triggers = summary_df.loc[4]['Total']
+                total_artifacts = total_tables + total_functions + total_procedures + total_triggers + total_views
+                print('-------------------------------------')
+                print('Artifacts                     Count')
+                print('-------------------------------------')
+                print(f'Tables                          {total_tables}')
+                print(f'Functions                       {total_functions}')
+                print(f'Procedures                      {total_procedures}')
+                print(f'Views                           {total_views}')
+                print(f'Triggers                        {total_triggers}')
+                print('-------------------------------------')
+                print(f'Total Artifacts                 {total_artifacts}')
+                print('-------------------------------------')
+
                 if not summary_df.empty:
                     summary_df=summary_df.sort_values(['Name'],ascending=False)
                     filename = abspath(f'{config.report}/{config.project_name}/{app}/{app}-SQLReport.xlsx')
@@ -110,10 +129,14 @@ class SQLDiscovery(SourceValidation):
                             xls.conditional_format(f'A1:B{len(detail[key])}', {'type':'formula','criteria':'=COUNTIF($B:$B,$B1)>1','format':dups_format})
 
                     writer.close()
-                    cls._log.info(f'SQL Discovery Report: {filename}')
+                    # cls._log.info(f'SQL Discovery Report: {filename}')
+                    cls._log.info(f'detailed discovery report available at {filename}\n')
             else:
-                cls._log.warning(f'No SQL found')
-        cls._log.info('SQLDiscovery complete.')
+                cls._log.warning(f'No SQL found\n')
+        # cls._log.info('SQLDiscovery complete.')
         pass
+
+    def get_title(cls) -> str:
+        return "SQL ARTIFACTS DISCOVERY"
 
 
