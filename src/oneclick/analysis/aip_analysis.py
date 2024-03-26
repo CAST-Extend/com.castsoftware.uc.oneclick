@@ -14,6 +14,7 @@ class AIPAnalysis(Analysis):
         pass
     
     def run(cls, config:Config):
+        cls._log.info(f'You can use oneclick to directly run AIP or HL or both analysis using command :- oneclick run -p <project name> --start=Analysis')
         if not config.is_console_active:
             cls._log.warning('AIP Console configuration is incomplete, analysis will not run')
             return 0
@@ -24,7 +25,8 @@ class AIPAnalysis(Analysis):
             aip_status = config.application[appl]['aip']
             if aip_status == '' or aip_status.startswith('Error'):
                 #add a new appication in AIP Console
-                cls._log.info(f'Running analysis for {config.project_name}\{appl}')
+                # cls._log.info(f'Running analysis for {config.project_name}\{appl}')
+                cls._log.info(f'Running AIP analysis for {appl}')
 
                 java_home = config.java_home
                 if len(java_home) > 0:
