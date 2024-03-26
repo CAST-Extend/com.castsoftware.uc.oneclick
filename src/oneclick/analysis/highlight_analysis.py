@@ -14,6 +14,7 @@ class HLAnalysis(Analysis):
         pass
 
     def run(cls, config:Config):
+        cls._log.info(f'You can use oneclick to directly run AIP or HL or both analysis using command :- oneclick run -p <project name> --start=Analysis')
         if not config.is_hl_active:
             cls._log.warning('Highlight configuration is incomplete, analysis will not run')
             return 0
@@ -26,7 +27,8 @@ class HLAnalysis(Analysis):
                 hl_status = config.application[appl]['hl']
                 if hl_status == '' or hl_status.startswith('Error'):
 
-                    cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
+                    # cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
+                    cls._log.info(f'Running Highlight analysis for {appl}')
                     app_id = rest.get_app_id(appl)
                     if app_id is None:
                         cls._log.info(f'Application {appl} not found in Highlight, Creating Application {appl}...')
