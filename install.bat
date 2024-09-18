@@ -52,7 +52,7 @@ set CODE_FOLDER=%1\CAST\CODE
 if "%CODE_FOLDER%x" == "x" goto missingCodeParam
 if not exist %CODE_FOLDER% goto missingCodeFolder
 echo Configure for installation
-
+ 
 :: Check for Python Installation
 python -m ensurepip --default-pip
 call pip --version 2>NUL

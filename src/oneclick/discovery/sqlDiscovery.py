@@ -54,7 +54,7 @@ class SQLDiscovery(SourceValidation):
             cls._data=[]
             sql_files = []
             non_sql_files = []
-            app_folder = abspath(f'{config.work}\\AIP\\{config.project_name}\\{app}')
+            app_folder = abspath(f'{config.work}/{config.project_name}/{app}')
             # cls._log.info(f'Searching {app_folder}')
             with tqdm(total=0) as pbar:
                 for root, dirs, files in walk(app_folder):

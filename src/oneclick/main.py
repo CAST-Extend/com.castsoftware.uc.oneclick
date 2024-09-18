@@ -6,7 +6,7 @@ from oneclick.discovery.unzip import Unzip
 from oneclick.discovery.prep import Prepare
 from oneclick.discovery.cloc import ClocPreCleanup,ClocPostCleanup
 from oneclick.discovery.profiler import ProfilerPreCleanup
-from oneclick.discovery.cleanup import cleanUpAIP,cleanUpHL
+from oneclick.discovery.cleanup import Cleanup,cleanUpHL
 from oneclick.discovery.sqlDiscovery import SQLDiscovery
 from oneclick.discovery.discoveryReport import DiscoveryReport
 
@@ -15,7 +15,6 @@ from oneclick.analysis.highlight_analysis import HLAnalysis
 from oneclick.analysis.aip_analysis import AIPAnalysis
 from oneclick.analysis.trackAnalysis import TrackAnalysis
 
-from cast_action_plan.action_plan import ActionPlan
 from oneclick.runArg import RunARGAIP,RunARG
 
 from argparse import ArgumentParser,RawTextHelpFormatter
@@ -27,6 +26,8 @@ from argparse_formatter import FlexiFormatter,ParagraphFormatter
 
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
+
+from pkg_resources import get_distribution
 
 import sys
 
@@ -50,6 +51,7 @@ def command_line() -> ArgumentParser:
     """
     config_parser = subparsers.add_parser('config')
     config_parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location',metavar='BASE_FOLDER')
+    config_parser.add_argument('-w','--workFolder', required=True, help='Working Folder Location',metavar='WORK_FOLDER')
     config_parser.add_argument('-d','--debug',type=bool)
     config_parser.add_argument('-p','--projectName', help='Name of the project')
 
@@ -108,8 +110,11 @@ def command_line() -> ArgumentParser:
     run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
     run_parser.add_argument('-p','--projectName', help='Name of the project')
 
-    run_parser.add_argument('--start',choices=['Analysis','Report'],default='Discovery',help='Start from catagory')
+    # run_parser.add_argument('--start',choices=['Analysis','Report','Cleanup'],default='Discovery',help='Start from catagory')
+    run_parser.add_argument('--start',default='Prepare',help='Start from catagory')
     run_parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
+    run_parser.add_argument('--runMRI', help='Run MRI Analysis')
+    run_parser.add_argument('--runHL', help='Run Highlight Analysis')
 
     run_parser.add_argument('-d','--debug',  default=False,type=bool)
 
@@ -118,12 +123,11 @@ def command_line() -> ArgumentParser:
 #TODO: d2-Ability to install onclick with all its components via PIP (d2)
 #TODO: d1-send emails (d1-SHP)
 if __name__ == '__main__':
-
-
-    print('\nCAST One Click')
-    print('Copyright (c) 2023 CAST Software Inc.\n')
-    print('If you need assistance, please contact us at oneclick@castsoftware.com\n')
-
+    version = get_distribution('com.castsoftware.uc.oneclick').version
+    print(f'\nCAST OneClick Setup, v{version}')
+    print(f'com.castsoftware.uc.python.common v{get_distribution("com.castsoftware.uc.python.common").version}')
+    print('Copyright (c) 2024 CAST Software Inc.')
+    print('If you need assistance, please contact oneclick@castsoftware.com')
 
     parser,config_parser = command_line()
     default_args = get_argparse_defaults(config_parser)
@@ -134,10 +138,14 @@ if __name__ == '__main__':
         config=Config(parser,default_args)
         #printing some inital messages to the user
 
-        if args.command == 'config':
-            log_level = INFO
-            log = Logger("main")
+        create_folder(abspath(config.logs))
+        file_name=abspath(f'{config.logs}/{config.project_name}')
+        create_folder(file_name)
+        config.log_filename=abspath(f'{file_name}/general.log')
+        log_level = INFO
+        log = Logger("main",file_name=config.log_filename)
 
+        if args.command == 'config':
             file = ''
             if args.projectName is None:
                 file='Default'
@@ -146,12 +154,6 @@ if __name__ == '__main__':
             log.info(f'{file} configuration file successfuly updated')
             exit ()
         elif args.command == 'run':
-            file_name=abspath(f'{args.baseFolder}/ONECLICK_WORK/LOGS/{config.project_name}')
-            create_folder(file_name)
-            config.log_filename=abspath(f'{file_name}/general.log')
-            
-            log_level = INFO
-            log = Logger("main",file_name=config.log_filename)
             # log.info(f'Running {args.command}')
             config.validate_for_run()
 
@@ -181,13 +183,9 @@ if __name__ == '__main__':
     if args.debug:
         log_level=DEBUG
 
-    create_folder(abspath(f'{config.base}/STAGED'))
     create_folder(abspath(config.work))
-    #create_folder(abspath(config.logs))
-    #create_folder(abspath(f'{config.logs}/{config.project_name}'))
     create_folder(abspath(config.oneclick_work))
     create_folder(abspath(f'{config.oneclick_work}/{config.project_name}'))
-    create_folder(abspath(f'{config.oneclick_work}/{config.project_name}/LOGS'))
     create_folder(abspath(config.report))
     create_folder(abspath(f'{config.report}/{config.project_name}'))
 
@@ -209,8 +207,8 @@ if __name__ == '__main__':
         # source code preparation
         ClocPreCleanup(config,log_level),
         ProfilerPreCleanup(config,log_level),
-        cleanUpAIP(config,log_level),
-        cleanUpHL(config,log_level),
+        Cleanup(config,log_level),
+        # cleanUpHL(config,log_level),
         ClocPostCleanup(config,log_level),
 
 
@@ -227,47 +225,36 @@ if __name__ == '__main__':
         HLAnalysis(log_level),
         TrackAnalysis(post_aip,log_level),
 
-        RunARG(config,log_level)
+        #RunARG(config,log_level)
 
         #TODO continue processing after analysis is done (d2)
         #TODO generate obsolescence report (d2)
     ]
 
-    step = 1
-    for p in process:
-        if issubclass(type(p), Analysis) and args.end == 'Discovery':
-            log.info('--end Discovery selected, process stopping here')
-            break
+    active=False
+    try:
+        step = 0
+        for p in process:
+            step += 1
+            #look for starting class
+            if type(p).__name__ == args.start:
+                active=True
 
+            if not active: 
+                log.info(f'Skipping {type(p).__name__}')
+                continue
 
-        log.info(f'=> STEP {step} : {p.get_title()}')
-        if args.start == 'Discovery':
-            if issubclass(type(p), SourceValidation):
-                status = p.run(config)
-
-        if args.start in ['Discovery','Analysis']:
-            if issubclass(type(p), Analysis):
-                status = p.run(config)
-                if status and issubclass(type(p), TrackAnalysis):
-                    log.error('One or more analysis failed, review logs and restart')
-                    break
-                elif status > 0:
-                    break
-
-
-        if args.end == 'Analysis':
-            if issubclass(type(p), RunARG):
+            if issubclass(type(p), Analysis) and args.end == 'Discovery':
+                log.info('--end Discovery selected, process stopping here')
                 break
 
-        if args.start in ['Discovery','Analysis','Report']:
-            if issubclass(type(p), RunARG):
-                status = p.run(config)
+            log.info(f'=> STEP {step} : {p.get_title()}')
+            status = p.run(config)
+    
+    except InvalidConfiguration as ic:
+        log.error(ic)
+    except Exception as ex:
+        log.error(ex)
 
-        # if issubclass(type(p), ActionPlan):
-        #     for appl in config.application:
-        #         log.info(f'Working on action items for {appl}')
-        #         p.run(appl)
-
-        step += 1
 
     log.info('Complete')

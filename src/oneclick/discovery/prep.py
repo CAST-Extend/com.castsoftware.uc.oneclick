@@ -1,10 +1,11 @@
 from cast_common.logger import Logger
 from cast_common.util import create_folder
 from os import mkdir,walk,listdir
-from os.path import exists,abspath
+from os.path import exists,abspath,isdir
 from shutil import copytree,rmtree
 from oneclick.discovery.sourceValidation import SourceValidation 
 from oneclick.config import Config
+from oneclick.exceptions import InvalidConfiguration
 
 from tqdm import tqdm
 
@@ -15,26 +16,20 @@ class Prepare(SourceValidation):
         pass
 
     def run(cls,config:Config):
-        # cls._log.info('=> STEP 1: PREPARE')
-
         no_of_apps = len(config.application)
 
-        cls._log.info(f'Found {no_of_apps} application(s).')
-        cls._log.info('OneClick will execute below steps -')
+        cls._log.info(f'Executing analysis for project {config.project_name}')
+        cls.log.info(f'    With {no_of_apps} application(s).')
 
         if config.start == 'Discovery':
             discovery_flag = True
         else:
             discovery_flag = False
 
-        cls._log.info(f'\t\t\tSource Code Unzip, Cleanup and Discovery - {discovery_flag}')
-        cls._log.info(f'\t\t\tRun MRI analysis: {config.is_aip_active}')
-        cls._log.info(f'\t\t\tRun Highlight analysis: {config.is_hl_active}')
-        cls._log.info(f'\t\t\tOutput Report Generation - True')
-        # cls._log.info('****************** Source Code Validation Log *********************')
-        # cls._log.info(f'Running {cls.__class__.__name__} for all applications')
-
-
+        cls.log.info(f'    Source Code Unzip, Cleanup and Discovery - {discovery_flag}')
+        cls.log.info(f'    Run MRI analysis: {config.is_aip_active}')
+        cls.log.info(f'    Run Highlight analysis: {config.is_hl_active}')
+ 
         """is the minimal enviroment configured
             base
             |-.oneClick
@@ -44,7 +39,7 @@ class Prepare(SourceValidation):
                 |-application 2
                 |-application ...
         """
-        cls._log.info('Creating destination folder structure')
+        cls.log.info('Creating destination folder structure')
         if not exists(config.deliver):
             raise ValueError(f'{config.deliver} does not exist')
 
@@ -60,37 +55,25 @@ class Prepare(SourceValidation):
         config.application=dirnames
 
         #Finally copy the contents of deliver to work
-        cls._log.info('Copying deliver to work')
+        cls.log.info('Copy all files in deliver to staging')
 
         # for folder in tqdm(dirnames,desc='Preparing applications'):
+        dst_project=f'{config.work}\\{config.project_name}'
+        create_folder(dst_project)
+
         for folder in dirnames:
+
             src_name = abspath(f'{config.deliver}\\{folder}')
-            dst_aip_name = abspath(f'{config.work}\\AIP')
-            dst_hl_name = abspath(f'{config.work}\\HL')
-            create_folder(dst_aip_name)
-            create_folder(dst_hl_name)
+            dst_app=f'{dst_project}\\{folder}'
+            cls.log.info(f'    From {src_name} to {dst_app}')
 
-            # create_folder(abspath(f'{config.output}/{folder}'))
-            # create_folder(abspath(f'{config.output}/{folder}/REPORT'))
-            # create_folder(abspath(f'{config.output}/{folder}/CLOC'))
+            if isdir (src_name):
+                if not exists(dst_app):
+                    copytree(src_name,dst_app)
+            else: # the project can only contain application folders, no files allowed
+                raise InvalidConfiguration(f'No applications found in project {config.project_name}')
 
-
-            dst_aip_project=f'{dst_aip_name}\\{config.project_name}'
-            dst_hl_project=f'{dst_hl_name}\\{config.project_name}'
-            create_folder(dst_aip_project)
-            create_folder(dst_hl_project)
-
-            dst_aip_app=f'{dst_aip_project}\\{folder}'
-            dst_hl_app=f'{dst_hl_project}\\{folder}'
-
-            if not exists(dst_aip_app):
-                #cls._log.info(f'Copy from {src_name} to {dst_aip_app}')
-                copytree(src_name,dst_aip_app)
-            if not exists(dst_hl_app):
-                #cls._log.info(f'Copy from {src_name} to {dst_hl_app}')
-                copytree(src_name,dst_hl_app)
-
-        cls._log.info('Environment preparation step complete')
+        cls.log.info(f'Environment preparation complete for project {config.project_name}')
 
         return True
 

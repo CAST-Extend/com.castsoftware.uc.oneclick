@@ -12,6 +12,10 @@ class Analysis():
         cls._log = Logger(log_name,log_level)
         pass
 
+    @property
+    def log(cls):
+        return cls._log
+
     def track_process(cls,process:Popen,operation:str,name:str):
         cls._pid.append(Process(process,operation,name))
         pass

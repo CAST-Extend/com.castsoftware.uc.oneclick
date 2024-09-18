@@ -4,11 +4,17 @@ from oneclick.config import Config
 from os.path import abspath
 
 class SourceValidation:
+    _log=None
 
     def __init__(cls,config:Config,log_name:str,log_level:int):
-        cls._log = Logger(name=log_name,level=log_level,file_name=config.log_filename)
-        cls._log_level=log_level
+        if SourceValidation._log is None:
+            SourceValidation._log = Logger(name=log_name,level=log_level,file_name=config.log_filename)
+            SourceValidation._log_level=log_level
         pass
+
+    @property
+    def log(cls):
+        return SourceValidation._log
 
     @property
     def required(cls):

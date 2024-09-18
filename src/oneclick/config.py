@@ -9,10 +9,10 @@ from json import JSONDecodeError,dump
 from os.path import abspath,exists,dirname
 from os import getcwd
 
+from cast_common.util import yes_no_input,folder_input,secret_input,url_input,string_input
+
 from argparse import ArgumentParser
 from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
-
-from urllib.parse import urlparse
 
 __author__ = "Nevin Kaplan"
 __copyright__ = "Copyright 2022, CAST Software"
@@ -26,36 +26,45 @@ class Config():
         self.log = Logger(self.__class__.__name__,log_level)
 
         args = parser.parse_args()
+ 
+        
+        if 'baseFolder' not in args:
+            args.baseFolder = folder_input('What folder is OneClick installed in?',file='.oneClick')
 
-        if not exists(abspath(args.baseFolder)):
-            raise InvalidConfigNoBase(f'Base folder must exist: {args.baseFolder}')
+        if not exists(abspath(args.baseFolder)) and exists(abspath(f'args.baseFolder/.oneClick')):
+            raise InvalidConfigNoBase(f'Invalid base folder: {args.baseFolder}')
 
-        base_config=abspath(f'{args.baseFolder}/.oneclick/config.json')
-        if not exists(base_config) and args.command == 'run':
+        base_config=abspath(f'{args.baseFolder}/.oneclick/config.json'.lstrip().rstrip())
+        if not exists(base_config) and 'command' in args and args.command == 'run':
             raise NoConfigFound('Base configuration file found, please run with the "config" option')
 
 
-        if args.command == 'config':
+        if 'command' not in args or args.command == 'config':
             if not exists(base_config):
                 self._config={}
                 self._config_file=base_config
-                self.base = args.baseFolder
+                self.base = args.baseFolder.lstrip().rstrip()
             else: 
-                if args.projectName is None:
-                    self._config_file = abspath(f'{args.baseFolder}/.oneclick/config.json')
+                if 'projectName' not in args:
+                    self._config_file = base_config
                 else:
-                    self._config_file = abspath(f'{args.baseFolder}/.oneclick/{args.projectName}.json')
+                    self._config_file = abspath(f'{args.baseFolder}/.oneclick/{args.projectName}.json'.lstrip().rstrip())
 
                 with open(abspath(self._config_file), 'rb') as config_file:
                     self._config = load(config_file)
-            try:       
-                if args.java_home is None:
+
+            #if there is no command in arguments we are comming from setup and should exit here
+            if 'command' not in args:
+                return
+            
+            try:     
+                if 'java_home' not in args: 
                     self.java_home = ''
                 else:
                     self.java_home = args.java_home
 
-                if args.cloc_version is not None: self.cloc_version = args.cloc_version
-                if args.profiler is not None: self.profiler = args.profiler
+                if 'cloc_version' not in args: self.cloc_version = args.cloc_version
+                if 'profiler' not in args is not None: self.profiler = args.profiler
 
                 #Dashboard
                 if args.aipURL is not None: self.aip_url = args.aipURL
@@ -122,7 +131,9 @@ class Config():
 
                 # Run for MRI
                 if self.is_console_active == False:
-                    if yes_no_input('Run MRI analysis for all applications?'):
+                    if not args.runMRI is None:
+                        self._set_aip_active=args.runMRI
+                    elif yes_no_input('Run MRI analysis for all applications?'):
                         while not self.is_console_active:
                             if len(self.console_url) == 0:
                                 self.console_url=url_input('Missing console URL:',self.console_url)
@@ -136,7 +147,9 @@ class Config():
                         self._set_console_active=False                                
 
                 if self.is_hl_active == False:                
-                    if yes_no_input('Run Highlight analysis for all applications?'):
+                    if not args.runHL is None:
+                        self._set_hl_active=args.runHL
+                    elif yes_no_input('Run Highlight analysis for all applications?'):
                         while not self.is_hl_active:
                             if len(self.hl_url) == 0:
                                 self.hl_url=url_input('Missing Highlight URL',self.hl_url)
@@ -148,6 +161,8 @@ class Config():
                                 self.hl_instance=string_input('Missing Highlight Instance ID',self.hl_instance)
                             else:
                                 self.hl_instance=self.hl_instance
+                    else:
+                        self._set_hl_active=False                                
 
                 # self.log.info(f'Run MRI analysis: {self.is_aip_active}')
                 # self.log.info(f'Run Highlight analysis: {self.is_hl_active}')
@@ -178,8 +193,8 @@ class Config():
         exec = abspath(f'{self.base}\\scripts\\{self.cloc_version}')
         if not exists(exec):
             raise InvalidConfiguration(f'CLOC executable not found: {exec}')
-        if not self.is_console_active and not self.is_hl_active:
-            raise InvalidConfiguration('Both Hightlight and AIP configureations are incomplete, at least one must be')
+        # if not self.is_console_active and not self.is_hl_active:
+        #     raise InvalidConfiguration('Both Hightlight and AIP configureations are incomplete, at least one must be')
 
 
     def check_default(self,arg_value,cfg_value,default_value) -> bool:
@@ -565,19 +580,19 @@ class Config():
 
     @property
     def deliver(self):
-        return f'{self.base}\\deliver\\{self.project_name}'
+        return f'{self.workbase}\\deliver\\{self.project_name}'
     @property
     def work(self):
-        return f'{self.base}\\STAGED'
+        return f'{self.workbase}\\STAGED'
     @property
     def report(self):
-        return f'{self.base}\\REPORT'
+        return f'{self.workbase}\\REPORT'
     @property
     def logs(self):
-        return f'{self.base}\\LOGS'
+        return f'{self.workbase}\\LOGS'
     @property
     def oneclick_work(self):
-        return f'{self.base}\\ONECLICK_WORK'
+        return f'{self.workbase}\\ONECLICK_WORK'
 
     """ **************** Email related entries ************************ """
     @property 
@@ -613,6 +628,15 @@ class Config():
         return self._get(self.setting,'arg-template')
 
     @property
+    def workbase(self):
+        return self._get(self.setting,'workbase','')
+    @workbase.setter
+    def workbase(self,value):
+        if value is not None:
+            self.setting['workbase']=value
+            self._save()
+
+    @property
     def base(self):
         return self._get(self.setting,'base','')
     @base.setter
@@ -626,7 +650,9 @@ class Config():
         return self._get(self.setting,'profiler')
     @profiler.setter
     def profiler(self,value):
-        if self._set_value(self.setting,'profiler',abspath(value)):
+        if len(value):
+            value = abspath(value)
+        if self._set_value(self.setting,'profiler',value):
             self._save()
 
     @property
@@ -650,103 +676,12 @@ class Config():
 
     @property
     def java_home(self):
+        if 'java-home' not in self.setting: self.setting['java-home']=''
         return self.setting['java-home']
     @java_home.setter
     def java_home(self,value):
         if self._set_value(self.setting,'java-home',value,''):
             self._save()
-
-
-def yes_no_input(prompt:str,default_value=True) -> bool:
-    while True:
-        if default_value:
-            default_value='Y'
-        else:
-            default_value='N'
-
-        val = input(f'{prompt} [{default_value}]?').upper()
-        if len(val) == 0: val = default_value
-
-        if val in ['Y','YES']:
-            return True
-        elif val in ['N','NO']:
-            return False
-        else:
-            print ('Expecting a Y[es] or N[o] response. ',end='')
-
-def folder_input(prompt:str,folder:str='',file:str=None,combine:bool=False) -> str:
-    if combine:
-        folder=folder.replace(file,'')
-
-    while True:
-        i = input(f'{prompt} [{abspath(folder)}]: ')
-        if len(i)==0:
-            folder = abspath(folder)
-        else:
-            folder = abspath(i)
-        if exists(folder):
-            if file is not None:
-                if exists(abspath(f'{folder}/{file}')):
-                    break
-                else:
-                    print (f'{folder} folder does not contain {file}, please try again')
-                    continue
-            else:
-                break
-        print (f'{folder} not found, please try again')
-
-    if combine:
-        folder = abspath(f'{folder}/{file}')
-    return folder
-
-def string_input(prompt:str,default_value=""):
-    while True:
-        if len(default_value)>0:
-            i = input(f'{prompt} [{default_value}]: ')
-        else:
-            i = input(f'{prompt}: ')
-
-        if len(i)==0:
-            if len(default_value) == 0:
-                print('Input required, please try again')
-                continue
-            else:
-                i = default_value
-        return i            
-
-def secret_input(prompt:str,default_value=""):
-    while True:
-        if len(default_value)>0:
-            i = input(f'{prompt} ***********: ')
-        else:
-            i = input(f'{prompt}: ')
-
-        if len(i)==0:
-            if len(default_value) == 0:
-                print('Input required, please try again')
-                continue
-            else:
-                i = default_value
-        return i            
-
-def url_input(prompt:str,default:str):
-    while True:
-        i = input(f'{prompt} [{default}]: ')
-        if len(i)>0 and uri_validator(i):
-            default = i
-        if uri_validator(default):
-            return default
-        else:
-            print ("Bad URL, please try again")      
-
-
-def uri_validator(x):
-    try:
-        result = urlparse(x)
-        return all([result.scheme, result.netloc])
-    except:
-        return False
-
 
 #        def _set_value(self,base,key,value,default=''):
 

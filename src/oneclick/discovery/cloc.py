@@ -76,7 +76,7 @@ class ClocPreCleanup(SourceValidation):
 
     def _run_cloc(cls,work_folder:str,cloc_output:str,cloc_output_ignored:str):
         args = [cls.cloc_path,work_folder,"--report-file",cloc_output,"--ignored",cloc_output_ignored,"--quiet"]
-        cls._log.debug(' '.join(args))
+        cls.log.debug(' '.join(args))
         proc = run_process(args,False)
         if proc.poll() is not None and exists(cloc_output):
             return 'DONE'
@@ -101,7 +101,7 @@ class ClocPreCleanup(SourceValidation):
         DefineDosDevice = windll.kernel32.DefineDosDeviceW
         DefineDosDevice.argtypes = [ c_int, c_wchar_p, c_wchar_p ]
 
-        project_folder=abspath(f'{config.work}/AIP/{config.project_name}')
+        project_folder=abspath(f'{config.work}/{config.project_name}')
         # Create a subst. Check the return for non-zero to mean success
         drive=project_folder
         platform = system()
@@ -111,14 +111,14 @@ class ClocPreCleanup(SourceValidation):
                 raise RuntimeError("Subst failed")
 
         for appl in tqdm(config.application,desc='Launching CLOC'):
-            #cls._log.info(f'Running {config.project_name}/{appl}')
+            #cls.log.info(f'Running {config.project_name}/{appl}')
             create_folder(f'{config.report}/{config.project_name}/{appl}')
             cloc_output = cls.cloc_output_path(config,appl)
             cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
             if platform == 'Windows':            
                 work_folder = abspath(f'{drive}/{appl}')
             else:
-                work_folder = abspath(f'{config.work}/AIP/{config.project_name}/{appl}')
+                work_folder = abspath(f'{config.work}/{config.project_name}/{appl}')
 
             #if the report is already out there - no need to continue
             if exists(cloc_output):
@@ -129,7 +129,7 @@ class ClocPreCleanup(SourceValidation):
 
         #has all cloc processing completed
         if cloc_run:
-            cls._log.info('=> Using CLOC')
+            cls.log.info('=> Using CLOC')
             all_done=False
             with tqdm(total=0,desc='CLOC Running') as t:
                 while (not all_done):
@@ -152,22 +152,22 @@ class ClocPreCleanup(SourceValidation):
                         cloc_output = cls.cloc_output_path(config,p)
                         cloc_output_ignored = cls.cloc_output_ignore_path(config,p)
 
-                        # cls._log.debug(f'Checking results for {config.project_name}/{p}')
+                        # cls.log.debug(f'Checking results for {config.project_name}/{p}')
                         #process completed
                         if type(process[p])==Popen and process[p].poll() is not None:
                             try:
                                 #get the results
                                 ret,output[p] = check_process(process[p],False)
                                 if ret != 0 or (exists(cloc_output) and getsize(cloc_output) == 0):
-                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                                    cls.log.error(f'Error running cloc on {cloc_output} ({ret})')
                             except IOError:
                                 if not exists(cloc_output) and getsize(cloc_output) == 0:
-                                    cls._log.error(f'Error running cloc on {cloc_output} ({ret})')
+                                    cls.log.error(f'Error running cloc on {cloc_output} ({ret})')
                             except ValueError as ex:
                                 if str(ex) == 'read of closed file':
-                                    cls._log.debug(f'Process already closed {p}')
+                                    cls.log.debug(f'Process already closed {p}')
                             except Exception as ex:
-                                cls._log.warning(f'{type(ex)} Error: {str(ex)}')
+                                cls.log.warning(f'{type(ex)} Error: {str(ex)}')
                                 pass
 
                             if exists(cloc_output):
@@ -184,7 +184,7 @@ class ClocPreCleanup(SourceValidation):
             cloc_output = cls.cloc_output_path(config,appl)
             cloc_output_ignored = cls.cloc_output_ignore_path(config,appl)
             if process[appl] == 'DONE' or process[appl] is None:
-                cls._log.debug(f'Processing {cloc_output}')
+                cls.log.debug(f'Processing {cloc_output}')
                 with open(cloc_output, 'r') as f:
                     content = f.read()
 
@@ -213,14 +213,14 @@ class ClocPreCleanup(SourceValidation):
                 tab_name = (tab_name[:30] + '..') if len(tab_name) > 30 else tab_name
                 loc = df['CODE'].sum()
                 if cls.phase == 'Before':
-                    cls._log.info(f'application {appl}, total loc {loc}')
+                    cls.log.info(f'application {appl}, total loc {loc}')
                 if cls.phase == 'After':
-                    cls._log.info(f'application {appl}')    
+                    cls.log.info(f'application {appl}')    
                     position = content.find('\n')
                     print(content[position+1:])
                 workbook = format_table(ClocPreCleanup.writer,df,tab_name,total_line=True)
             else:
-                cls._log.error(f'Error running CLOC for {appl} {output[appl]}')
+                cls.log.error(f'Error running CLOC for {appl} {output[appl]}')
         return True
 
     def get_title(cls) -> str:
