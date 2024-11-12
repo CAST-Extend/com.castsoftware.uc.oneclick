@@ -1,260 +1,184 @@
-from cast_common.logger import Logger,INFO,DEBUG
-from cast_common.util import create_folder
-from oneclick.config import Config
+__author__ = "Nevin Kaplan"
+__email__ = "n.kaplan@castsoftware.com"
+__copyright__ = "Copyright 2024, CAST Software"
+
+from pkg_resources import get_distribution
+from oneclick.configTest import Config,Status
+from oneclick.base import Base
+from oneclick.exceptions import InvalidConfiguration,InvalidConfigNoBase
 
 from oneclick.discovery.unzip import Unzip
 from oneclick.discovery.prep import Prepare
 from oneclick.discovery.cloc import ClocPreCleanup,ClocPostCleanup
 from oneclick.discovery.profiler import ProfilerPreCleanup
-from oneclick.discovery.cleanup import Cleanup,cleanUpHL
+from oneclick.discovery.cleanup import Cleanup,rmtree
 from oneclick.discovery.sqlDiscovery import SQLDiscovery
 from oneclick.discovery.discoveryReport import DiscoveryReport
 
+
+
 from oneclick.analysis.analysis import Analysis
+from oneclick.analysis.runAnalysis import RunHighlight
 from oneclick.analysis.highlight_analysis import HLAnalysis
 from oneclick.analysis.aip_analysis import AIPAnalysis
 from oneclick.analysis.trackAnalysis import TrackAnalysis
 
-from oneclick.runArg import RunARGAIP,RunARG
-
-from argparse import ArgumentParser,RawTextHelpFormatter
-from oneclick.sendEmail import EmailNotification
-from sys import exit
+from inquirer import List,prompt
 from os.path import abspath,exists
 
-from argparse_formatter import FlexiFormatter,ParagraphFormatter
-
-from oneclick.discovery.sourceValidation import SourceValidation 
-from oneclick.exceptions import NoConfigFound,InvalidConfiguration,InvalidConfigNoBase
-
-from pkg_resources import get_distribution
-
-import sys
-
-__author__ = "Nevin Kaplan"
-__email__ = "n.kaplan@castsoftware.com"
-__copyright__ = "Copyright 2022, CAST Software"
-
-def get_argparse_defaults(parser):
-    defaults = {}
-    for action in parser._actions:
-        if not action.required and action.dest != "help":
-            defaults[action.dest] = action.default
-    return defaults
-
-def command_line() -> ArgumentParser:
-    parser = ArgumentParser(prog='OneClick',  formatter_class=lambda prog: FlexiFormatter(prog, width=99999, max_help_position=60))
-    subparsers = parser.add_subparsers(title='command',dest='command')
-
-    """
-        configure default json to be used with all projects going forward
-    """
-    config_parser = subparsers.add_parser('config')
-    config_parser.add_argument('-b','--baseFolder', required=True, help='Base Folder Location',metavar='BASE_FOLDER')
-    config_parser.add_argument('-w','--workFolder', required=True, help='Working Folder Location',metavar='WORK_FOLDER')
-    config_parser.add_argument('-d','--debug',type=bool)
-    config_parser.add_argument('-p','--projectName', help='Name of the project')
-
-    #settings
-    settings=config_parser.add_argument_group('General Settings')
-    settings.add_argument('--java_home', help='Set if java is not part of the system path')
-    settings.add_argument('--report_template', help='Set if java is not part of the system path')
-    settings.add_argument('--cloc_version',default='cloc-1.96.exe', help='set the version of cloc exe')
-    settings.add_argument('--profiler', help='profiler executable location')
-
-    #dashboard access
-    dashboard=config_parser.add_argument_group('CAST AIP Dashboard Access')
-    dashboard.add_argument('--aipURL', help='AIP API URL')
-    dashboard.add_argument('--aipUser', help='AIP API  User')
-    dashboard.add_argument('--aipPassword', help='AIP API  Password')
-
-    #highlight
-    highlight=config_parser.add_argument_group('CAST Highlight Access')
-    highlight.add_argument('--hlURL',default='https://rpa.casthighlight.com', help='Highlight URL',metavar='URL')
-    highlight.add_argument('--hlUser',  help='Highlight User',metavar='USER')
-    highlight.add_argument('--hlPassword',  help='Highlight Password',metavar='PASSWORD')
-    highlight.add_argument('--hlInstance',  help='Highlight Instance Id',type=int,metavar='ID')
-    highlight.add_argument('--hlCLI',
-                            default='c:/Program Files/CAST/Highlight-Automation-Command/HighlightAutomation.jar', 
-                            help='Highlight CLI Location',
-                            metavar='LOCATION')
-    highlight.add_argument('--hlAgent',
-                            default='c:/Program Files/CAST/HighlightAgent',
-                            help='Highlight Perl Installation Location (HighlightAgent/strawberry/perl)',
-                            metavar='LOCATION')
-    # highlight.add_argument('--HLAnalyzerDir', 
-    #                        default='c:/Program Files/CAST/HighlightAgent/perl',
-    #                        help='Highlight Perl Installation Location (HighlightAgent/perl)',
-    #                        metavar='LOCATION')
-
-    console=config_parser.add_argument_group('CAST AIP Console')
-    console.add_argument('--consoleURL',  help='AIP Console URL',metavar='URL')
-    console.add_argument('--consoleKey',  help='AIP Console Key',metavar='KEY')
-    console.add_argument('--consoleCLI',  help='AIP Console CLI Location',metavar='LOCATION')
-    console.add_argument('--enable-security-assessment', help='AIP Console security-assessment', default=True)
-    console.add_argument('--blueprint', help='AIP Console blueprint design', default=True)
-
-    database=config_parser.add_argument_group('CAST AIP Core Database')
-    database.add_argument('--dbHost',  help='Database Host')
-    database.add_argument('--dbPort',  help='Database Port')
-    database.add_argument('--dbUser',  help='Database User',default="operator")
-    database.add_argument('--dbPassword',  help='Database Password',default="CastAIP")
-    database.add_argument('--dbDatabase',  help='Database Database',default="postgres")
-
-    """
-        OneClick "Run" parameters
-    """
-    run_parser = subparsers.add_parser('run')
-    run_parser.add_argument('-b','--baseFolder', help='Base Folder Location')
-    run_parser.add_argument('-n','--consoleNode', help='AIP Console Node Name',metavar='NAME')
-    run_parser.add_argument('-c','--companyName',  default='Company Name', help='Name of the project')
-    run_parser.add_argument('-p','--projectName', help='Name of the project')
-
-    # run_parser.add_argument('--start',choices=['Analysis','Report','Cleanup'],default='Discovery',help='Start from catagory')
-    run_parser.add_argument('--start',default='Prepare',help='Start from catagory')
-    run_parser.add_argument('--end',choices=['Discovery','Analysis','Report'],default='Report',help='End after catagory')
-    run_parser.add_argument('--runMRI', help='Run MRI Analysis')
-    run_parser.add_argument('--runHL', help='Run Highlight Analysis')
-
-    run_parser.add_argument('-d','--debug',  default=False,type=bool)
-
-    return parser,config_parser
-
-#TODO: d2-Ability to install onclick with all its components via PIP (d2)
-#TODO: d1-send emails (d1-SHP)
 if __name__ == '__main__':
     version = get_distribution('com.castsoftware.uc.oneclick').version
     print(f'\nCAST OneClick Setup, v{version}')
     print(f'com.castsoftware.uc.python.common v{get_distribution("com.castsoftware.uc.python.common").version}')
     print('Copyright (c) 2024 CAST Software Inc.')
     print('If you need assistance, please contact oneclick@castsoftware.com')
-
-    parser,config_parser = command_line()
-    default_args = get_argparse_defaults(config_parser)
-    args = parser.parse_args()
-
-    config = NotImplemented
+    
+    config = Config()
+    Base(config)    
     try:
-        config=Config(parser,default_args)
-        #printing some inital messages to the user
+        config.log.info(f'****************** Starting CAST OneClick for project {config.project_name} ******************')
 
-        create_folder(abspath(config.logs))
-        file_name=abspath(f'{config.logs}/{config.project_name}')
-        create_folder(file_name)
-        config.log_filename=abspath(f'{file_name}/general.log')
-        log_level = INFO
-        log = Logger("main",file_name=config.log_filename)
+        if config.reset:
+            config.log.info(f'Resetting all applications')
+            for app in config.applist:
+                app['status']['highlight'] = app['status']['aip'] = Status.NOT_STARTED
+            config._save()
 
-        if args.command == 'config':
-            file = ''
-            if args.projectName is None:
-                file='Default'
-            else:
-                file = args.projectName
-            log.info(f'{file} configuration file successfuly updated')
-            exit ()
-        elif args.command == 'run':
-            # log.info(f'Running {args.command}')
-            config.validate_for_run()
+            for folder in [abspath(f'{config.stage_folder}/{config.project_name}'),
+                        abspath(f'{config.highlight_folder}/{config.project_name}'),
+                        abspath(f'{config.report_folder}/{config.project_name}')]:
+                config.log.info(f'Removing {folder}')
+                if exists(folder):
+                    rmtree(folder)
+            for app in config.applist:
+                app['deleted'] = {'folders':'','files':''}
+                app['sql'] = {'tables':'','functions':'','procedures':'','views':'','triggers':''}
+                app['loc'] = ''
+                app['unpacked'] = ''
 
-    except NoConfigFound as ex:
-        log.error(config_parser.format_help())
-        log.error(ex)
-        exit()
+        # config.log.info(config.application_report())
+        process = [
 
-    except InvalidConfigNoBase as ex:
-        log.error("Invalid Configuration")
-        log.error(ex)
-        exit()
+            # environment setup
+            Prepare(),
+            Unzip(),
+            
+            # source code preparation
+            ClocPreCleanup(),
+            Cleanup(),
+            ClocPostCleanup(),
+            # ProfilerPreCleanup(),
 
-    except InvalidConfiguration as ex:
-        log.error("Invalid Configuration")
-        log.error(ex)
-        cfg = ''
-        if 'CLOC' in str(ex):
-            cfg = '--cloc_version <cloc.exe>'
+            # reporting
+            SQLDiscovery(),
+            DiscoveryReport(),
 
-        log.info('To update the default configuraiton file use')
-        log.info(f'     OneClick config {cfg}')
-        log.info('To update the application configuraiton file use:')
-        log.info(f'     OneClick config -p {config.project_name} {cfg}')
-        exit()
+            #todo: add discovery report email notification
+            # EmailNotification(),
 
-    if args.debug:
-        log_level=DEBUG
+            # application analysis process
+            #TODO DLM module?
+            # AIPAnalysis(),
+            # HLAnalysis(),
+            # TrackAnalysis()
 
-    create_folder(abspath(config.work))
-    create_folder(abspath(config.oneclick_work))
-    create_folder(abspath(f'{config.oneclick_work}/{config.project_name}'))
-    create_folder(abspath(config.report))
-    create_folder(abspath(f'{config.report}/{config.project_name}'))
+            RunHighlight()
 
-    post_aip = [
-        #ActionPlan(config,log_level),
-        RunARGAIP(config,log_level)
-    ]
+            #RunARG(config,log_level)
 
-    post_highlight = [
-        #TODO generate Highlight BOM report (d1)
-    ]
+        ]
 
-    process = [
+        choices = []
+        for obj in process:
+            if  obj.choose:
+                choices.append(f'{obj.name}') 
 
-        # environment setup
-        Prepare(config,log_level),
-        Unzip(config,log_level),
-        
-        # source code preparation
-        ClocPreCleanup(config,log_level),
-        ProfilerPreCleanup(config,log_level),
-        Cleanup(config,log_level),
-        # cleanUpHL(config,log_level),
-        ClocPostCleanup(config,log_level),
+        start=0
+        end=len(choices)-1
+        if not (config.quiet):
+            questions = [
+                List(
+                    'start with step',
+                    message="Starting process step?", 
+                    choices=choices,
+                    default=choices[0]
+                    ),
+                List(
+                    'End with step',
+                    message="Ending process step", 
+                    choices=choices,
+                    default=choices[len(choices)-1]
+                    )
+            ]
+            answers = prompt(questions)
+            config.start = answers['start with step']
+            config.end = answers['End with step']
 
+        start = end = 0        
+        if config.start == None or len(config.start) == 0:
+            start=0
+        else:
+            start = 0
+            for i in range(len(process)):
+                if process[i].name.startswith(config.start):
+                    start=i
+                    break
 
-        # reporting
-        SQLDiscovery(config,log_level),
-        DiscoveryReport(config,log_level),
+        if config.end == None or len(config.end) == 0:
+            end=len(process)-1
+        else:
+            end = len(process)
+            for i in range(len(process)):
+                if process[i].name.startswith(config.end):
+                    end=i
+                    break
 
-        #todo: add discovery report email notification
-        # EmailNotification(config,log_level),
+        if start > end:
+            raise InvalidConfiguration(f'End step {process[end].name} is before start step {process[start].name}')
+        elif not process[start].choose:
+            raise InvalidConfiguration(f'Start step {process[start].name} is not a selectable step')
 
-        # application analysis process
-        #TODO DLM module?
-        AIPAnalysis(log_level),
-        HLAnalysis(log_level),
-        TrackAnalysis(post_aip,log_level),
+        config.start = process[start].name
+        config.end = process[end].name
 
-        #RunARG(config,log_level)
-
-        #TODO continue processing after analysis is done (d2)
-        #TODO generate obsolescence report (d2)
-    ]
-
-    active=False
-    try:
+        config.log.info(f'Starting project {config.project_name} at "{config.start}" and ending at "{config.end}"')
+        active=False
         step = 0
         for p in process:
             step += 1
             #look for starting class
-            if type(p).__name__ == args.start:
+            if p.name == process[start].name:
                 active=True
 
             if not active: 
-                log.info(f'Skipping {type(p).__name__}')
+                config.log.info(f'Skipping {p.name}')
                 continue
 
-            if issubclass(type(p), Analysis) and args.end == 'Discovery':
-                log.info('--end Discovery selected, process stopping here')
-                break
+            # if issubclass(type(p), Analysis) and end == 'Discovery':
+            #     config.log.info('--end Discovery selected, process stopping here')
+            #     break
 
-            log.info(f'=> STEP {step} : {p.get_title()}')
-            status = p.run(config)
-    
+            p.log.info(f'=> STEP {step} : {p.name}')
+            
+            if p.can_run:
+                # config.log.info(f'Running {p.name}')
+                status = p.run()
+                if not status:
+                    # config.log.error(f'Error running {p.name}')
+                    break
+                config._save()
+            else:
+                config.log.info(f'Skipping {p.name}, configuration is incomplete')
+            pass
+
+
     except InvalidConfiguration as ic:
-        log.error(ic)
+        config.log.error(ic)
     except Exception as ex:
-        log.error(ex)
+        from traceback import format_exc
 
+        print ('\n\n\n\n\n\n\n\n')
 
-    log.info('Complete')
+        config.log.error(format_exc())
+    config.log.info(f'Thanks for using CAST OneClick. For more information, contact oneclick@castsoftware.com')
+
