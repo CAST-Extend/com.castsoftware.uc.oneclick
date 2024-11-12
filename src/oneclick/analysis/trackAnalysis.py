@@ -12,9 +12,9 @@ class TrackAnalysis(Analysis):
         pass
 
     def run(cls, config:Config):
-
+        cls._log.info(f"Stopping oneclick will stop HL analysis but not AIP. You can check status of AIP Scan directly on AIP Console at {config.console_url}")
         while True:
-            cls._log.info(f'Checking {len(cls._pid)} processes ...')
+            # cls._log.info(f'Checking {len(cls._pid)} processes ...')
             for p in cls._pid:
                 just_completed=False
                 process = p.process
@@ -48,7 +48,7 @@ class TrackAnalysis(Analysis):
                                 #if len(find_in_list(line,p.log))==0:
                                 p.log.append(line)
                             if process.returncode == 0:
-                                p.status = 'OK'
+                                p.status = 'Complete'
                             else:
                                 p.status = f'Error: {process.returncode}'
                                 cls._log.error(f'error running {p.name}')
@@ -61,22 +61,22 @@ class TrackAnalysis(Analysis):
                             config._save()
                             
 
-                cls._log.info(f"{p.operation} analysis for {config.project_name}\{p.name}: {p.status}")
+                cls._log.info(f"{p.operation} analysis for Application {p.name}, {p.status}")
                 if just_completed == True:
-                    if p.status != 'OK':
+                    if p.status != 'Complete':
                         for line in p.log:
                             print(f'\t{line}')
 
-                    if p.status=='OK' and  p.operation == 'AIP':
-                        cls._log.info('Running post analsis jobs...')
+                    if p.status=='Complete' and  p.operation == 'AIP':
+                        # cls._log.info('Running post analsis jobs...')
                         for proc in cls._post_aip:
                             if proc.__class__.__name__ not in config.application[p.name] or \
-                                config.application[p.name][proc.__class__.__name__] != 'OK':
+                                config.application[p.name][proc.__class__.__name__] != 'Complete':
 
                                 cls._log.info(f'******************* {proc.__class__.__name__} *******************************')
                                 proc.run(p.name)
                                 
-                                config.application[p.name][proc.__class__.__name__]='OK'
+                                config.application[p.name][proc.__class__.__name__]='Complete'
                                 config._save()
 
 
@@ -90,7 +90,7 @@ class TrackAnalysis(Analysis):
                 error = False
                 for p in cls._pid:
                     cls._log.info(f"{p.operation} for {config.project_name}\{p.name}: {p.status}")
-                    if "OK" not in p.status:
+                    if "Complete" not in p.status:
                         error = True
                 break
             sleep(60)
@@ -105,3 +105,5 @@ class TrackAnalysis(Analysis):
         #     # TODO: add more desriptive error message
         #     raise RuntimeError ("")
 
+    def get_title(cls) -> str:
+        return "TRACKING ANALYSIS" 

@@ -1,19 +1,17 @@
 [project]
 name='com.castsoftware.uc.oneclick'
 description="Assessment Generator"
-version='1.0.1' #prod version
+version='1.1.0' #prod version
 dependencies = [
-    'pandas','python-pptx==0.6.18','python-docx',
+    'pandas','python-docx',
     'argparse_formatter','django','pyunpack','tqdm',
     'patool','archive','pypiwin32','psycopg2','openpyxl',
-    'com.castsoftware.uc.python.common>=1.1.3',
-    'com.castsoftware.uc.action-plan',
-    'com.castsoftware.uc.arg>=1.6.2'    
+    'com.castsoftware.uc.python.common>=1.1.14'
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Operating System :: OS Independent",
+    "Operating System :: OS Independent"
 ]
 
 requires-python = ">=3.10"

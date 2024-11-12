@@ -2,7 +2,7 @@ from oneclick.analysis.analysis import Analysis
 from subprocess import Popen,PIPE
 from oneclick.config import Config
 from cast_common.hlRestCall import HLRestCall
-from cast_common.util import run_process,create_folder
+from cast_common.util import run_process,create_folder,check_process
 from os.path import abspath
 
 import sys
@@ -14,6 +14,7 @@ class HLAnalysis(Analysis):
         pass
 
     def run(cls, config:Config):
+        cls._log.info(f'You can use oneclick to directly run AIP or HL or both analysis using command :- oneclick run -p <project name> --start=Analysis')
         if not config.is_hl_active:
             cls._log.warning('Highlight configuration is incomplete, analysis will not run')
             return 0
@@ -26,7 +27,8 @@ class HLAnalysis(Analysis):
                 hl_status = config.application[appl]['hl']
                 if hl_status == '' or hl_status.startswith('Error'):
 
-                    cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
+                    # cls._log.info(f'Running Highlight analysis for {config.project_name}\{appl}')
+                    cls._log.info(f'Running Highlight analysis for {appl}')
                     app_id = rest.get_app_id(appl)
                     if app_id is None:
                         cls._log.info(f'Application {appl} not found in Highlight, Creating Application {appl}...')
@@ -37,27 +39,42 @@ class HLAnalysis(Analysis):
                         else:
                             cls._log.info(f'Not able to Application {appl} inside Highlight due to some error!')                       
 
-                    hl_sourceDir = f'{config.base}\\STAGED\\HL\\{config.project_name}\\{appl}'
-                    hl_workingDir = f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT\\{appl}'
+                    hl_sourceDir = abspath(f'{config.work}\\{config.project_name}\\{appl}')
+                    hl_workingDir = abspath(f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT\\{appl}')
                     create_folder(f'{config.oneclick_work}\\{config.project_name}\\HL_ANALYSIS_RESULT')
                     create_folder(hl_workingDir)
                     java_home = config.java_home
                     if len(java_home) > 0:
                         java_home = f'{java_home}'
 
-                    args = [abspath(f'{config.java_home}/bin/java.exe'),
-                            '-jar',config.hl_cli,
-                            '--sourceDir', hl_sourceDir,
-                            '--workingDir' , hl_workingDir,
-                            '--companyId', str(config.hl_instance),
-                            '--analyzerDir',config.analyzer_dir,
-                            '--perlInstallDir',config.perl_install_dir,
-                            '--applicationId', str(app_id),
-                            '--serverUrl', config.hl_url.rsplit('/',1)[0],
-                            '--login',config.hl_user,
-                            '--password',config.hl_password]
+                    # args = [abspath(f'{config.java_home}/bin/java.exe'),
+                    #         '-jar',config.hl_cli,
+                    #         '--sourceDir', hl_sourceDir,
+                    #         '--workingDir' , hl_workingDir,
+                    #         '--companyId', str(config.hl_instance),
+                    #         '--analyzerDir',config.analyzer_dir,
+                    #         '--perlInstallDir',config.perl_install_dir,
+                    #         '--applicationId', str(app_id),
+                    #         '--serverUrl', config.hl_url.rsplit('/',1)[0],
+                    #         '--login',config.hl_user,
+                    #         '--password',config.hl_password]
+
+                    args = [abspath(f'{config.base}/scripts/runHighlight.bat'),
+                            abspath(f'{config.java_home}/bin/java.exe'),
+                            config.hl_cli,
+                            hl_sourceDir,
+                            hl_workingDir,
+                            str(config.hl_instance),
+                            config.analyzer_dir,
+                            config.perl_install_dir,
+                            str(app_id),
+                            config.hl_url.rsplit('/',1)[0],
+                            config.hl_user,
+                            config.hl_password]
                     try:
                         proc = run_process(args,wait=False)
+                        pass
+
                     except FileNotFoundError as e:
                         cls._log.error(f'Unable to launch analysis process {e}')
                         cls._log.error(args)

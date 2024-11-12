@@ -2,7 +2,7 @@ import pandas
 from oneclick.discovery.sourceValidation import SourceValidation 
 from pandas import DataFrame,read_excel
 from os.path import abspath,exists
-from oneclick.config import Config
+from oneclick.configTest import Config,Status
 from cast_common.util import convert_LOC,list_to_text
 
 from docx import Document
@@ -14,10 +14,14 @@ from tqdm import tqdm
 #todo: if SQL problems, add bullet under SQL Delivery to describe (d1)
 
 class DiscoveryReport(SourceValidation):
+    @property
+    def name(self) -> str:
+        return f'Discovery Report'
+    def choose(self) -> bool:
+        return True
 
-    def __init__(cls, config:Config, log_level:int):
-        super().__init__(config,cls.__class__.__name__,log_level)
-
+    def __init__(cls):
+        pass
 
     def cloc_report(cls,file:str,sheet:str):
         
@@ -27,15 +31,16 @@ class DiscoveryReport(SourceValidation):
             if exists(file):
                 df = read_excel(file,sheet_name=sheet)
         except ValueError as ex:
-            cls._log.warning(f'No cloc informaiton found for {sheet}')
+            cls.config.log.warning(f'No cloc information found for {sheet}')
 
         return df
 
 
-    def run(cls,config:Config):
+    def run(cls):
+        config = cls.config
 
-        cloc_report = abspath(f'{config.report}/{config.project_name}/{config.project_name}-cloc.xlsx')
-        discovery_report = abspath(f'{config.report}/{config.project_name}/{config.project_name}-source-code-discovery.docx')
+        cloc_report = abspath(f'{config.report_folder}/{config.project_name}/{config.project_name}-cloc.xlsx')
+        discovery_report = abspath(f'{config.report_folder}/{config.project_name}/{config.project_name}-source-code-discovery.docx')
         # create an instance of a word document
         doc = Document()
         # add a heading of level 0 (largest heading)
@@ -47,20 +52,25 @@ class DiscoveryReport(SourceValidation):
 
         doc.add_heading('Observation by Application', 1)
 
-        for appl in tqdm(config.application,desc='Discovery',leave=True, position=1):
-            cls._log.info(f'Running {cls.__class__.__name__} for {appl}')
+        print(cls.show_progress())
 
-            sql_report = abspath(f'{config.report}/{config.project_name}/{appl}/{appl}-SQLReport.xlsx')
+        for appl in config.applist:
+            app_name = appl['name']
+            # cls._log.info(f'Running {cls.__class__.__name__} for {app_name}')
 
-            doc.add_heading(f'Application {appl}:', 2)
+            appl['status']['aip']=appl['status']['highlight']=Status.DISCOVERY_REPORT_START
 
-            before_df = cls.cloc_report(cloc_report,f'{appl}-Before')
+            sql_report = abspath(f'{config.report}/{config.project_name}/{app_name}/{app_name}-SQLReport.xlsx')
+
+            doc.add_heading(f'Application {app_name}:', 2)
+
+            before_df = cls.cloc_report(cloc_report,f'{app_name}-Before')
             if before_df.empty:
                 doc.add_paragraph(f'This application contains NO source code')
             else:
                 # read by 'Stats Before Code CleanUP' sheet of an Cloc_Output excel file
                 before_df=before_df[before_df['LANGUAGE'] != 'Totals']
-                before_df[before_df.columns]=before_df.apply(lambda x: x.str.strip() if isinstance(x, str) else x)
+                before_df[before_df.columns]=before_df.apply(lambda x: x.str.strip() if isinstance(x, str) else x).copy()
                 #print(before_df)
 
                 filt=(before_df['APPLICABLE']==False)
@@ -72,7 +82,7 @@ class DiscoveryReport(SourceValidation):
                     non_code= str(l.iloc[0]['CODE']//1000) +' KLOC of '+ l.iloc[0]['LANGUAGE'].strip() +' non code files and ~'+ str(l.iloc[1]['CODE']//1000) +' KLOC of '+ l.iloc[1]['LANGUAGE']
 
                 # read by 'Stats After Code CleanUP' sheet of an Cloc_Output excel file
-                after_df = cls.cloc_report(cloc_report,f'{appl}-After')
+                after_df = cls.cloc_report(cloc_report,f'{app_name}-After')
                 #print(after_df)
 
                 # read by 'Summary' sheet of an SQL_Output excel file
@@ -80,7 +90,7 @@ class DiscoveryReport(SourceValidation):
                     sql_df = read_excel(sql_report,sheet_name='Summary')
                 else:
                     sql_df = DataFrame(columns=['Name','Total','Unique','Dups'])
-                    cls._log.warning('No SQL found')
+                    # cls._log.warning('No SQL found')
                 #sql_df = sql_df[sql_df['Total']>0]
 
                 # out of scope code base
@@ -163,10 +173,18 @@ class DiscoveryReport(SourceValidation):
                 # Adding style to a table
                 t.style = 'Medium Shading 1 Accent 1'
 
+            appl['status']['aip']=appl['status']['highlight']=Status.DISCOVERY_REPORT_END
+
         # now save the document to a location
         doc.save(discovery_report)
-        cls._log.info(f'Source Code Discovery report has been written to {discovery_report}')
 
+        print(cls.show_progress(clear=True))
+        config.log.info(f'Source Code Discovery report generated at {discovery_report} (note: pls review report document before sharing)\n')
+        print(cls.show_progress(done=True))
+        return True
+
+    def get_title(cls) -> str:
+        return "DELIVERABLE DISCOVERY REPORT"
 
 def make_rows_bold(*rows):
     for row in rows:
